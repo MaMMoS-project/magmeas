@@ -19,7 +19,8 @@ mu_0 = np.pi * 4e-7
 class VSM:
 
     """
-    Class for importing, storing and using of VSM-data aswell as derived parameters.
+    Class for importing, storing and using of VSM-data aswell as derived
+    parameters.
 
     Attributes
     ----------
@@ -36,11 +37,14 @@ class VSM:
     D: FLOAT
         Demagnetization factor for magnetization direction
     saturation: len 2 TUPLE
-        Saturation magnetization or polarization. Given as tuple of value and unit. Default unit is Tesla.
+        Saturation magnetization or polarization. Given as tuple of value and
+        unit. Default unit is Tesla.
     remanence: len 2 TUPLE
-        Remanent magnetization or polarization. Given as tuple of value and unit. Default unit is Tesla.
+        Remanent magnetization or polarization. Given as tuple of value and
+        unit. Default unit is Tesla.
     coercivity: len 2 TUPLE
-        Intrinsic coercivity (coercivity where magnetization is reduced to zero). Given as tuple of value and unit. Default unit is Tesla.
+        Intrinsic coercivity (coercivity where magnetization is reduced to
+        zero). Given as tuple of value and unit. Default unit is Tesla.
     BHmax: FLOAT
         Maximum energy product from demagnetization curve, given in kJ/m^3.
     squareness: FLOAT
@@ -51,7 +55,8 @@ class VSM:
     demag_prism()
         Calculates Demagnetization factor for rectangular prism
     get_saturization()
-        Calculates saturation magnetization or polarization, using the approach to saturation method
+        Calculates saturation magnetization or polarization, using the
+        approach to saturation method
     get_remanence()
         Extracts remanent magnetization or polarization from hysteresis loop
     get_coercivity()
@@ -63,7 +68,8 @@ class VSM:
     load_qs()
         Load VSM-data from a quantum systems .DAT file
     plot()
-        Plots hysteresis loop, optionally with inset of demagnetisation curve, optionally saves as png
+        Plots hysteresis loop, optionally with inset of demagnetisation curve,
+        optionally saves as png
     properties_to_txt()
         Saves all properties derived from the VSM-measurement to CSV-file.
     """
@@ -83,18 +89,26 @@ class VSM:
 
     def demag_prism(self, a, b, c):
         """
-        Calculates demagnetization factor Dz for a rectangular prism with dimensions a, b, and c where c is assumed to be the axis along which the prism was magnetized.\n
-        Copied from https://rmlmcfadden.github.io/bnmr/technical-information/calculators/ \n
-        Equation from A. Aharoni, J. Appl. Phys. 83, 3422 (1998). https://doi.org/10.1063/1.367113  Eq. (1) - see Fig. 1 for_abc coordinate system
+        Calculates demagnetization factor Dz for a rectangular prism with
+        dimensions a, b, and c where c is assumed to be the axis along which
+        the prism was magnetized.\n
+        Copied from
+        https://rmlmcfadden.github.io/bnmr/technical-information/calculators/\n
+        Equation from A. Aharoni, J. Appl. Phys. 83, 3422 (1998).
+        https://doi.org/10.1063/1.367113
+        Eq. (1) - see Fig. 1 for_abc coordinate system
 
         Parameters
         ----------
         a: FLOAT
-            One side length of rectangular prism, perpendicular to magnetization direction.
+            One side length of rectangular prism, perpendicular to
+            magnetization direction.
         b: FLOAT
-            One side length of rectangular prism, perpendicular to magnetization direction.
+            One side length of rectangular prism, perpendicular to
+            magnetization direction.
         c: FLOAT
-            One side length of rectangular prism, parallel to magnetization direction.
+            One side length of rectangular prism, parallel to magnetization
+            direction.
 
         Returns
         -------
@@ -105,7 +119,7 @@ class VSM:
         # the expression takes input as half of the semi-axes
         a = 0.5 * a
         b = 0.5 * b
-        c = 0.5 * c     # c is assumed to be the axis along which the prism was magnetized
+        c = 0.5 * c     # c is || axis along which the prism was magnetized
         # define some convenience terms
         a2 = a * a
         b2 = b * b
@@ -140,17 +154,19 @@ class VSM:
 
     def get_saturation(self, unit='T'):
         """
-        Calculates saturation magnetization or polarization, using the approach to saturation method. Accounts for high field susceptibility.
+        Calculates saturation magnetization or polarization, using the approach
+        to saturation method. Accounts for high field susceptibility.
 
         Parameters
         ----------
         unit: STRING, optional
-            Unit the saturation is supposed to be returned in. Default is Tesla.
+            Unit the saturation is supposed to be returned in. Default is Tesla
 
         Returns
         -------
         saturation: len 2 TUPLE
-            Tuple of value and unit of saturation magnetization/polarization (depending on given unit)
+            Tuple of value and unit of saturation magnetization/polarization
+            (depending on given unit)
         """
 
         x = self.H
@@ -158,17 +174,24 @@ class VSM:
 
         H_max = np.max(x)  # maximum magnetic field
 
-        # get indices of all points where H_max - 1 MA/m < H <= H_max , assumed to be nearly linear region of highest fields
-        # note how this does not discriminate between magnetization and demagnetization, also not between initial and final saturation
-        # due to this the calculated saturation will be somewhat of an average value
+        # get indices of all points where H_max - 1 MA/m < H <= H_max
+        # assumed to be nearly linear region of highest fields
+        # note how this does not discriminate between magnetization and
+        # demagnetization, also not between initial and final saturation
+        # due to this the calculated saturation will be somewhat of an
+        # average value
         filt_ind = np.where(x > H_max - 1e6)
 
-        # linear regression of high-field region to extract high-field susceptibility
+        # linear regression of high-field region to extract
+        # high-field susceptibility
         linreg1 = linregress(x[filt_ind], y[filt_ind])
 
-        # substract high-field susceptibility contribution from magnetization and find intercept of another linear regression of 1/H over M
-        # this lets H go towards infinity for 1/H = 0 (intercept of regression) and is thus more accurate for a saturation magnetization
-        # if no high field susceptibility is contributing to the magnetization, then there is also nothing getting subtracted
+        # substract high-field susceptibility contribution from magnetization
+        # and find intercept of another linear regression of 1/H over M
+        # this lets H go towards infinity for 1/H = 0 (intercept of regression)
+        # and is thus more accurate for a saturation magnetization
+        # if no high field susceptibility is contributing to the magnetization,
+        # then there is also nothing getting subtracted
         linreg2 = linregress(
             1/x[filt_ind], y[filt_ind] - x[filt_ind] * linreg1.slope)
         M_sat = linreg2.intercept
@@ -191,30 +214,40 @@ class VSM:
         Returns
         -------
         remanence: len 2 TUPLE
-            Tuple of value and unit of remanent magnetization/polarization (depending on given unit)
+            Tuple of value and unit of remanent magnetization/polarization
+            (depending on given unit)
         """
         x = self.H
         y = self.M
 
         a = np.array([])
-        # scan over whole range of values to find the two points where the y-axis is crossed
+        # scan over whole range of values to find the two points where the
+        # y-axis is crossed
         for i in range(len(x)-1):
-            # H on left and right side will be positive and negative respectively or the other way around
+            # H on left and right side will be positive and negative
+            # respectively or the other way around
             if x[i] * x[i+1] <= 0:
-                # hysteresis curve between two points is assumed to be linear, calculate linear equation to get exact interception point with y-axis
+                # hysteresis curve between two points is assumed to be linear,
+                # calculate linear equation to get exact interception point
+                # with y-axis
                 m = (y[i+1]-y[i])/(x[i+1]-x[i])  # slope
                 n = y[i] - m * x[i]  # y-intercept
-                # append y-intercepts as value for remanence to array of all interceptions during hysteresis
+                # append y-intercepts as value for remanence to array of all
+                # interceptions during hysteresis
                 a = np.append(a, n)
         a = np.abs(a)  # get absolute values of all remanences
 
-        # test for initial magnetization curve, in this case the interception point of the hysteresis will be lower than the remanence, thus discarded
-        # a deviation of 2 % has been arbitrarily defined to distinguish the interception during the initial magnetization from the remanences
+        # test for initial magnetization curve, in this case the interception
+        # point of the hysteresis will be lower than the remanence and thus
+        # discarded
+        # a deviation of 2 % has been arbitrarily defined to distinguish the
+        # interception during the initial magnetization from the remanences
         if np.abs((a[0] - np.mean(a[1:])) / np.mean(a[1:])) > 0.02:
             a = a[1:]
         # average all interception points at H=0 to one mean remanence
         a = np.mean(a)
-        # save the remanence in different units to be called directly without need for later conversion
+        # save the remanence in different units to be called directly without
+        # need for later conversion
         a = {'A/m': a,
              'kA/m': a*1e-3,
              'T': a*mu_0,
@@ -233,30 +266,38 @@ class VSM:
         Returns
         -------
         coercivity: len 2 TUPLE
-            Tuple of value and unit of intrinsic coercivity        
+            Tuple of value and unit of intrinsic coercivity
         """
         x = self.H
         y = self.M
 
         a = np.array([])
-        # scan over whole range of values to find the two points where the y-axis is crossed
+        # scan over whole range of values to find the two points where the
+        # y-axis is crossed
         for i in range(len(x)-1):
-            # M on left and right side will be positive and negative respectively or the other way around
+            # M on left and right side will be positive and negative
+            # respectively or the other way around
             if y[i] * y[i+1] <= 0:
-                # hysteresis curve between two points is assumed to be linear, calculate linear equation to get exact interception point with x-axis
+                # hysteresis curve between two points is assumed to be linear,
+                # calculate linear equation to get exact interception point
+                # with x-axis
                 m = (y[i+1]-y[i])/(x[i+1]-x[i])  # slope
                 n = y[i] - m * x[i]  # y-intercept
                 x0 = -n / m  # x-intercept
-                # append x-intercepts as value for coercivity to array of all interceptions during hysteresis
+                # append x-intercepts as value for coercivity to array of all
+                # interceptions during hysteresis
                 a = np.append(a, x0)
         a = np.abs(a)  # get absolute values of all coercivities
-        # test for initial magnetization curve, in this case the interception point of the hysteresis will deviate from coercivity, thus discarded
-        # a deviation of 2 % has been arbitrarily defined to distinguish the interception during the initial magnetization from the coercivity
+        # test for initial magnetization curve, in this case the interception
+        # point of the hysteresis will deviate from coercivity, thus discarded
+        # a deviation of 2 % has been arbitrarily defined to distinguish the
+        # interception during the initial magnetization from the coercivity
         if np.abs((a[0] - np.mean(a[1:])) / np.mean(a[1:])) > 0.02:
             a = a[1:]
         # average all interception points at M=0 to one mean coercivity
         a = np.mean(a)
-        # save the remanence in different units to be called directly without need for later conversion
+        # save the remanence in different units to be called directly without
+        # need for later conversion
         a = {'A/m': a,
              'kA/m': a*1e-3,
              'T': a*mu_0,
@@ -283,7 +324,8 @@ class VSM:
         B = (x + y) * mu_0
         BH = x * B
         for i in range(100, len(x)-1):
-            # B on left and right side of x0 will be positive and negative respectively or the other way around
+            # B on left and right side of x0 will be positive and negative
+            # respectively or the other way around
             if B[i] * B[i+1] <= 0:
                 # cut of BH so it only contains first and second quadrant
                 BH = BH[:i]
@@ -310,10 +352,13 @@ class VSM:
         # value that magnetization is supposed to have at knee-point
         Mk = 0.9 * self.get_remanence(unit='A/m')[0]
         a = np.array([])
-        # scan over whole range of values to find the two points where 0.9*Mr is between
+        # scan over whole range of values to find the two points where 0.9*Mr
+        # is between
         for i in range(len(x)-1):
-            if ((y[i] <= Mk) and (y[i+1] > Mk)) or ((y[i] >= Mk) and (y[i+1] < Mk)):
-                # hysteresis curve between two points is assumed to be linear, calculate linear equation to get exact knee-point
+            if ((y[i] <= Mk) and (y[i+1] > Mk)) or ((y[i] >= Mk)
+                                                    and (y[i+1] < Mk)):
+                # hysteresis curve between two points is assumed to be linear,
+                # calculate linear equation to get exact knee-point
                 m = (y[i+1]-y[i])/(x[i+1]-x[i])  # slope
                 n = y[i] - m * x[i]  # y-intercept
                 Hk = (Mk - n) / m  # knee field strength
@@ -327,14 +372,17 @@ class VSM:
 
     def load_qd(self, datfile, unit='T'):
         """
-        Load VSM-data from a quantum systems .DAT file. Mass, density and demagnetization factor of measured sample has to be given first.
+        Load VSM-data from a quantum systems .DAT file. Mass, density and
+        demagnetization factor of measured sample has to be given first.
 
         Parameters
         ----------
         datfile: STRING
-            Path to quantum systems .DAT file that data is supposed to be imported from
+            Path to quantum systems .DAT file that data is supposed to be
+            imported from
         unit: STRING, optional
-            Unit the magnetic properties are supposed to be saved in. Default is Tesla.
+            Unit the magnetic properties are supposed to be saved in.
+            Default is Tesla.
         Returns
         -------
         None
@@ -347,7 +395,7 @@ class VSM:
         m = np.array(df['Moment (emu)'])  # save moments as np.array
         # save field as np.array and convert from Oe to A/m
         H = np.array(df['Magnetic Field (Oe)']) * 1E-4 / mu_0
-        M = m / self.mass * self.density  # calculate magnetisation in emu/cm^3 or kA/m
+        M = m / self.mass * self.density  # calc magnetisation in kA/m
         M = M * 1E3  # convert magnetisation from kA/m to A/m
         H = H - self.D * M  # correct field for demagnetisation
         # save absolute temperature as np.array
@@ -375,16 +423,20 @@ class VSM:
 
     def plot(self, filepath=None, demag=True, label=None):
         """
-        Plots hysteresis loop, optionally with inset of demagnetization curve and saves figure if a filepath is given.
+        Plots hysteresis loop, optionally with inset of demagnetization curve
+        and saves figure if a filepath is given.
 
         Parameters
         ----------
         filepath: STRING, optional
-            Filepath for saving the figure. Default is None, in that case no file is saved.
+            Filepath for saving the figure. Default is None, in that case no
+            file is saved.
         demag: BOOL, optional
-            Boolean that determines if demagnetization curve is plotted as an inset next to hysteresis loop. Default is True.
+            Boolean that determines if demagnetization curve is plotted as an
+            inset next to hysteresis loop. Default is True.
         label: STRING, optional
-            Optional label of hysteresis loop that can be displayed in the legend. Default is None, in that case no legend is displayed.
+            Optional label of hysteresis loop that can be displayed in the
+            legend. Default is None, in that case no legend is displayed.
 
         Returns
         -------
@@ -397,10 +449,10 @@ class VSM:
         fig, ax1 = plt.subplots(1, 1, figsize=(16/2.54, 12/2.54))
         ax1.plot(H, M, label=label)
 
-        # find upper and lower border of plot, so that hysteresis loop fits nicely
+        # find upper and lower border of plot, so that hysteresis loop fits
         Jmax = None
         for i in np.arange(0, 5, 0.1):
-            if Jmax == None:
+            if Jmax is None:
                 if i >= self.saturation[0] + 0.02:
                     Jmax = i
                     break
@@ -417,7 +469,7 @@ class VSM:
                  axis='both', linestyle=':', linewidth=1)
         ax1.grid(visible=True, which='minor', axis='both',
                  linestyle=':', linewidth=0.5)
-        if label != None:
+        if label is not None:
             ax1.legend()
         fig.tight_layout()
 
@@ -426,16 +478,17 @@ class VSM:
             ax2 = ax1.inset_axes([0.58, 0.15, 0.3, 0.5])
             ax2.plot(H[100:-100], M[100:-100], label=label)
 
-            # find upper and lower border of plot, so that demagnetization curve fits nicely
+            # find upper and lower border of plot, so that demagnetization
+            # curve fits nicely
             Hmin, Jmax = None, None
             for i in np.arange(0, 5, 0.05):
-                if Hmin == None:
+                if Hmin is None:
                     if -i <= -self.coercivity[0] - 0.02:
                         Hmin = -i
-                if Jmax == None:
+                if Jmax is None:
                     if i >= self.remanence[0] + 0.02:
                         Jmax = i
-                if Hmin != None and Jmax != None:
+                if Hmin is not None and Jmax is not None:
                     break
 
             # format plot
@@ -455,7 +508,7 @@ class VSM:
             fig.tight_layout()
 
         # save figure if filepath is given
-        if filepath != None:
+        if filepath is not None:
             plt.savefig(filepath, dpi=300)
 
     def properties_to_txt(self, filepath, unit='T', sep="\t"):
@@ -467,7 +520,8 @@ class VSM:
         filepath: STRING
             Fielpath to save the TXT-file to.
         unit: STRING
-            Unit the saturation, remanence and coercivity are given in. Default is Tesla
+            Unit the saturation, remanence and coercivity are given in.
+            Default is Tesla
         sep: STRING
             Seperator to be used during the pd.to_csv. Default is "\t"
 
@@ -490,18 +544,22 @@ class VSM:
 
 def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     """
-    Plots hysteresis loops and optionally demagnetization curves of several VSM measurements. Saves figure if filepath is given.
+    Plots hysteresis loops and optionally demagnetization curves of
+    several VSM measurements. Saves figure if filepath is given.
 
     Parameters
     ----------
     data: LIST
         List of several objects which have to be of the VSM class.
     labels: LIST
-        List of labels that are going to be used in the legend of the plot. Has to have the same length as data.
+        List of labels that are going to be used in the legend of the plot.
+        Has to have the same length as data.
     filepath: STRING, optional
-        Filepath for saving the figure. Default is None, in that case no file is saved.
+        Filepath for saving the figure. Default is None, in that case no file
+        is saved.
     demag: BOOL, optional
-        Boolean that determines if demagnetization curve is plotted as an inset next to hysteresis loop. Default is True.
+        Boolean that determines if demagnetization curve is plotted as an
+        inset next to hysteresis loop. Default is True.
 
     Returns
     -------
@@ -514,11 +572,11 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     for i in range(len(data)):
         ax1.plot(data[i].H * mu_0, data[i].M * mu_0, label=labels[i])
 
-    # find upper and lower border of plot, so that hysteresis loops fits nicely
+    # find upper and lower border of plot, so that hysteresis loops fits
     Jmax = None
     satmax = max([i.saturation[0] for i in data])
     for i in np.arange(0, 5, 0.1):
-        if Jmax == None:
+        if Jmax is None:
             if i >= satmax + 0.02:
                 Jmax = i + 0.05
                 break
@@ -546,18 +604,19 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
             ax2.plot(data[i].H[100:-100] * mu_0,
                      data[i].M[100:-100] * mu_0, label=labels[i])
 
-        # find upper and lower border of plot, so that demagnetization curve fits nicely
+        # find upper and lower border of plot, so that demagnetization
+        # curve fits nicely
         coercmax = max([i.coercivity[0] for i in data])
         remmax = max([i.remanence[0] for i in data])
         Hmin, Jmax = None, None
         for i in np.arange(0, 5, 0.05):
-            if Hmin == None:
+            if Hmin is None:
                 if -i <= -coercmax - 0.02:
                     Hmin = -i
-            if Jmax == None:
+            if Jmax is None:
                 if i >= remmax + 0.02:
                     Jmax = i
-            if Hmin != None and Jmax != None:
+            if Hmin is not None and Jmax is not None:
                 break
 
         # format plot
@@ -576,14 +635,15 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
                  linestyle=':', linewidth=0.5)
 
     # save figure if filepath is given
-    if filepath != None:
+    if filepath is not None:
         plt.savefig(filepath, dpi=300)
     return None
 
 
 def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
     """
-    Saves magnetic properties derived from the several VSM-measurements to CSV-file.
+    Saves magnetic properties derived from the several VSM-measurements to
+    CSV-file.
 
     Parameters
     ----------
@@ -592,9 +652,11 @@ def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
     data : LIST
         List of VSM objects.
     labels : LIST
-        List of labels (string) identifying the data rows. Has to be of same length as data.
+        List of labels (string) identifying the data rows.
+        Has to be of same length as data.
     unit: STRING
-        Unit the saturation, remanence and coercivity are given in. Default is Tesla
+        Unit the saturation, remanence and coercivity are given in.
+        Default is Tesla
     sep: STRING
         Seperator to be used during the pd.to_csv. Default is "\t"
 
