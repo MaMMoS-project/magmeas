@@ -74,7 +74,7 @@ class VSM:
         Saves all properties derived from the VSM-measurement to CSV-file.
     """
 
-    def __init__(self):
+    def __init__(self, datfile):
         self.H = np.array([])
         self.M = np.array([])
         self.T = np.array([])
@@ -86,6 +86,7 @@ class VSM:
         self.coercivity = None
         self.BHmax = None
         self.squareness = None
+        self.load_qd(datfile)
 
     def demag_prism(self, a, b, c):
         """
@@ -149,8 +150,7 @@ class VSM:
         )
         # divide out the factor of pi
         D = pi_Dz / np.pi
-        self.D = D
-        # return D
+        return D
 
     def calc_saturation(self, unit='T'):
         """
@@ -388,16 +388,35 @@ class VSM:
         None
 
         """
+
+        def extract(string, startsub, endsub):
+            startind = string.index(startsub)
+            endind = string.index(endsub)
+            return string[startind:endind]
+
+        def rextract(string, startsub, endsub):
+            endind = string.index(endsub)
+            startind = string.rindex(startsub, 0, endind)
+            return string[startind + len(startsub):endind]
+
         with open(datfile) as f:  # find out encoding of .DAT
             encode = f.encoding
+            s = f.read()
+        s = extract(s, 'TITLE', '[Data]')
+        mass = float(rextract(s, 'INFO,', ',SAMPLE_MASS')) * 1e-3  # mass in g
+        dim = rextract(s, 'INFO,(', '),SAMPLE_SIZE').split(',')
+        dim = [float(f) for f in dim]
+        density = mass / np.prod(dim) / 1e-3
+        D = self.demag_prism(dim[0], dim[1], dim[2])
+
         # import measurement data
         df = pd.read_csv(datfile, skiprows=34, encoding=encode)
         m = np.array(df['Moment (emu)'])  # save moments as np.array
         # save field as np.array and convert from Oe to A/m
         H = np.array(df['Magnetic Field (Oe)']) * 1E-4 / mu_0
-        M = m / self.mass * self.density  # calc magnetisation in kA/m
+        M = m / mass * density  # calc magnetisation in kA/m
         M = M * 1E3  # convert magnetisation from kA/m to A/m
-        H = H - self.D * M  # correct field for demagnetisation
+        H = H - D * M  # correct field for demagnetisation
         # save absolute temperature as np.array
         T = np.array(df['Temperature (K)'])
 
@@ -696,3 +715,15 @@ def diff(a, b):
         Difference of Value a and b in percent.
     """
     return (b - a) / a
+
+
+def extract(string, startsub, endsub):
+    startind = string.index(startsub)
+    endind = string.index(endsub)
+    return string[startind:endind]
+
+
+def rextract(string, startsub, endsub):
+    endind = string.index(endsub)
+    startind = string.rindex(startsub, 0, endind)
+    return string[startind + len(startsub):endind]
