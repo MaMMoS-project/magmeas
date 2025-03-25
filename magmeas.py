@@ -54,16 +54,16 @@ class VSM:
     -------
     demag_prism()
         Calculates Demagnetization factor for rectangular prism
-    get_saturization()
+    calc_saturization()
         Calculates saturation magnetization or polarization, using the
         approach to saturation method
-    get_remanence()
+    calc_remanence()
         Extracts remanent magnetization or polarization from hysteresis loop
-    get_coercivity()
+    calc_coercivity()
         Extracts intrinsic Coercivity from hysteresis loop
-    get_BHmax()
+    calc_BHmax()
         Calculates maximum energy product from demagnetization curve
-    get_squareness()
+    calc_squareness()
         Calculates squareness of demagnetization curve
     load_qs()
         Load VSM-data from a quantum systems .DAT file
@@ -152,7 +152,7 @@ class VSM:
         self.D = D
         # return D
 
-    def get_saturation(self, unit='T'):
+    def calc_saturation(self, unit='T'):
         """
         Calculates saturation magnetization or polarization, using the approach
         to saturation method. Accounts for high field susceptibility.
@@ -202,7 +202,7 @@ class VSM:
              'mT': M_sat*mu_0*1e3}
         return (a[unit], unit)
 
-    def get_remanence(self, unit='T'):
+    def calc_remanence(self, unit='T'):
         """
         Extracts remanent magnetization or polarization from hysteresis loop
 
@@ -254,7 +254,7 @@ class VSM:
              'mT': a*mu_0*1e3}
         return (a[unit], unit)
 
-    def get_coercivity(self, unit='T'):
+    def calc_coercivity(self, unit='T'):
         """
         Extracts intrinsic Coercivity from hysteresis loop
 
@@ -304,7 +304,7 @@ class VSM:
              'mT': a*mu_0*1e3}
         return (a[unit], unit)
 
-    def get_BHmax(self):
+    def calc_BHmax(self):
         """
         Extracts maximum Energy product from demagnetization curve
 
@@ -333,7 +333,7 @@ class VSM:
         # return BHmax as highest negative value of BH in second quadrant
         return np.min(BH) * -1e-3
 
-    def get_squareness(self):
+    def calc_squareness(self):
         """
         Calculates squareness of demagnetization curve
 
@@ -350,7 +350,7 @@ class VSM:
         y = self.M
 
         # value that magnetization is supposed to have at knee-point
-        Mk = 0.9 * self.get_remanence(unit='A/m')[0]
+        Mk = 0.9 * self.calc_remanence(unit='A/m')[0]
         a = np.array([])
         # scan over whole range of values to find the two points where 0.9*Mr
         # is between
@@ -367,7 +367,7 @@ class VSM:
         a = np.abs(a)  # get absolute values
         # a = np.mean(a)                         #get mean knee fiel strength
         a = a[1]
-        S = a / self.get_coercivity(unit='A/m')[0]
+        S = a / self.calc_coercivity(unit='A/m')[0]
         return S
 
     def load_qd(self, datfile, unit='T'):
@@ -415,11 +415,11 @@ class VSM:
         self.M = M
         self.T = T
 
-        self.saturation = self.get_saturation(unit)
-        self.remanence = self.get_remanence(unit)
-        self.coercivity = self.get_coercivity(unit)
-        self.BHmax = self.get_BHmax()
-        self.squareness = self.get_squareness()
+        self.saturation = self.calc_saturation(unit)
+        self.remanence = self.calc_remanence(unit)
+        self.coercivity = self.calc_coercivity(unit)
+        self.BHmax = self.calc_BHmax()
+        self.squareness = self.calc_squareness()
 
     def plot(self, filepath=None, demag=True, label=None):
         """
@@ -532,9 +532,9 @@ class VSM:
 
         df = pd.DataFrame(
             {
-                "Js in "+unit: [self.get_saturation(unit)[0]],
-                "Jr in "+unit: [self.get_remanence(unit)[0]],
-                "iHc in "+unit: [self.get_coercivity(unit)[0]],
+                "Js in "+unit: [self.calc_saturation(unit)[0]],
+                "Jr in "+unit: [self.calc_remanence(unit)[0]],
+                "iHc in "+unit: [self.calc_coercivity(unit)[0]],
                 r"BHmax in kJ/m^3": [self.BHmax],
                 "S": [self.squareness]
             }
@@ -668,9 +668,9 @@ def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
     df = pd.DataFrame(
         {
             "sample": labels,
-            "Js in "+unit: [i.get_saturation(unit)[0] for i in data],
-            "Jr in "+unit: [i.get_remanence(unit)[0] for i in data],
-            "iHc in "+unit: [i.get_coercivity(unit)[0] for i in data],
+            "Js in "+unit: [i.calc_saturation(unit)[0] for i in data],
+            "Jr in "+unit: [i.calc_remanence(unit)[0] for i in data],
+            "iHc in "+unit: [i.calc_coercivity(unit)[0] for i in data],
             r"BHmax in kJ/m^3": [i.BHmax for i in data],
             "S": [i.squareness for i in data]
         }
