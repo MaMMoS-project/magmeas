@@ -695,4 +695,4 @@ def diff(a, b):
     FLOAT
         Difference of Value a and b in percent.
     """
-    return (a - b) / a
+    return (b - a) / a
