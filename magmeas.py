@@ -34,7 +34,7 @@ class VSM:
     Methods
     -------
     load_qd()
-        Load VSM-data from a quantum systems .DAT file
+        Load VSM-data from a quantum design .DAT file
     get_saturization()
         Getter function for the saturation polarization or magnetization.
         Calculated using the approach to saturation method.
@@ -50,7 +50,7 @@ class VSM:
         Plots hysteresis loop, optionally with inset of demagnetisation curve,
         optionally saves as png
     properties_to_txt()
-        Saves all properties derived from the VSM-measurement to CSV-file.
+        Saves all properties derived from VSM-measurement to CSV-file.
     """
 
     def __init__(self, datfile):
@@ -287,12 +287,9 @@ class VSM:
             Maximum energy product in kJ/m^3
         """
 
-        x = self.H
-        y = self.M
-
-        B = (x + y) * mu_0
-        BH = x * B
-        for i in range(100, len(x)-1):
+        B = (self.H + self.M) * mu_0
+        BH = self.H * B
+        for i in range(100, len(self.H)-1):
             # B on left and right side of x0 will be positive and negative
             # respectively or the other way around
             if B[i] * B[i+1] <= 0:
