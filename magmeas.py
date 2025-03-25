@@ -30,43 +30,22 @@ class VSM:
         Magnetization in A/m
     T: NUMPY-ARRAY
        Absolute temperature in K
-    mass: FLOAT
-        Mass of measured sample in g
-    density: FLOAT
-        Density of measured sample in g/cm^3
-    D: FLOAT
-        Demagnetization factor for magnetization direction
-    saturation: len 2 TUPLE
-        Saturation magnetization or polarization. Given as tuple of value and
-        unit. Default unit is Tesla.
-    remanence: len 2 TUPLE
-        Remanent magnetization or polarization. Given as tuple of value and
-        unit. Default unit is Tesla.
-    coercivity: len 2 TUPLE
-        Intrinsic coercivity (coercivity where magnetization is reduced to
-        zero). Given as tuple of value and unit. Default unit is Tesla.
-    BHmax: FLOAT
-        Maximum energy product from demagnetization curve, given in kJ/m^3.
-    squareness: FLOAT
-        Squareness of demagnetizatino curve, dimensionless
 
     Methods
     -------
-    demag_prism()
-        Calculates Demagnetization factor for rectangular prism
-    calc_saturization()
-        Calculates saturation magnetization or polarization, using the
-        approach to saturation method
-    calc_remanence()
-        Extracts remanent magnetization or polarization from hysteresis loop
-    calc_coercivity()
-        Extracts intrinsic Coercivity from hysteresis loop
-    calc_BHmax()
-        Calculates maximum energy product from demagnetization curve
-    calc_squareness()
-        Calculates squareness of demagnetization curve
-    load_qs()
+    load_qd()
         Load VSM-data from a quantum systems .DAT file
+    get_saturization()
+        Getter function for the saturation polarization or magnetization.
+        Calculated using the approach to saturation method.
+    get_remanence()
+        Getter function for the remanent polarization or magnetization.
+    get_coercivity()
+        Getter function for the coercivity
+    get_BHmax()
+        Getter function for the maximum energy product BHmax
+    get_squareness()
+        Getter function for the squareness
     plot()
         Plots hysteresis loop, optionally with inset of demagnetisation curve,
         optionally saves as png
@@ -142,7 +121,7 @@ class VSM:
         D = pi_Dz / np.pi
         return D
 
-    def calc_saturation(self, unit='T'):
+    def calc_saturation(self):
         """
         Calculates saturation magnetization or polarization, using the approach
         to saturation method. Accounts for high field susceptibility.
@@ -190,9 +169,9 @@ class VSM:
              'kA/m': M_sat*1e-3,
              'T': M_sat*mu_0,
              'mT': M_sat*mu_0*1e3}
-        return (a[unit], unit)
+        return a
 
-    def calc_remanence(self, unit='T'):
+    def calc_remanence(self):
         """
         Extracts remanent magnetization or polarization from hysteresis loop
 
@@ -242,9 +221,9 @@ class VSM:
              'kA/m': a*1e-3,
              'T': a*mu_0,
              'mT': a*mu_0*1e3}
-        return (a[unit], unit)
+        return a
 
-    def calc_coercivity(self, unit='T'):
+    def calc_coercivity(self):
         """
         Extracts intrinsic Coercivity from hysteresis loop
 
@@ -292,7 +271,7 @@ class VSM:
              'kA/m': a*1e-3,
              'T': a*mu_0,
              'mT': a*mu_0*1e3}
-        return (a[unit], unit)
+        return a
 
     def calc_BHmax(self):
         """
@@ -340,7 +319,7 @@ class VSM:
         y = self.M
 
         # value that magnetization is supposed to have at knee-point
-        Mk = 0.9 * self.calc_remanence(unit='A/m')[0]
+        Mk = 0.9 * self.get_remanence(unit='A/m')
         a = np.array([])
         # scan over whole range of values to find the two points where 0.9*Mr
         # is between
@@ -357,7 +336,7 @@ class VSM:
         a = np.abs(a)  # get absolute values
         # a = np.mean(a)                         #get mean knee fiel strength
         a = a[1]
-        S = a / self.calc_coercivity(unit='A/m')[0]
+        S = a / self.get_coercivity(unit='A/m')
         return S
 
     def load_qd(self, datfile, unit='T'):
@@ -423,11 +402,91 @@ class VSM:
         self.M = M
         self.T = T
 
-        self.saturation = self.calc_saturation(unit)
-        self.remanence = self.calc_remanence(unit)
-        self.coercivity = self.calc_coercivity(unit)
-        self.BHmax = self.calc_BHmax()
-        self.squareness = self.calc_squareness()
+        self._saturation = self.calc_saturation()
+        self._remanence = self.calc_remanence()
+        self._coercivity = self.calc_coercivity()
+        self._BHmax = self.calc_BHmax()
+        self._squareness = self.calc_squareness()
+
+    def get_saturation(self, unit='T'):
+        """
+        Getter function for saturation. Depending on the given unit this will
+        be the saturation magnetization or saturation polarization.
+
+        Parameters
+        ----------
+        unit : STR, optional
+            Unit the value of the saturation is given in. The default is 'T'.
+
+        Returns
+        -------
+        FLOAT
+            Returns value of the saturation in the specified unit.
+        """
+        return self._saturation[unit]
+
+    def get_remanence(self, unit='T'):
+        """
+        Getter function for remanence. Depending on the given unit this will
+        be the remanent magnetization or remanent polarization.
+
+        Parameters
+        ----------
+        unit : STR, optional
+            Unit the value of the remanence is given in. The default is 'T'.
+
+        Returns
+        -------
+        FLOAT
+            Returns value of the remanence in the specified unit.
+        """
+        return self._remanence[unit]
+
+    def get_coercivity(self, unit='T'):
+        """
+        Getter function for coercivity. Depending on the given unit this might
+        return a product of coercivity and the vacuum permeability.
+
+        Parameters
+        ----------
+        unit : STR, optional
+            Unit the value of the coercivity is given in. The default is 'T'.
+
+        Returns
+        -------
+        FLOAT
+            Returns value of the coercivity in the specified unit.
+        """
+        return self._coercivity[unit]
+
+    def get_BHmax(self):
+        """
+        Getter function for saturation. Implemented for consistency.
+
+        Parameters
+        ----------
+        NONE
+
+        -------
+        FLOAT
+            Returns value of BHmax in kJ/m**3
+        """
+        return self._BHmax
+
+    def get_squareness(self):
+        """
+        Getter function for squareness. Implemented for consistency.
+
+        Parameters
+        ----------
+        NONE
+
+        Returns
+        -------
+        FLOAT
+            Returns value of squareness
+        """
+        return self._squareness
 
     def plot(self, filepath=None, demag=True, label=None):
         """
@@ -461,7 +520,7 @@ class VSM:
         Jmax = None
         for i in np.arange(0, 5, 0.1):
             if Jmax is None:
-                if i >= self.saturation[0] + 0.02:
+                if i >= self.get_saturation('T') + 0.02:
                     Jmax = i
                     break
 
@@ -491,10 +550,10 @@ class VSM:
             Hmin, Jmax = None, None
             for i in np.arange(0, 5, 0.05):
                 if Hmin is None:
-                    if -i <= -self.coercivity[0] - 0.02:
+                    if -i <= -self.get_coercivity('T') - 0.02:
                         Hmin = -i
                 if Jmax is None:
-                    if i >= self.remanence[0] + 0.02:
+                    if i >= self.get_remanence('T') + 0.02:
                         Jmax = i
                 if Hmin is not None and Jmax is not None:
                     break
@@ -540,11 +599,11 @@ class VSM:
 
         df = pd.DataFrame(
             {
-                "Js in "+unit: [self.calc_saturation(unit)[0]],
-                "Jr in "+unit: [self.calc_remanence(unit)[0]],
-                "iHc in "+unit: [self.calc_coercivity(unit)[0]],
-                r"BHmax in kJ/m^3": [self.BHmax],
-                "S": [self.squareness]
+                "Js in "+unit: [self.get_saturation(unit)],
+                "Jr in "+unit: [self.get_remanence(unit)],
+                "iHc in "+unit: [self.get_coercivity(unit)],
+                r"BHmax in kJ/m^3": [self.get_BHmax()],
+                "S": [self.get_squareness()]
             }
         )
         df.to_csv(filepath, sep=sep)
@@ -582,7 +641,7 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
 
     # find upper and lower border of plot, so that hysteresis loops fits
     Jmax = None
-    satmax = max([i.saturation[0] for i in data])
+    satmax = max([i.get_saturation('T') for i in data])
     for i in np.arange(0, 5, 0.1):
         if Jmax is None:
             if i >= satmax + 0.02:
@@ -614,8 +673,8 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
 
         # find upper and lower border of plot, so that demagnetization
         # curve fits nicely
-        coercmax = max([i.coercivity[0] for i in data])
-        remmax = max([i.remanence[0] for i in data])
+        coercmax = max([i.get_coercivity for i in data])
+        remmax = max([i.get_remanence for i in data])
         Hmin, Jmax = None, None
         for i in np.arange(0, 5, 0.05):
             if Hmin is None:
@@ -676,11 +735,11 @@ def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
     df = pd.DataFrame(
         {
             "sample": labels,
-            "Js in "+unit: [i.calc_saturation(unit)[0] for i in data],
-            "Jr in "+unit: [i.calc_remanence(unit)[0] for i in data],
-            "iHc in "+unit: [i.calc_coercivity(unit)[0] for i in data],
-            r"BHmax in kJ/m^3": [i.BHmax for i in data],
-            "S": [i.squareness for i in data]
+            "Js in "+unit: [i.get_saturation(unit)[0] for i in data],
+            "Jr in "+unit: [i.get_remanence(unit)[0] for i in data],
+            "iHc in "+unit: [i.get_coercivity(unit)[0] for i in data],
+            r"BHmax in kJ/m^3": [i.get_BHmax for i in data],
+            "S": [i.get_squareness for i in data]
         }
     )
     df.to_csv(filepath, sep=sep)
@@ -704,15 +763,3 @@ def diff(a, b):
         Difference of Value a and b in percent.
     """
     return (b - a) / a
-
-
-def extract(string, startsub, endsub):
-    startind = string.index(startsub)
-    endind = string.index(endsub)
-    return string[startind:endind]
-
-
-def rextract(string, startsub, endsub):
-    endind = string.index(endsub)
-    startind = string.rindex(startsub, 0, endind)
-    return string[startind + len(startsub):endind]
