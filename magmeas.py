@@ -75,11 +75,7 @@ class VSM:
     """
 
     def __init__(self, datfile):
-        self.saturation = None
-        self.remanence = None
-        self.coercivity = None
-        self.BHmax = None
-        self.squareness = None
+
         self.load_qd(datfile)
 
     def demag_prism(self, a, b, c):
@@ -366,8 +362,7 @@ class VSM:
 
     def load_qd(self, datfile, unit='T'):
         """
-        Load VSM-data from a quantum systems .DAT file. Mass, density and
-        demagnetization factor of measured sample has to be given first.
+        Load VSM-data from a quantum systems .DAT file.
 
         Parameters
         ----------
