@@ -75,12 +75,6 @@ class VSM:
     """
 
     def __init__(self, datfile):
-        self.H = np.array([])
-        self.M = np.array([])
-        self.T = np.array([])
-        self.mass = None
-        self.density = None
-        self.D = None
         self.saturation = None
         self.remanence = None
         self.coercivity = None
