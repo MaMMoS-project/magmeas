@@ -354,8 +354,8 @@ class VSM:
             startind = string.rindex(startsub, 0, endind)
             return string[startind + len(startsub):endind]
 
-        with open(datfile) as f:  # find out encoding of .DAT
-            encode = f.encoding
+        with open(datfile, 'r') as f:  # find out encoding of .DAT
+            # encode = f.encoding
             s = f.read()
         mass = float(rextract(s, 'INFO,', ',SAMPLE_MASS')) * 1e-3  # mass in g
         dim = rextract(s, 'INFO,(', '),SAMPLE_SIZE').split(',')
@@ -364,7 +364,7 @@ class VSM:
         D = self.demag_prism(dim[0], dim[1], dim[2])
 
         # import measurement data
-        df = pd.read_csv(datfile, skiprows=34, encoding=encode)
+        df = pd.read_csv(datfile, skiprows=34, encoding='cp1252')
         m = np.array(df['Moment (emu)'])  # save moments as np.array
         # save field as np.array and convert from Oe to A/m
         H = np.array(df['Magnetic Field (Oe)']) * 1E-4 / mu_0
@@ -749,3 +749,40 @@ def diff(a, b):
         Difference of Value a and b in percent.
     """
     return (b - a) / a
+
+
+def droot(x, y):
+    """
+    Finding root of a discrete dataset of x and y values.
+
+    Parameters
+    ----------
+    x : ARRAY
+        Dataset in horizontal axis, on which root point is located on.
+    y : ARRAY
+        Dataset in vertical axis.
+
+    Returns
+    -------
+    FLOAT|ARRAY
+        Array of root points. If only one is found, it's returned as float.
+    """
+    r = np.array([])
+    # scan over whole range of values to find the two points where the
+    # y-axis is crossed
+    for i in range(len(x)-1):
+        # y values on left and right side of root will only be negative if
+        # their product is negative
+        if y[i] * y[i+1] <= 0:
+            # dataset between two points is assumed to be linear,
+            # calculate linear equation to get exact interception point
+            # with x-axis
+            m = (y[i+1]-y[i])/(x[i+1]-x[i])  # slope
+            n = y[i] - m * x[i]  # y-intercept
+            x0 = -n / m  # x-intercept
+            # append x-intercepts as root to array
+            r = np.append(r, x0)
+    # Convert array of found roots to float if only one was found
+    if np.shape(r) == (1):
+        r = r[:]
+    return r
