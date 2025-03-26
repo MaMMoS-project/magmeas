@@ -354,9 +354,8 @@ class VSM:
             startind = string.rindex(startsub, 0, endind)
             return string[startind + len(startsub):endind]
 
-        with open(datfile, 'r') as f:  # find out encoding of .DAT
-            # encode = f.encoding
-            s = f.read()
+        with open(datfile, 'rb') as f:
+            s = str(f.read(-1))
         mass = float(rextract(s, 'INFO,', ',SAMPLE_MASS')) * 1e-3  # mass in g
         dim = rextract(s, 'INFO,(', '),SAMPLE_SIZE').split(',')
         dim = [float(f) for f in dim]
