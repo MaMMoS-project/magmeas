@@ -734,6 +734,6 @@ def droot(x, y):
             # append x-intercepts as root to array
             r = np.append(r, x0)
     # Convert array of found roots to float if only one was found
-    if np.shape(r) == (1):
-        r = r[:]
+    if np.shape(r) == (1,):
+        r = r[0]
     return r
