@@ -186,24 +186,8 @@ class VSM:
             Tuple of value and unit of remanent magnetization/polarization
             (depending on given unit)
         """
-        x = self.H
-        y = self.M
-
-        a = np.array([])
-        # scan over whole range of values to find the two points where the
-        # y-axis is crossed
-        for i in range(len(x)-1):
-            # H on left and right side will be positive and negative
-            # respectively or the other way around
-            if x[i] * x[i+1] <= 0:
-                # hysteresis curve between two points is assumed to be linear,
-                # calculate linear equation to get exact interception point
-                # with y-axis
-                m = (y[i+1]-y[i])/(x[i+1]-x[i])  # slope
-                n = y[i] - m * x[i]  # y-intercept
-                # append y-intercepts as value for remanence to array of all
-                # interceptions during hysteresis
-                a = np.append(a, n)
+        # find intersections of hysteresis loop with H=0
+        a = droot(self.M, self.H)
         a = np.abs(a)  # get absolute values of all remanences
 
         # test for initial magnetization curve, in this case the interception
@@ -237,25 +221,8 @@ class VSM:
         coercivity: len 2 TUPLE
             Tuple of value and unit of intrinsic coercivity
         """
-        x = self.H
-        y = self.M
-
-        a = np.array([])
-        # scan over whole range of values to find the two points where the
-        # y-axis is crossed
-        for i in range(len(x)-1):
-            # M on left and right side will be positive and negative
-            # respectively or the other way around
-            if y[i] * y[i+1] <= 0:
-                # hysteresis curve between two points is assumed to be linear,
-                # calculate linear equation to get exact interception point
-                # with x-axis
-                m = (y[i+1]-y[i])/(x[i+1]-x[i])  # slope
-                n = y[i] - m * x[i]  # y-intercept
-                x0 = -n / m  # x-intercept
-                # append x-intercepts as value for coercivity to array of all
-                # interceptions during hysteresis
-                a = np.append(a, x0)
+        # find intersections of hysteresis loop with M=0
+        a = droot(self.H, self.M)
         a = np.abs(a)  # get absolute values of all coercivities
         # test for initial magnetization curve, in this case the interception
         # point of the hysteresis will deviate from coercivity, thus discarded
@@ -307,27 +274,12 @@ class VSM:
         S: FLOAT
         Squareness (dimensionless)
         """
-        x = self.H
-        y = self.M
-
         # value that magnetization is supposed to have at knee-point
         Mk = 0.9 * self.get_remanence(unit='A/m')
-        a = np.array([])
-        # scan over whole range of values to find the two points where 0.9*Mr
-        # is between
-        for i in range(len(x)-1):
-            if ((y[i] <= Mk) and (y[i+1] > Mk)) or ((y[i] >= Mk)
-                                                    and (y[i+1] < Mk)):
-                # hysteresis curve between two points is assumed to be linear,
-                # calculate linear equation to get exact knee-point
-                m = (y[i+1]-y[i])/(x[i+1]-x[i])  # slope
-                n = y[i] - m * x[i]  # y-intercept
-                Hk = (Mk - n) / m  # knee field strength
-                # append to array of all knee fiel strengths
-                a = np.append(a, Hk)
+        # find intersections of Hysteresis loop with M=Mk
+        a = droot(self.H, self.M - Mk)
         a = np.abs(a)  # get absolute values
-        # a = np.mean(a)                         #get mean knee fiel strength
-        a = a[1]
+        a = a[1]  # second root should be knee field strength
         S = a / self.get_coercivity(unit='A/m')
         return S
 
