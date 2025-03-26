@@ -287,16 +287,11 @@ class VSM:
             Maximum energy product in kJ/m^3
         """
 
-        B = (self.H + self.M) * mu_0
-        BH = self.H * B
-        for i in range(100, len(self.H)-1):
-            # B on left and right side of x0 will be positive and negative
-            # respectively or the other way around
-            if B[i] * B[i+1] <= 0:
-                # cut of BH so it only contains first and second quadrant
-                BH = BH[:i]
-                break
-        # return BHmax as highest negative value of BH in second quadrant
+        BH = (self.H + self.M) * mu_0 * self.H  # calculate BH
+        # product of B and H is positive in first and third quadrant, negative
+        # in second and third quadrant, so no finding of demagnetization curve
+        # is necessary
+        # BHmax is minimum of BH, should always be negative value
         return np.min(BH) * -1e-3
 
     def calc_squareness(self):
@@ -354,11 +349,6 @@ class VSM:
 
         """
 
-        def extract(string, startsub, endsub):
-            startind = string.index(startsub)
-            endind = string.index(endsub)
-            return string[startind:endind]
-
         def rextract(string, startsub, endsub):
             endind = string.index(endsub)
             startind = string.rindex(startsub, 0, endind)
@@ -367,7 +357,6 @@ class VSM:
         with open(datfile) as f:  # find out encoding of .DAT
             encode = f.encoding
             s = f.read()
-        s = extract(s, 'TITLE', '[Data]')
         mass = float(rextract(s, 'INFO,', ',SAMPLE_MASS')) * 1e-3  # mass in g
         dim = rextract(s, 'INFO,(', '),SAMPLE_SIZE').split(',')
         dim = [float(f) for f in dim]
