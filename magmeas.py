@@ -308,7 +308,13 @@ class VSM:
 
         with open(datfile, 'rb') as f:
             s = str(f.read(-1))
-        mass = float(rextract(s, 'INFO,', ',SAMPLE_MASS')) * 1e-3  # mass in g
+        try:
+            mass = float(rextract(s, 'INFO,', ',SAMPLE_MASS')) * \
+                1e-3  # mass in g
+        except ValueError:
+            # raise Exception("This doesn't work you have to have a mass")
+            mass = 0
+            self._mass_specific = False
         dim = rextract(s, 'INFO,(', '),SAMPLE_SIZE').split(',')
         dim = [float(f) for f in dim]
         density = mass / np.prod(dim) / 1e-3
@@ -453,16 +459,7 @@ class VSM:
         fig, ax1 = plt.subplots(1, 1, figsize=(16/2.54, 12/2.54))
         ax1.plot(H, M, label=label)
 
-        # find upper and lower border of plot, so that hysteresis loop fits
-        Jmax = None
-        for i in np.arange(0, 5, 0.1):
-            if Jmax is None:
-                if i >= self.get_saturation('T') + 0.02:
-                    Jmax = i
-                    break
-
         # format plot
-        ax1.axis([-15, 15, -Jmax, Jmax])
         ax1.xaxis.set_major_locator(MultipleLocator(2))
         ax1.xaxis.set_minor_locator(MultipleLocator(.5))
         ax1.yaxis.set_major_locator(MultipleLocator(0.2))
