@@ -53,9 +53,16 @@ class VSM:
         Saves all properties derived from VSM-measurement to CSV-file.
     """
 
-    def __init__(self, datfile):
+    def __init__(self, datfile, read_method='auto'):
 
-        self.load_qd(datfile)
+        # import data
+        self.load_qd(datfile, read_method=read_method)
+
+        self._saturation = self.calc_saturation()
+        self._remanence = self.calc_remanence()
+        self._coercivity = self.calc_coercivity()
+        self._BHmax = self.calc_BHmax()
+        self._squareness = self.calc_squareness()
 
     def demag_prism(self, a, b, c):
         """
@@ -283,7 +290,7 @@ class VSM:
         S = a / self.get_coercivity(unit='A/m')
         return S
 
-    def load_qd(self, datfile, unit='T'):
+    def load_qd(self, datfile, read_method, unit='T'):
         """
         Load VSM-data from a quantum systems .DAT file.
 
@@ -306,19 +313,53 @@ class VSM:
             startind = string.rindex(startsub, 0, endind)
             return string[startind + len(startsub):endind]
 
-        with open(datfile, 'rb') as f:
-            s = str(f.read(-1))
-        try:
-            mass = float(rextract(s, 'INFO,', ',SAMPLE_MASS')) * \
-                1e-3  # mass in g
-        except ValueError:
-            # raise Exception("This doesn't work you have to have a mass")
-            mass = 0
-            self._mass_specific = False
-        dim = rextract(s, 'INFO,(', '),SAMPLE_SIZE').split(',')
-        dim = [float(f) for f in dim]
-        density = mass / np.prod(dim) / 1e-3
-        D = self.demag_prism(dim[0], dim[1], dim[2])
+        err = '''
+              Sample parameters could not be read automatically.
+              Please enter sample parameters manually or enter them
+              correctly in the .DAT file like this:
+              INFO,<mass in mg>,SAMPLE_MASS
+              INFO,(<a>, <b>, <c>),SAMPLE_SIZE
+              sample dimensions a, b and c in mm
+              '''
+
+        if read_method == 'auto':
+            # Automatically read out sample parameters
+            with open(datfile, 'rb') as f:
+                s = str(f.read(-1))
+
+            try:
+                mass = float(rextract(s, 'INFO,', ',SAMPLE_MASS')) * \
+                    1e-3  # mass in g
+            except ValueError:
+                raise Exception(err)
+
+            try:
+                dim = rextract(s, 'INFO,(', '),SAMPLE_SIZE').split(',')
+                dim = [float(f) for f in dim]
+            except ValueError:
+                raise Exception(err)
+
+            density = mass / np.prod(dim) * 1e3
+            D = self.demag_prism(dim[0], dim[1], dim[2])
+
+        # Input sample parameters manually
+        elif read_method == 'manual':
+            print('Manual input method selected')
+            mass = float(input('Sample mass in mg: '))
+            print(f'mass = {mass} mg')
+            a = float(
+                input('Sample dimension a (perpendicular to field) in mm: '))
+            print(f'a = {a} mm')
+            b = float(
+                input('Sample dimension b (perpendicular to field) in mm: '))
+            print(f'b = {b} mm')
+            c = float(
+                input('Sample dimension c (parallel to field) in mm: '))
+            print(f'c = {c} mm')
+            density = mass / (a * b * c) * 1e3
+            D = self.demag_prism(a, b, c)
+        else:
+            raise Exception(err)
 
         # import measurement data
         df = pd.read_csv(datfile, skiprows=34, encoding='cp1252')
@@ -344,12 +385,6 @@ class VSM:
         self.H = H
         self.M = M
         self.T = T
-
-        self._saturation = self.calc_saturation()
-        self._remanence = self.calc_remanence()
-        self._coercivity = self.calc_coercivity()
-        self._BHmax = self.calc_BHmax()
-        self._squareness = self.calc_squareness()
 
     def get_saturation(self, unit='T'):
         """
@@ -573,17 +608,7 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     for i in range(len(data)):
         ax1.plot(data[i].H * mu_0, data[i].M * mu_0, label=labels[i])
 
-    # find upper and lower border of plot, so that hysteresis loops fits
-    Jmax = None
-    satmax = max([i.get_saturation('T') for i in data])
-    for i in np.arange(0, 5, 0.1):
-        if Jmax is None:
-            if i >= satmax + 0.02:
-                Jmax = i + 0.05
-                break
-
     # format plot
-    ax1.axis([-15, 15, -Jmax, Jmax])
     ax1.xaxis.set_major_locator(MultipleLocator(2))
     ax1.xaxis.set_minor_locator(MultipleLocator(.5))
     ax1.yaxis.set_major_locator(MultipleLocator(0.2))
