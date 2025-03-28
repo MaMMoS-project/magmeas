@@ -30,7 +30,9 @@ class VSM:
     M: NUMPY-ARRAY
         Magnetization in A/m
     T: NUMPY-ARRAY
-       Absolute temperature in K
+        Absolute temperature in K
+    t: NUMPY-ARRAY
+        Time in seconds
 
     Methods
     -------
@@ -373,20 +375,24 @@ class VSM:
         H = H - D * M  # correct field for demagnetisation
         # save absolute temperature as np.array
         T = np.array(df['Temperature (K)'])
+        # save time stamp
+        t = np.array(df['Time Stamp (sec)'])
 
         # test datapoints for missing values (where value is nan)
         nanfilter = [True]*len(H)
         for i in range(len(H)):
             nanfilter[i] = ~np.isnan(H[i]) and ~np.isnan(
-                M[i]) and ~np.isnan(T[i])
+                M[i]) and ~np.isnan(T[i]) and ~np.isnan(t[i])
         # delete all datapoints where any of H, M or T ar nan
         if ~np.all(nanfilter):
             H = H[nanfilter]
             M = M[nanfilter]
             T = T[nanfilter]
+            t = t[nanfilter]
         self.H = H
         self.M = M
         self.T = T
+        self.t = t - t[0]  # convert time stamp to time since measurement start
 
     def get_saturation(self, unit='T'):
         """
