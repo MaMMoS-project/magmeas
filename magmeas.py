@@ -56,7 +56,7 @@ class VSM:
         Saves all properties derived from VSM-measurement to CSV-file.
     """
 
-    def __init__(self, datfile, read_method='auto'):
+    def __init__(self, datfile, read_method='auto', calc_properties=True):
 
         # import data
         self.load_qd(datfile, read_method=read_method)
@@ -74,15 +74,16 @@ class VSM:
         #                     Both Magnetic Field and Temperature seem to vary.
         #                     This is currently not supported.''')
 
-        # calculate properties
-        if self.measurement == 'M(H)':
-            self._saturation = self.calc_saturation()
-            self._remanence = self.calc_remanence()
-            self._coercivity = self.calc_coercivity()
-            self._BHmax = self.calc_BHmax()
-            self._squareness = self.calc_squareness()
-        elif self.measurement == 'M(T)':
-            self.Tc = self.calc_Tc()
+        if calc_properties:
+            # calculate properties
+            if self.measurement == 'M(H)':
+                self._saturation = self.calc_saturation()
+                self._remanence = self.calc_remanence()
+                self._coercivity = self.calc_coercivity()
+                self._BHmax = self.calc_BHmax()
+                self._squareness = self.calc_squareness()
+            elif self.measurement == 'M(T)':
+                self.Tc = self.calc_Tc()
 
     def demag_prism(self, a, b, c):
         """
