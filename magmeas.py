@@ -61,12 +61,28 @@ class VSM:
         # import data
         self.load_qd(datfile, read_method=read_method)
 
+        # Determine type of measurement
+        if self._H_var and not self._T_var:
+            self.measurement = 'M(H)'
+        elif self._T_var:
+            self.measurement = 'M(T)'
+        else:
+            self.measurement = 'unknown'
+        # else:
+        #     raise Exception('''
+        #                     Unrecocnized measurement type!
+        #                     Both Magnetic Field and Temperature seem to vary.
+        #                     This is currently not supported.''')
+
         # calculate properties
-        self._saturation = self.calc_saturation()
-        self._remanence = self.calc_remanence()
-        self._coercivity = self.calc_coercivity()
-        self._BHmax = self.calc_BHmax()
-        self._squareness = self.calc_squareness()
+        if self.measurement == 'M(H)':
+            self._saturation = self.calc_saturation()
+            self._remanence = self.calc_remanence()
+            self._coercivity = self.calc_coercivity()
+            self._BHmax = self.calc_BHmax()
+            self._squareness = self.calc_squareness()
+        elif self.measurement == 'M(T)':
+            self.Tc = self.calc_Tc()
 
     def demag_prism(self, a, b, c):
         """
@@ -294,6 +310,39 @@ class VSM:
         S = a / self.get_coercivity(unit='A/m')
         return S
 
+    def calc_Tc(self):
+        """
+        Calculates Curie-temperature from M(T) measurement
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        Tc: FLOAT
+        Squareness (dimensionless)
+        """
+        # norm the moment to positive values between 0 and 1
+        # we are only interested in Tc, absolute moments don't matter
+        nM = np.abs(self.M) / np.max(np.abs(self.M))
+
+        # let's only look at M(T) during cooling, this is usually more reliable
+        # cooling is assumed to occur after half of the measurement time
+        # also cut off last couple of measurement points as they are unstable
+        nM = nM[(self.t > np.max(self.t) * 0.5)
+                * (self.t < np.max(self.t) * 0.9)]
+        T = self.T[(self.t > np.max(self.t) * 0.5)
+                   * (self.t < np.max(self.t) * .9)]
+        # generous kernel for smoothing
+        kernel = np.ones(20) / 20
+        # smooth measurement by convolution with kernel
+        sT = np.convolve(T, kernel, mode='valid')
+        sM = np.convolve(nM, kernel, mode='valid')
+        # Tc is temperature where dM/dT has minimum
+        Tc = sT[np.argmin(np.gradient(sM) / np.gradient(sT))]
+        return Tc
+
     def load_qd(self, datfile, read_method, unit='T'):
         """
         Load VSM-data from a quantum systems .DAT file.
@@ -393,6 +442,11 @@ class VSM:
         self.M = M
         self.T = T
         self.t = t - t[0]  # convert time stamp to time since measurement start
+
+        # Does H vary by more than 10 A/m?
+        self._H_var = float(np.max(self.H) - np.min(self.H)) > 10
+        # Does T vary by more than 10 K?
+        self._T_var = float(np.max(self.T) - np.min(self.T)) > 10
 
     def get_saturation(self, unit='T'):
         """
