@@ -6,6 +6,7 @@ Created on Tue Feb  6 10:48:00 2024
 """
 
 import pandas as pd
+import json
 import numpy as np
 from scipy.stats import linregress
 import matplotlib.pyplot as plt
@@ -58,6 +59,7 @@ class VSM:
         # import data
         self.load_qd(datfile, read_method=read_method)
 
+        # calculate properties
         self._saturation = self.calc_saturation()
         self._remanence = self.calc_remanence()
         self._coercivity = self.calc_coercivity()
@@ -577,6 +579,33 @@ class VSM:
         )
         df.to_csv(filepath, sep=sep)
 
+    def properties_to_json(self, filepath, unit='T'):
+        """
+        Saves all properties derived from the VSM-measurement to json-file.
+
+        Parameters
+        ----------
+        filepath: STRING
+            Fielpath to save the TXT-file to.
+        unit: STRING
+            Unit the saturation, remanence and coercivity are given in.
+            Default is Tesla
+
+        Returns
+        -------
+        None
+        """
+
+        properties = {
+            "Js in "+unit: [self.get_saturation(unit)],
+            "Jr in "+unit: [self.get_remanence(unit)],
+            "iHc in "+unit: [self.get_coercivity(unit)],
+            r"BHmax in kJ/m^3": [self.get_BHmax()],
+            "S": [self.get_squareness()]
+        }
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(properties, f, ensure_ascii=False, indent=4)
+
 
 def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     """
@@ -694,14 +723,49 @@ def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
     df = pd.DataFrame(
         {
             "sample": labels,
-            "Js in "+unit: [i.get_saturation(unit)[0] for i in data],
-            "Jr in "+unit: [i.get_remanence(unit)[0] for i in data],
-            "iHc in "+unit: [i.get_coercivity(unit)[0] for i in data],
-            r"BHmax in kJ/m^3": [i.get_BHmax for i in data],
-            "S": [i.get_squareness for i in data]
+            "Js in "+unit: [i.get_saturation(unit) for i in data],
+            "Jr in "+unit: [i.get_remanence(unit) for i in data],
+            "iHc in "+unit: [i.get_coercivity(unit) for i in data],
+            r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
+            "S": [i.get_squareness() for i in data]
         }
     )
     df.to_csv(filepath, sep=sep)
+
+
+def mult_properties_to_json(filepath, data, labels, unit='T'):
+    """
+    Saves magnetic properties derived from the several VSM-measurements to
+    json-file.
+
+    Parameters
+    ----------
+    filepath: STRING
+        Fielpath to save the TXT-file to.
+    data : LIST
+        List of VSM objects.
+    labels : LIST
+        List of labels (string) identifying the data rows.
+        Has to be of same length as data.
+    unit: STRING
+        Unit the saturation, remanence and coercivity are given in.
+        Default is Tesla
+
+    Returns
+    -------
+    None
+    """
+
+    properties = {
+        "sample": labels,
+        "Js in "+unit: [i.get_saturation(unit) for i in data],
+        "Jr in "+unit: [i.get_remanence(unit) for i in data],
+        "iHc in "+unit: [i.get_coercivity(unit) for i in data],
+        r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
+        "S": [i.get_squareness() for i in data]
+    }
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump(properties, f, ensure_ascii=False, indent=4)
 
 
 def diff(a, b):
