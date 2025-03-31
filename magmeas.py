@@ -68,11 +68,6 @@ class VSM:
             self.measurement = 'M(T)'
         else:
             self.measurement = 'unknown'
-        # else:
-        #     raise Exception('''
-        #                     Unrecocnized measurement type!
-        #                     Both Magnetic Field and Temperature seem to vary.
-        #                     This is currently not supported.''')
 
         if calc_properties:
             # calculate properties
@@ -344,7 +339,7 @@ class VSM:
         Tc = sT[np.argmin(np.gradient(sM) / np.gradient(sT))]
         return Tc
 
-    def load_qd(self, datfile, read_method, unit='T'):
+    def load_qd(self, datfile, read_method):
         """
         Load VSM-data from a quantum systems .DAT file.
 
@@ -353,9 +348,6 @@ class VSM:
         datfile: STRING
             Path to quantum systems .DAT file that data is supposed to be
             imported from
-        unit: STRING, optional
-            Unit the magnetic properties are supposed to be saved in.
-            Default is Tesla.
         Returns
         -------
         None
@@ -373,7 +365,7 @@ class VSM:
               correctly in the .DAT file like this:
               INFO,<mass in mg>,SAMPLE_MASS
               INFO,(<a>, <b>, <c>),SAMPLE_SIZE
-              sample dimensions a, b and c in mm
+              sample dimensions a, b and c in mm, c parallel to field
               '''
 
         if read_method == 'auto':
@@ -429,20 +421,13 @@ class VSM:
         t = np.array(df['Time Stamp (sec)'])
 
         # test datapoints for missing values (where value is nan)
-        nanfilter = [True]*len(H)
-        for i in range(len(H)):
-            nanfilter[i] = ~np.isnan(H[i]) and ~np.isnan(
-                M[i]) and ~np.isnan(T[i]) and ~np.isnan(t[i])
-        # delete all datapoints where any of H, M or T ar nan
-        if ~np.all(nanfilter):
-            H = H[nanfilter]
-            M = M[nanfilter]
-            T = T[nanfilter]
-            t = t[nanfilter]
-        self.H = H
-        self.M = M
-        self.T = T
-        self.t = t - t[0]  # convert time stamp to time since measurement start
+        nanfilter = ~np.isnan(H) * ~np.isnan(M) * ~np.isnan(T) * ~np.isnan(t)
+        # delete all datapoints where any of H, M or T ar nan and assign them
+        self.H = H[nanfilter]
+        self.M = M[nanfilter]
+        self.T = T[nanfilter]
+        # convert time stamp to time since measurement start
+        self.t = t[nanfilter] - t[nanfilter][0]
 
         # Does H vary by more than 10 A/m?
         self._H_var = float(np.max(self.H) - np.min(self.H)) > 10
