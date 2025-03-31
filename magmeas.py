@@ -173,10 +173,9 @@ class VSM:
 
         # get indices of all points where H_max - 1 MA/m < H <= H_max
         # assumed to be nearly linear region of highest fields
-        # note how this does not discriminate between magnetization and
-        # demagnetization, also not between initial and final saturation
-        # due to this the calculated saturation will be somewhat of an
-        # average value
+        # Note how this does not discriminate between initial and final
+        # saturation. Due to this the calculated saturation will be somewhat
+        # of an average value.
         filt_ind = np.where(x > H_max - 1e6)
 
         # linear regression of high-field region to extract
@@ -184,7 +183,7 @@ class VSM:
         linreg1 = linregress(x[filt_ind], y[filt_ind])
 
         # substract high-field susceptibility contribution from magnetization
-        # and find intercept of another linear regression of 1/H over M
+        # and find intercept of another linear regression of M over 1/H
         # this lets H go towards infinity for 1/H = 0 (intercept of regression)
         # and is thus more accurate for a saturation magnetization
         # if no high field susceptibility is contributing to the magnetization,
@@ -313,7 +312,8 @@ class VSM:
 
     def calc_Tc(self):
         """
-        Calculates Curie-temperature from M(T) measurement
+        Calculates Curie-temperature from M(T) measurement, assuming only one
+        Curie-temperature
 
         Parameters
         ----------
@@ -322,7 +322,7 @@ class VSM:
         Returns
         -------
         Tc: FLOAT
-        Squareness (dimensionless)
+            Curie-Temperature in K
         """
         # norm the moment to positive values between 0 and 1
         # we are only interested in Tc, absolute moments don't matter
@@ -331,10 +331,10 @@ class VSM:
         # let's only look at M(T) during cooling, this is usually more reliable
         # cooling is assumed to occur after half of the measurement time
         # also cut off last couple of measurement points as they are unstable
-        nM = nM[(self.t > np.max(self.t) * 0.5)
-                * (self.t < np.max(self.t) * 0.9)]
-        T = self.T[(self.t > np.max(self.t) * 0.5)
-                   * (self.t < np.max(self.t) * .9)]
+        selec = ((self.t > np.max(self.t) * 0.5) *
+                 (self.t < np.max(self.t) * 0.9))
+        nM = nM[selec]
+        T = self.T[selec]
         # generous kernel for smoothing
         kernel = np.ones(20) / 20
         # smooth measurement by convolution with kernel
