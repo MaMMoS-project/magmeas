@@ -614,15 +614,17 @@ class VSM:
         None
         """
 
-        df = pd.DataFrame(
-            {
+        if self.measurement == 'M(H)':
+            properties = {
                 "Js in "+unit: [self.get_saturation(unit)],
                 "Jr in "+unit: [self.get_remanence(unit)],
                 "iHc in "+unit: [self.get_coercivity(unit)],
                 r"BHmax in kJ/m^3": [self.get_BHmax()],
                 "S": [self.get_squareness()]
             }
-        )
+        elif self.measurement == 'M(T)':
+            properties = {"Tc in K": [self.Tc]}
+        df = pd.DataFrame(properties)
         df.to_csv(filepath, sep=sep)
 
     def properties_to_json(self, filepath, unit='T'):
@@ -642,13 +644,16 @@ class VSM:
         None
         """
 
-        properties = {
-            "Js in "+unit: [self.get_saturation(unit)],
-            "Jr in "+unit: [self.get_remanence(unit)],
-            "iHc in "+unit: [self.get_coercivity(unit)],
-            r"BHmax in kJ/m^3": [self.get_BHmax()],
-            "S": [self.get_squareness()]
-        }
+        if self.measurement == 'M(H)':
+            properties = {
+                "Js in "+unit: [self.get_saturation(unit)],
+                "Jr in "+unit: [self.get_remanence(unit)],
+                "iHc in "+unit: [self.get_coercivity(unit)],
+                r"BHmax in kJ/m^3": [self.get_BHmax()],
+                "S": [self.get_squareness()]
+            }
+        elif self.measurement == 'M(T)':
+            properties = {"Tc in K": [self.Tc]}
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(properties, f, ensure_ascii=False, indent=4)
 
@@ -766,8 +771,8 @@ def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
     None
     """
 
-    df = pd.DataFrame(
-        {
+    if all([i.measurement == 'M(H)' for i in data]):
+        properties = {
             "sample": labels,
             "Js in "+unit: [i.get_saturation(unit) for i in data],
             "Jr in "+unit: [i.get_remanence(unit) for i in data],
@@ -775,7 +780,16 @@ def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
             r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
             "S": [i.get_squareness() for i in data]
         }
-    )
+    elif all([i.measurement == 'M(T)' for i in data]):
+        properties = {
+            "sample": labels,
+            "Tc in K": [i.Tc for i in data]
+        }
+    else:
+        raise Exception("""Please only export a list of VSM measurements if
+                        all of them are the same measurement type. This
+                        does not seem to be the case.""")
+    df = pd.DataFrame(properties)
     df.to_csv(filepath, sep=sep)
 
 
@@ -802,14 +816,24 @@ def mult_properties_to_json(filepath, data, labels, unit='T'):
     None
     """
 
-    properties = {
-        "sample": labels,
-        "Js in "+unit: [i.get_saturation(unit) for i in data],
-        "Jr in "+unit: [i.get_remanence(unit) for i in data],
-        "iHc in "+unit: [i.get_coercivity(unit) for i in data],
-        r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
-        "S": [i.get_squareness() for i in data]
-    }
+    if all([i.measurement == 'M(H)' for i in data]):
+        properties = {
+            "sample": labels,
+            "Js in "+unit: [i.get_saturation(unit) for i in data],
+            "Jr in "+unit: [i.get_remanence(unit) for i in data],
+            "iHc in "+unit: [i.get_coercivity(unit) for i in data],
+            r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
+            "S": [i.get_squareness() for i in data]
+        }
+    elif all([i.measurement == 'M(T)' for i in data]):
+        properties = {
+            "sample": labels,
+            "Tc in K": [i.Tc for i in data]
+        }
+    else:
+        raise Exception("""Please only export a list of VSM measurements if
+                        all of them are the same measurement type. This
+                        does not seem to be the case.""")
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(properties, f, ensure_ascii=False, indent=4)
 
