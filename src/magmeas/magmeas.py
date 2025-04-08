@@ -8,7 +8,6 @@ Created on Tue Feb  6 10:48:00 2024
 import pandas as pd
 import json
 import numpy as np
-from scipy.stats import linregress
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
@@ -38,9 +37,6 @@ class VSM:
     -------
     load_qd()
         Load VSM-data from a quantum design .DAT file
-    get_saturization()
-        Getter function for the saturation polarization or magnetization.
-        Calculated using the approach to saturation method.
     get_remanence()
         Getter function for the remanent polarization or magnetization.
     get_coercivity()
@@ -54,6 +50,8 @@ class VSM:
         optionally saves as png
     properties_to_txt()
         Saves all properties derived from VSM-measurement to CSV-file.
+    properties_to_json()
+        Saves all properties derived from VSM-measurement to JSON-file.
     """
 
     def __init__(self, datfile, read_method='auto', calc_properties=True):
@@ -72,7 +70,6 @@ class VSM:
         if calc_properties:
             # calculate properties
             if self.measurement == 'M(H)':
-                self._saturation = self.calc_saturation()
                 self._remanence = self.calc_remanence()
                 self._coercivity = self.calc_coercivity()
                 self._BHmax = self.calc_BHmax()
@@ -143,55 +140,6 @@ class VSM:
         # divide out the factor of pi
         D = pi_Dz / np.pi
         return D
-
-    def calc_saturation(self):
-        """
-        Calculates saturation magnetization or polarization, using the approach
-        to saturation method. Accounts for high field susceptibility.
-
-        Parameters
-        ----------
-        unit: STRING, optional
-            Unit the saturation is supposed to be returned in. Default is Tesla
-
-        Returns
-        -------
-        saturation: len 2 TUPLE
-            Tuple of value and unit of saturation magnetization/polarization
-            (depending on given unit)
-        """
-
-        x = self.H
-        y = self.M
-
-        H_max = np.max(x)  # maximum magnetic field
-
-        # get indices of all points where H_max - 1 MA/m < H <= H_max
-        # assumed to be nearly linear region of highest fields
-        # Note how this does not discriminate between initial and final
-        # saturation. Due to this the calculated saturation will be somewhat
-        # of an average value.
-        filt_ind = np.where(x > H_max - 1e6)
-
-        # linear regression of high-field region to extract
-        # high-field susceptibility
-        linreg1 = linregress(x[filt_ind], y[filt_ind])
-
-        # substract high-field susceptibility contribution from magnetization
-        # and find intercept of another linear regression of M over 1/H
-        # this lets H go towards infinity for 1/H = 0 (intercept of regression)
-        # and is thus more accurate for a saturation magnetization
-        # if no high field susceptibility is contributing to the magnetization,
-        # then there is also nothing getting subtracted
-        linreg2 = linregress(
-            1/x[filt_ind], y[filt_ind] - x[filt_ind] * linreg1.slope)
-        M_sat = linreg2.intercept
-
-        a = {'A/m': M_sat,
-             'kA/m': M_sat*1e-3,
-             'T': M_sat*mu_0,
-             'mT': M_sat*mu_0*1e3}
-        return a
 
     def calc_remanence(self):
         """
@@ -434,23 +382,6 @@ class VSM:
         # Does T vary by more than 10 K?
         self._T_var = float(np.max(self.T) - np.min(self.T)) > 10
 
-    def get_saturation(self, unit='T'):
-        """
-        Getter function for saturation. Depending on the given unit this will
-        be the saturation magnetization or saturation polarization.
-
-        Parameters
-        ----------
-        unit : STR, optional
-            Unit the value of the saturation is given in. The default is 'T'.
-
-        Returns
-        -------
-        FLOAT
-            Returns value of the saturation in the specified unit.
-        """
-        return self._saturation[unit]
-
     def get_remanence(self, unit='T'):
         """
         Getter function for remanence. Depending on the given unit this will
@@ -487,7 +418,7 @@ class VSM:
 
     def get_BHmax(self):
         """
-        Getter function for saturation. Implemented for consistency.
+        Getter function for BHmax. Implemented for consistency.
 
         Parameters
         ----------
@@ -604,7 +535,7 @@ class VSM:
         filepath: STRING
             Fielpath to save the TXT-file to.
         unit: STRING
-            Unit the saturation, remanence and coercivity are given in.
+            Unit the remanence and coercivity are given in.
             Default is Tesla
         sep: STRING
             Seperator to be used during the pd.to_csv. Default is "\t"
@@ -616,7 +547,6 @@ class VSM:
 
         if self.measurement == 'M(H)':
             properties = {
-                "Js in "+unit: [self.get_saturation(unit)],
                 "Jr in "+unit: [self.get_remanence(unit)],
                 "iHc in "+unit: [self.get_coercivity(unit)],
                 r"BHmax in kJ/m^3": [self.get_BHmax()],
@@ -636,7 +566,7 @@ class VSM:
         filepath: STRING
             Fielpath to save the TXT-file to.
         unit: STRING
-            Unit the saturation, remanence and coercivity are given in.
+            Unit the remanence and coercivity are given in.
             Default is Tesla
 
         Returns
@@ -646,7 +576,6 @@ class VSM:
 
         if self.measurement == 'M(H)':
             properties = {
-                "Js in "+unit: [self.get_saturation(unit)],
                 "Jr in "+unit: [self.get_remanence(unit)],
                 "iHc in "+unit: [self.get_coercivity(unit)],
                 r"BHmax in kJ/m^3": [self.get_BHmax()],
@@ -761,7 +690,7 @@ def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
         List of labels (string) identifying the data rows.
         Has to be of same length as data.
     unit: STRING
-        Unit the saturation, remanence and coercivity are given in.
+        Unit the remanence and coercivity are given in.
         Default is Tesla
     sep: STRING
         Seperator to be used during the pd.to_csv. Default is "\t"
@@ -774,7 +703,6 @@ def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
     if all([i.measurement == 'M(H)' for i in data]):
         properties = {
             "sample": labels,
-            "Js in "+unit: [i.get_saturation(unit) for i in data],
             "Jr in "+unit: [i.get_remanence(unit) for i in data],
             "iHc in "+unit: [i.get_coercivity(unit) for i in data],
             r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
@@ -808,7 +736,7 @@ def mult_properties_to_json(filepath, data, labels, unit='T'):
         List of labels (string) identifying the data rows.
         Has to be of same length as data.
     unit: STRING
-        Unit the saturation, remanence and coercivity are given in.
+        Unit the remanence and coercivity are given in.
         Default is Tesla
 
     Returns
@@ -819,7 +747,6 @@ def mult_properties_to_json(filepath, data, labels, unit='T'):
     if all([i.measurement == 'M(H)' for i in data]):
         properties = {
             "sample": labels,
-            "Js in "+unit: [i.get_saturation(unit) for i in data],
             "Jr in "+unit: [i.get_remanence(unit) for i in data],
             "iHc in "+unit: [i.get_coercivity(unit) for i in data],
             r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
@@ -855,7 +782,7 @@ def diff(a, b):
     FLOAT
         Difference of Value a and b in percent.
     """
-    return (b - a) / a
+    return (b - a) / a * 100
 
 
 def droot(x, y):
