@@ -1,0 +1,18 @@
+abstract: "Python module that enables the import and handling of magnetometry data."
+authors:
+  - family-names: Winkler
+    given-names: Jonas
+    orcid: "https://orcid.org/0009-0000-7815-5916"
+    affiliation: "Leibniz Institute for Solid State and Materials Research (ROR: https://ror.org/04zb59n70)"
+  - name: The magmeas Developers
+    website: "https://github.com/jwinkler29/magmeas"
+cff-version: 1.2.0
+keywords:
+  - magnetometry
+  - vibrating sample magnetometry
+  - experimental data processing
+license: MIT
+message: "If you would like to cite this code, please do so using these metadata."
+repository-code: "https://github.com/jwinkler29/magmeas"
+title: "sem_io"
+version: 0.0.1
