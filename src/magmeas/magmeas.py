@@ -1,23 +1,16 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Feb  6 10:48:00 2024
+"""VSM class and functions using it."""
 
-@author: jw14
-"""
-
-import pandas as pd
 import json
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator
 
-# %%
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib.ticker import MultipleLocator
 
 mu_0 = np.pi * 4e-7
 
 
 class VSM:
-
     """
     Class for importing, storing and using of VSM-data aswell as derived
     parameters.
@@ -54,39 +47,38 @@ class VSM:
         Saves all properties derived from VSM-measurement to JSON-file.
     """
 
-    def __init__(self, datfile, read_method='auto', calc_properties=True):
-
+    def __init__(self, datfile, read_method="auto", calc_properties=True):
         # import data
         self.load_qd(datfile, read_method=read_method)
 
         # Determine type of measurement
         if self._H_var and not self._T_var:
-            self.measurement = 'M(H)'
+            self.measurement = "M(H)"
         elif self._T_var:
-            self.measurement = 'M(T)'
+            self.measurement = "M(T)"
         else:
-            self.measurement = 'unknown'
+            self.measurement = "unknown"
 
         if calc_properties:
             # calculate properties
-            if self.measurement == 'M(H)':
+            if self.measurement == "M(H)":
                 self._remanence = self.calc_remanence()
                 self._coercivity = self.calc_coercivity()
                 self._BHmax = self.calc_BHmax()
                 self._squareness = self.calc_squareness()
-            elif self.measurement == 'M(T)':
+            elif self.measurement == "M(T)":
                 self.Tc = self.calc_Tc()
 
     def demag_prism(self, a, b, c):
-        """
-        Calculates demagnetization factor Dz for a rectangular prism with
-        dimensions a, b, and c where c is assumed to be the axis along which
-        the prism was magnetized.\n
+        r"""
+        Calculate demagnetization factor Dz for a rectangular prism.
+        Dimensions are a, b, and c. c is assumed to be the axis along which
+        the prism was magnetized.
         Copied from
-        https://rmlmcfadden.github.io/bnmr/technical-information/calculators/\n
+        https://rmlmcfadden.github.io/bnmr/technical-information/calculators/
         Equation from A. Aharoni, J. Appl. Phys. 83, 3422 (1998).
         https://doi.org/10.1063/1.367113
-        Eq. (1) - see Fig. 1 for_abc coordinate system
+        Eq. (1) - see Fig. 1 for_abc coordinate system.
 
         Parameters
         ----------
@@ -105,11 +97,10 @@ class VSM:
         D: FLOAT
             Demagnetization factor along axis of magnetization (c-axis).
         """
-
         # the expression takes input as half of the semi-axes
         a = 0.5 * a
         b = 0.5 * b
-        c = 0.5 * c     # c is || axis along which the prism was magnetized
+        c = 0.5 * c  # c is || axis along which the prism was magnetized
         # define some convenience terms
         a2 = a * a
         b2 = b * b
@@ -134,8 +125,7 @@ class VSM:
             + (a2 * a + b2 * b - 2 * c2 * c) / (3 * abc)
             + ((a2 + b2 - 2 * c2) / (3 * abc)) * r_abc
             + (c / ab) * (r_ac + r_bc)
-            - (r_ab * r_ab * r_ab + r_bc * r_bc *
-               r_bc + r_ac * r_ac * r_ac) / (3 * abc)
+            - (r_ab * r_ab * r_ab + r_bc * r_bc * r_bc + r_ac * r_ac * r_ac) / (3 * abc)
         )
         # divide out the factor of pi
         D = pi_Dz / np.pi
@@ -143,7 +133,7 @@ class VSM:
 
     def calc_remanence(self):
         """
-        Extracts remanent magnetization or polarization from hysteresis loop
+        Extract remanent magnetization or polarization from hysteresis loop.
 
         Parameters
         ----------
@@ -171,15 +161,12 @@ class VSM:
         a = np.mean(a)
         # save the remanence in different units to be called directly without
         # need for later conversion
-        a = {'A/m': a,
-             'kA/m': a*1e-3,
-             'T': a*mu_0,
-             'mT': a*mu_0*1e3}
+        a = {"A/m": a, "kA/m": a * 1e-3, "T": a * mu_0, "mT": a * mu_0 * 1e3}
         return a
 
     def calc_coercivity(self):
         """
-        Extracts intrinsic Coercivity from hysteresis loop
+        Extract intrinsic Coercivity from hysteresis loop.
 
         Parameters
         ----------
@@ -204,15 +191,12 @@ class VSM:
         a = np.mean(a)
         # save the remanence in different units to be called directly without
         # need for later conversion
-        a = {'A/m': a,
-             'kA/m': a*1e-3,
-             'T': a*mu_0,
-             'mT': a*mu_0*1e3}
+        a = {"A/m": a, "kA/m": a * 1e-3, "T": a * mu_0, "mT": a * mu_0 * 1e3}
         return a
 
     def calc_BHmax(self):
         """
-        Extracts maximum Energy product from demagnetization curve
+        Extract maximum Energy product from demagnetization curve.
 
         Parameters
         ----------
@@ -223,7 +207,6 @@ class VSM:
         BHmax: FLOAT
             Maximum energy product in kJ/m^3
         """
-
         BH = (self.H + self.M) * mu_0 * self.H  # calculate BH
         # product of B and H is positive in first and third quadrant, negative
         # in second and third quadrant, so no finding of demagnetization curve
@@ -233,7 +216,7 @@ class VSM:
 
     def calc_squareness(self):
         """
-        Calculates squareness of demagnetization curve
+        Calculate squareness of demagnetization curve.
 
         Parameters
         ----------
@@ -245,18 +228,18 @@ class VSM:
         Squareness (dimensionless)
         """
         # value that magnetization is supposed to have at knee-point
-        Mk = 0.9 * self.get_remanence(unit='A/m')
+        Mk = 0.9 * self.get_remanence(unit="A/m")
         # find intersections of Hysteresis loop with M=Mk
         a = droot(self.H, self.M - Mk)
         a = np.abs(a)  # get absolute values
         a = a[1]  # second root should be knee field strength
-        S = a / self.get_coercivity(unit='A/m')
+        S = a / self.get_coercivity(unit="A/m")
         return S
 
     def calc_Tc(self):
         """
-        Calculates Curie-temperature from M(T) measurement, assuming only one
-        Curie-temperature
+        Calculate Curie-temperature from M(T) measurement, assuming only one
+        Curie-temperature.
 
         Parameters
         ----------
@@ -274,15 +257,14 @@ class VSM:
         # let's only look at M(T) during cooling, this is usually more reliable
         # cooling is assumed to occur after half of the measurement time
         # also cut off last couple of measurement points as they are unstable
-        selec = ((self.t > np.max(self.t) * 0.5) *
-                 (self.t < np.max(self.t) * 0.9))
+        selec = (self.t > np.max(self.t) * 0.5) * (self.t < np.max(self.t) * 0.9)
         nM = nM[selec]
         T = self.T[selec]
         # generous kernel for smoothing
         kernel = np.ones(20) / 20
         # smooth measurement by convolution with kernel
-        sT = np.convolve(T, kernel, mode='valid')
-        sM = np.convolve(nM, kernel, mode='valid')
+        sT = np.convolve(T, kernel, mode="valid")
+        sM = np.convolve(nM, kernel, mode="valid")
         # Tc is temperature where dM/dT has minimum
         Tc = sT[np.argmin(np.gradient(sM) / np.gradient(sT))]
         return Tc
@@ -296,6 +278,7 @@ class VSM:
         datfile: STRING
             Path to quantum systems .DAT file that data is supposed to be
             imported from
+
         Returns
         -------
         None
@@ -305,68 +288,64 @@ class VSM:
         def rextract(string, startsub, endsub):
             endind = string.index(endsub)
             startind = string.rindex(startsub, 0, endind)
-            return string[startind + len(startsub):endind]
+            return string[startind + len(startsub) : endind]
 
-        err = '''
+        err = """
               Sample parameters could not be read automatically.
               Please enter sample parameters manually or enter them
               correctly in the .DAT file like this:
               INFO,<mass in mg>,SAMPLE_MASS
               INFO,(<a>, <b>, <c>),SAMPLE_SIZE
               sample dimensions a, b and c in mm, c parallel to field
-              '''
+              """
 
-        if read_method == 'auto':
+        if read_method == "auto":
             # Automatically read out sample parameters
-            with open(datfile, 'rb') as f:
+            with open(datfile, "rb") as f:
                 s = str(f.read(-1))
 
             try:
-                mass = float(rextract(s, 'INFO,', ',SAMPLE_MASS')) * \
-                    1e-3  # mass in g
+                mass = float(rextract(s, "INFO,", ",SAMPLE_MASS")) * 1e-3  # mass in g
             except ValueError:
-                raise Exception(err)
+                raise Exception(err) from None
 
             try:
-                dim = rextract(s, 'INFO,(', '),SAMPLE_SIZE').split(',')
+                dim = rextract(s, "INFO,(", "),SAMPLE_SIZE").split(",")
                 dim = [float(f) for f in dim]
             except ValueError:
-                raise Exception(err)
+                raise Exception(err) from None
 
             density = mass / np.prod(dim) * 1e3
             D = self.demag_prism(dim[0], dim[1], dim[2])
 
         # Input sample parameters manually
-        elif read_method == 'manual':
-            print('Manual input method selected')
-            mass = float(input('Sample mass in mg: '))
-            print(f'mass = {mass} mg')
-            a = float(
-                input('Sample dimension a (perpendicular to field) in mm: '))
-            print(f'a = {a} mm')
-            b = float(
-                input('Sample dimension b (perpendicular to field) in mm: '))
-            print(f'b = {b} mm')
-            c = float(
-                input('Sample dimension c (parallel to field) in mm: '))
-            print(f'c = {c} mm')
+        elif read_method == "manual":
+            print("Manual input method selected")
+            mass = float(input("Sample mass in mg: "))
+            print(f"mass = {mass} mg")
+            a = float(input("Sample dimension a (perpendicular to field) in mm: "))
+            print(f"a = {a} mm")
+            b = float(input("Sample dimension b (perpendicular to field) in mm: "))
+            print(f"b = {b} mm")
+            c = float(input("Sample dimension c (parallel to field) in mm: "))
+            print(f"c = {c} mm")
             density = mass / (a * b * c) * 1e3
             D = self.demag_prism(a, b, c)
         else:
             raise Exception(err)
 
         # import measurement data
-        df = pd.read_csv(datfile, skiprows=34, encoding='cp1252')
-        m = np.array(df['Moment (emu)'])  # save moments as np.array
+        df = pd.read_csv(datfile, skiprows=34, encoding="cp1252")
+        m = np.array(df["Moment (emu)"])  # save moments as np.array
         # save field as np.array and convert from Oe to A/m
-        H = np.array(df['Magnetic Field (Oe)']) * 1E-4 / mu_0
+        H = np.array(df["Magnetic Field (Oe)"]) * 1e-4 / mu_0
         M = m / mass * density  # calc magnetisation in kA/m
-        M = M * 1E3  # convert magnetisation from kA/m to A/m
+        M = M * 1e3  # convert magnetisation from kA/m to A/m
         H = H - D * M  # correct field for demagnetisation
         # save absolute temperature as np.array
-        T = np.array(df['Temperature (K)'])
+        T = np.array(df["Temperature (K)"])
         # save time stamp
-        t = np.array(df['Time Stamp (sec)'])
+        t = np.array(df["Time Stamp (sec)"])
 
         # test datapoints for missing values (where value is nan)
         nanfilter = ~np.isnan(H) * ~np.isnan(M) * ~np.isnan(T) * ~np.isnan(t)
@@ -382,7 +361,7 @@ class VSM:
         # Does T vary by more than 10 K?
         self._T_var = float(np.max(self.T) - np.min(self.T)) > 10
 
-    def get_remanence(self, unit='T'):
+    def get_remanence(self, unit="T"):
         """
         Getter function for remanence. Depending on the given unit this will
         be the remanent magnetization or remanent polarization.
@@ -399,7 +378,7 @@ class VSM:
         """
         return self._remanence[unit]
 
-    def get_coercivity(self, unit='T'):
+    def get_coercivity(self, unit="T"):
         """
         Getter function for coercivity. Depending on the given unit this might
         return a product of coercivity and the vacuum permeability.
@@ -447,8 +426,8 @@ class VSM:
 
     def plot(self, filepath=None, demag=True, label=None):
         """
-        Plots hysteresis loop, optionally with inset of demagnetization curve
-        and saves figure if a filepath is given.
+        Plot hysteresis loop, optionally with inset of demagnetization curve
+        and save figure if a filepath is given.
 
         Parameters
         ----------
@@ -466,24 +445,21 @@ class VSM:
         -------
         None
         """
-
         H = self.H * mu_0  # converts H from A/m to Tesla
         M = self.M * mu_0  # converts M from A/m to Tesla
 
-        fig, ax1 = plt.subplots(1, 1, figsize=(16/2.54, 12/2.54))
+        fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
         ax1.plot(H, M, label=label)
 
         # format plot
         ax1.xaxis.set_major_locator(MultipleLocator(2))
-        ax1.xaxis.set_minor_locator(MultipleLocator(.5))
+        ax1.xaxis.set_minor_locator(MultipleLocator(0.5))
         ax1.yaxis.set_major_locator(MultipleLocator(0.2))
         ax1.yaxis.set_minor_locator(MultipleLocator(0.05))
-        ax1.set_xlabel(r'$\mu_0 H_{int}$ in $T$')
-        ax1.set_ylabel(r'$J$ in $T$')
-        ax1.grid(visible=True, which='major',
-                 axis='both', linestyle=':', linewidth=1)
-        ax1.grid(visible=True, which='minor', axis='both',
-                 linestyle=':', linewidth=0.5)
+        ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
+        ax1.set_ylabel(r"$J$ in $T$")
+        ax1.grid(visible=True, which="major", axis="both", linestyle=":", linewidth=1)
+        ax1.grid(visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5)
         if label is not None:
             ax1.legend()
         fig.tight_layout()
@@ -497,38 +473,38 @@ class VSM:
             # curve fits nicely
             Hmin, Jmax = None, None
             for i in np.arange(0, 5, 0.05):
-                if Hmin is None:
-                    if -i <= -self.get_coercivity('T') - 0.02:
-                        Hmin = -i
-                if Jmax is None:
-                    if i >= self.get_remanence('T') + 0.02:
-                        Jmax = i
+                if Hmin is None and -i <= -self.get_coercivity("T") - 0.02:
+                    Hmin = -i
+                if Jmax is None and i >= self.get_remanence("T") + 0.02:
+                    Jmax = i
                 if Hmin is not None and Jmax is not None:
                     break
 
             # format plot
             ax2.axis([Hmin, 0, 0, Jmax])
-            ax2.yaxis.set_label_position('right')
+            ax2.yaxis.set_label_position("right")
             ax2.yaxis.tick_right()
             ax2.xaxis.set_major_locator(MultipleLocator(0.1))
             ax2.xaxis.set_minor_locator(MultipleLocator(0.05))
             ax2.yaxis.set_major_locator(MultipleLocator(0.1))
             ax2.yaxis.set_minor_locator(MultipleLocator(0.05))
-            ax2.set_xlabel(r'$\mu_0 H_{int}$ in $T$')
-            ax2.set_ylabel(r'$J$ in $T$')
-            ax2.grid(visible=True, which='major',
-                     axis='both', linestyle=':', linewidth=1)
-            ax2.grid(visible=True, which='minor', axis='both',
-                     linestyle=':', linewidth=0.5)
+            ax2.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
+            ax2.set_ylabel(r"$J$ in $T$")
+            ax2.grid(
+                visible=True, which="major", axis="both", linestyle=":", linewidth=1
+            )
+            ax2.grid(
+                visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5
+            )
             fig.tight_layout()
 
         # save figure if filepath is given
         if filepath is not None:
             plt.savefig(filepath, dpi=300)
 
-    def properties_to_txt(self, filepath, unit='T', sep="\t"):
-        """
-        Saves all properties derived from the VSM-measurement to CSV-file.
+    def properties_to_txt(self, filepath, unit="T", sep="\t"):
+        r"""
+        Save all properties derived from the VSM-measurement to CSV-file.
 
         Parameters
         ----------
@@ -544,22 +520,21 @@ class VSM:
         -------
         None
         """
-
-        if self.measurement == 'M(H)':
+        if self.measurement == "M(H)":
             properties = {
-                "Jr in "+unit: [self.get_remanence(unit)],
-                "iHc in "+unit: [self.get_coercivity(unit)],
+                "Jr in " + unit: [self.get_remanence(unit)],
+                "iHc in " + unit: [self.get_coercivity(unit)],
                 r"BHmax in kJ/m^3": [self.get_BHmax()],
-                "S": [self.get_squareness()]
+                "S": [self.get_squareness()],
             }
-        elif self.measurement == 'M(T)':
+        elif self.measurement == "M(T)":
             properties = {"Tc in K": [self.Tc]}
         df = pd.DataFrame(properties)
         df.to_csv(filepath, sep=sep)
 
-    def properties_to_json(self, filepath, unit='T'):
+    def properties_to_json(self, filepath, unit="T"):
         """
-        Saves all properties derived from the VSM-measurement to json-file.
+        Save all properties derived from the VSM-measurement to json-file.
 
         Parameters
         ----------
@@ -573,23 +548,22 @@ class VSM:
         -------
         None
         """
-
-        if self.measurement == 'M(H)':
+        if self.measurement == "M(H)":
             properties = {
-                "Jr in "+unit: [self.get_remanence(unit)],
-                "iHc in "+unit: [self.get_coercivity(unit)],
+                "Jr in " + unit: [self.get_remanence(unit)],
+                "iHc in " + unit: [self.get_coercivity(unit)],
                 r"BHmax in kJ/m^3": [self.get_BHmax()],
-                "S": [self.get_squareness()]
+                "S": [self.get_squareness()],
             }
-        elif self.measurement == 'M(T)':
+        elif self.measurement == "M(T)":
             properties = {"Tc in K": [self.Tc]}
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             json.dump(properties, f, ensure_ascii=False, indent=4)
 
 
 def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     """
-    Plots hysteresis loops and optionally demagnetization curves of
+    Plot hysteresis loops and optionally demagnetization curves of
     several VSM measurements. Saves figure if filepath is given.
 
     Parameters
@@ -610,8 +584,7 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     -------
     None
     """
-
-    fig, ax1 = plt.subplots(1, 1, figsize=(16/2.54, 12/2.54))
+    fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
 
     # plot hysteresis loops
     for i in range(len(data)):
@@ -619,15 +592,13 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
 
     # format plot
     ax1.xaxis.set_major_locator(MultipleLocator(2))
-    ax1.xaxis.set_minor_locator(MultipleLocator(.5))
+    ax1.xaxis.set_minor_locator(MultipleLocator(0.5))
     ax1.yaxis.set_major_locator(MultipleLocator(0.2))
     ax1.yaxis.set_minor_locator(MultipleLocator(0.05))
-    ax1.set_xlabel(r'$\mu_0 H_{int}$ in $T$')
-    ax1.set_ylabel(r'$J$ in $T$')
-    ax1.grid(visible=True, which='major',
-             axis='both', linestyle=':', linewidth=1)
-    ax1.grid(visible=True, which='minor', axis='both',
-             linestyle=':', linewidth=0.5)
+    ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
+    ax1.set_ylabel(r"$J$ in $T$")
+    ax1.grid(visible=True, which="major", axis="both", linestyle=":", linewidth=1)
+    ax1.grid(visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5)
     ax1.legend()
     fig.tight_layout()
     plt.gca().set_prop_cycle(None)
@@ -636,8 +607,9 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     if demag:
         ax2 = ax1.inset_axes([0.58, 0.15, 0.3, 0.5])
         for i in range(len(data)):
-            ax2.plot(data[i].H[100:-100] * mu_0,
-                     data[i].M[100:-100] * mu_0, label=labels[i])
+            ax2.plot(
+                data[i].H[100:-100] * mu_0, data[i].M[100:-100] * mu_0, label=labels[i]
+            )
 
         # find upper and lower border of plot, so that demagnetization
         # curve fits nicely
@@ -645,29 +617,25 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
         remmax = max([i.get_remanence for i in data])
         Hmin, Jmax = None, None
         for i in np.arange(0, 5, 0.05):
-            if Hmin is None:
-                if -i <= -coercmax - 0.02:
-                    Hmin = -i
-            if Jmax is None:
-                if i >= remmax + 0.02:
-                    Jmax = i
+            if Hmin is None and -i <= -coercmax - 0.02:
+                Hmin = -i
+            if Jmax is None and i >= remmax + 0.02:
+                Jmax = i
             if Hmin is not None and Jmax is not None:
                 break
 
         # format plot
         ax2.axis([Hmin, 0, 0, Jmax])
-        ax2.yaxis.set_label_position('right')
+        ax2.yaxis.set_label_position("right")
         ax2.yaxis.tick_right()
         ax2.xaxis.set_major_locator(MultipleLocator(0.1))
         ax2.xaxis.set_minor_locator(MultipleLocator(0.05))
         ax2.yaxis.set_major_locator(MultipleLocator(0.1))
         ax2.yaxis.set_minor_locator(MultipleLocator(0.05))
-        ax2.set_xlabel(r'$\mu_0 H_{int}$ in $T$')
-        ax2.set_ylabel(r'$J$ in $T$')
-        ax2.grid(visible=True, which='major',
-                 axis='both', linestyle=':', linewidth=1)
-        ax2.grid(visible=True, which='minor', axis='both',
-                 linestyle=':', linewidth=0.5)
+        ax2.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
+        ax2.set_ylabel(r"$J$ in $T$")
+        ax2.grid(visible=True, which="major", axis="both", linestyle=":", linewidth=1)
+        ax2.grid(visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5)
 
     # save figure if filepath is given
     if filepath is not None:
@@ -675,9 +643,9 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     return None
 
 
-def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
-    """
-    Saves magnetic properties derived from the several VSM-measurements to
+def mult_properties_to_txt(filepath, data, labels, unit="T", sep="\t"):
+    r"""
+    Save magnetic properties derived from the several VSM-measurements to
     CSV-file.
 
     Parameters
@@ -699,20 +667,16 @@ def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
     -------
     None
     """
-
-    if all([i.measurement == 'M(H)' for i in data]):
+    if all([i.measurement == "M(H)" for i in data]):
         properties = {
             "sample": labels,
-            "Jr in "+unit: [i.get_remanence(unit) for i in data],
-            "iHc in "+unit: [i.get_coercivity(unit) for i in data],
+            "Jr in " + unit: [i.get_remanence(unit) for i in data],
+            "iHc in " + unit: [i.get_coercivity(unit) for i in data],
             r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
-            "S": [i.get_squareness() for i in data]
+            "S": [i.get_squareness() for i in data],
         }
-    elif all([i.measurement == 'M(T)' for i in data]):
-        properties = {
-            "sample": labels,
-            "Tc in K": [i.Tc for i in data]
-        }
+    elif all([i.measurement == "M(T)" for i in data]):
+        properties = {"sample": labels, "Tc in K": [i.Tc for i in data]}
     else:
         raise Exception("""Please only export a list of VSM measurements if
                         all of them are the same measurement type. This
@@ -721,9 +685,9 @@ def mult_properties_to_txt(filepath, data, labels, unit='T', sep='\t'):
     df.to_csv(filepath, sep=sep)
 
 
-def mult_properties_to_json(filepath, data, labels, unit='T'):
+def mult_properties_to_json(filepath, data, labels, unit="T"):
     """
-    Saves magnetic properties derived from the several VSM-measurements to
+    Save magnetic properties derived from the several VSM-measurements to
     json-file.
 
     Parameters
@@ -743,31 +707,27 @@ def mult_properties_to_json(filepath, data, labels, unit='T'):
     -------
     None
     """
-
-    if all([i.measurement == 'M(H)' for i in data]):
+    if all([i.measurement == "M(H)" for i in data]):
         properties = {
             "sample": labels,
-            "Jr in "+unit: [i.get_remanence(unit) for i in data],
-            "iHc in "+unit: [i.get_coercivity(unit) for i in data],
+            "Jr in " + unit: [i.get_remanence(unit) for i in data],
+            "iHc in " + unit: [i.get_coercivity(unit) for i in data],
             r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
-            "S": [i.get_squareness() for i in data]
+            "S": [i.get_squareness() for i in data],
         }
-    elif all([i.measurement == 'M(T)' for i in data]):
-        properties = {
-            "sample": labels,
-            "Tc in K": [i.Tc for i in data]
-        }
+    elif all([i.measurement == "M(T)" for i in data]):
+        properties = {"sample": labels, "Tc in K": [i.Tc for i in data]}
     else:
         raise Exception("""Please only export a list of VSM measurements if
                         all of them are the same measurement type. This
                         does not seem to be the case.""")
-    with open(filepath, 'w', encoding='utf-8') as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         json.dump(properties, f, ensure_ascii=False, indent=4)
 
 
 def diff(a, b):
     """
-    Calculates the difference between value a and value b relative to
+    Calculate the difference between value a and value b relative to
     value a in percent.
 
     Parameters
@@ -787,7 +747,7 @@ def diff(a, b):
 
 def droot(x, y):
     """
-    Finding root of a discrete dataset of x and y values.
+    Find root of a discrete dataset of x and y values.
 
     Parameters
     ----------
@@ -804,14 +764,14 @@ def droot(x, y):
     r = np.array([])
     # scan over whole range of values to find the two points where the
     # y-axis is crossed
-    for i in range(len(x)-1):
+    for i in range(len(x) - 1):
         # y values on left and right side of root will only be negative if
         # their product is negative
-        if y[i] * y[i+1] <= 0:
+        if y[i] * y[i + 1] <= 0:
             # dataset between two points is assumed to be linear,
             # calculate linear equation to get exact interception point
             # with x-axis
-            m = (y[i+1]-y[i])/(x[i+1]-x[i])  # slope
+            m = (y[i + 1] - y[i]) / (x[i + 1] - x[i])  # slope
             n = y[i] - m * x[i]  # y-intercept
             x0 = -n / m  # x-intercept
             # append x-intercepts as root to array
