@@ -15,4 +15,4 @@ license: MIT
 message: "If you would like to cite this code, please do so using these metadata."
 repository-code: "https://github.com/jwinkler29/magmeas"
 title: "magmeas"
-version: 0.0.1
+version: 0.1.0
