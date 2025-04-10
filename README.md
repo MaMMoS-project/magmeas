@@ -6,7 +6,6 @@ Automatic plotting with matplotlib is also available.
 Dependencies:
 - numpy
 - pandas
-- json
 - matplotlib
 
 Requires Python >= 3.6 because f-strings are used
