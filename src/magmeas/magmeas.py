@@ -38,6 +38,8 @@ class VSM:
         Getter function for the maximum energy product BHmax
     get_squareness()
         Getter function for the squareness
+    get_Tc()
+        Getter function for the Curie-temperature
     plot()
         Plots hysteresis loop, optionally with inset of demagnetisation curve,
         optionally saves as png
@@ -67,7 +69,7 @@ class VSM:
                 self._BHmax = self.calc_BHmax()
                 self._squareness = self.calc_squareness()
             elif self.measurement == "M(T)":
-                self.Tc = self.calc_Tc()
+                self._Tc = self.calc_Tc()
 
     def demag_prism(self, a, b, c):
         r"""
@@ -137,14 +139,13 @@ class VSM:
 
         Parameters
         ----------
-        unit: STRING, optional
-            Unit the remanence is supposed to be returned in. Default is Tesla.
+        NONE
 
         Returns
         -------
-        remanence: len 2 TUPLE
-            Tuple of value and unit of remanent magnetization/polarization
-            (depending on given unit)
+        remanence: DICTIONARY
+            Dictionary of possible units as keys and the respective value of
+            the remanence in this unit
         """
         # find intersections of hysteresis loop with H=0
         a = droot(self.M, self.H)
@@ -170,13 +171,13 @@ class VSM:
 
         Parameters
         ----------
-        unit: STRING, optional
-            Unit the remanence is supposed to be returned in. Default is Tesla.
+        NONE
 
         Returns
         -------
-        coercivity: len 2 TUPLE
-            Tuple of value and unit of intrinsic coercivity
+        coercivity: DICTIONARY
+            Dictionary of possible units as keys and the respective value of
+            the coercivity in this unit
         """
         # find intersections of hysteresis loop with M=0
         a = droot(self.H, self.M)
@@ -212,7 +213,7 @@ class VSM:
         # in second and third quadrant, so no finding of demagnetization curve
         # is necessary
         # BHmax is minimum of BH, should always be negative value
-        return np.min(BH) * -1e-3
+        return np.min(BH) * -1e-3  # convert to positive value in kJ/m**3
 
     def calc_squareness(self):
         """
@@ -267,7 +268,8 @@ class VSM:
         sM = np.convolve(nM, kernel, mode="valid")
         # Tc is temperature where dM/dT has minimum
         Tc = sT[np.argmin(np.gradient(sM) / np.gradient(sT))]
-        return Tc
+        a = {"K": Tc, "°C": Tc - 273.15}
+        return a
 
     def load_qd(self, datfile, read_method):
         """
@@ -424,6 +426,23 @@ class VSM:
         """
         return self._squareness
 
+    def get_Tc(self, unit="K"):
+        """
+        Getter function for Curie-temperature.
+
+        Parameters
+        ----------
+        unit : STR, optional
+            Unit the value of the Curie-temperature is given in.
+            The default is 'K'.
+
+        Returns
+        -------
+        FLOAT
+            Returns value of the Curie-temperature in the specified unit.
+        """
+        return self._Tc[unit]
+
     def plot(self, filepath=None, demag=True, label=None):
         """
         Plot hysteresis loop, optionally with inset of demagnetization curve
@@ -528,7 +547,7 @@ class VSM:
                 "S": [self.get_squareness()],
             }
         elif self.measurement == "M(T)":
-            properties = {"Tc in K": [self.Tc]}
+            properties = {"Tc in K": [self.get_Tc()]}
         df = pd.DataFrame(properties)
         df.to_csv(filepath, sep=sep)
 
@@ -556,7 +575,7 @@ class VSM:
                 "S": [self.get_squareness()],
             }
         elif self.measurement == "M(T)":
-            properties = {"Tc in K": [self.Tc]}
+            properties = {"Tc in K": [self.get_Tc()]}
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(properties, f, ensure_ascii=False, indent=4)
 
@@ -676,7 +695,7 @@ def mult_properties_to_txt(filepath, data, labels, unit="T", sep="\t"):
             "S": [i.get_squareness() for i in data],
         }
     elif all([i.measurement == "M(T)" for i in data]):
-        properties = {"sample": labels, "Tc in K": [i.Tc for i in data]}
+        properties = {"sample": labels, "Tc in K": [i.get_Tc() for i in data]}
     else:
         raise Exception("""Please only export a list of VSM measurements if
                         all of them are the same measurement type. This
@@ -716,7 +735,7 @@ def mult_properties_to_json(filepath, data, labels, unit="T"):
             "S": [i.get_squareness() for i in data],
         }
     elif all([i.measurement == "M(T)" for i in data]):
-        properties = {"sample": labels, "Tc in K": [i.Tc for i in data]}
+        properties = {"sample": labels, "Tc in K": [i.get_Tc() for i in data]}
     else:
         raise Exception("""Please only export a list of VSM measurements if
                         all of them are the same measurement type. This
