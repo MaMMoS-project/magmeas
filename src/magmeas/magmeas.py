@@ -579,6 +579,30 @@ class VSM:
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(properties, f, ensure_ascii=False, indent=4)
 
+    def print_properties(self, unit="T"):
+        """
+        Print out properties of VSM object.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        if self.measurement == "M(H)":
+            properties = {
+                "Jr in " + unit: [self.get_remanence(unit)],
+                "iHc in " + unit: [self.get_coercivity(unit)],
+                r"BHmax in kJ/m^3": [self.get_BHmax()],
+                "S": [self.get_squareness()],
+            }
+        elif self.measurement == "M(T)":
+            properties = {"Tc in K": [self.get_Tc()]}
+        for key in properties:
+            print(f"{key} = {properties[key][0]}")
+
 
 def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     """
