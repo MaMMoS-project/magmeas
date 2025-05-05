@@ -5,7 +5,7 @@ calculated from M(H) hysteresis loops and exported to JSON- or CSV-files.
 Automatic plotting with matplotlib is also available.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from magmeas.magmeas import (
     VSM,
