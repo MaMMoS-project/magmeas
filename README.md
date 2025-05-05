@@ -28,7 +28,7 @@ INFO,(a, b, c),SAMPLE_SIZE
 
 With m being the sample mass in mg, a and b being the sample dimensions perpendicular to the magnetization axis and
 c being the sample dimension parallel to the magnetization axis. So far only cuboid samples are supported and the density
-is assumed to be m / (a*b*c)
+is assumed to be m / (a * b * c)
 
 ### Command line
 
@@ -46,17 +46,17 @@ magmeas file.DAT
 ```
 
 
-To plot the measurement with matplotlib, type:
+To plot the measurement with matplotlib, type "-p" or "--plot":
 
 ```bash
 magmeas -p file.DAT
 ```
 
 
-If you want to store the calculated properties in a JSON-file, use:
+If you want to store the calculated properties in a JSON-file, use "-d" or "--dump":
 
 ```bash
-magmeas -d 
+magmeas -d file.DAT
 ```
 
 
