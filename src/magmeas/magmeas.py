@@ -445,6 +445,33 @@ class VSM:
 
     def plot(self, filepath=None, demag=True, label=None):
         """
+        Plot M(H) or M(T) measurement. Wrapper function.
+
+        Parameters
+        ----------
+        filepath : TYPE, optional
+            Filepath for saving the figure. Default is None, in that case no
+            file is saved.
+        demag : TYPE, optional
+            Boolean that determines if demagnetization curve is plotted as an
+            inset next to hysteresis loop. Default is True. Only applies to
+            M(H)-measurements.
+        label : TYPE, optional
+            Optional label of hysteresis loop that can be displayed in the
+            legend. Default is None, in that case no legend is displayed.
+
+        Returns
+        -------
+        None.
+        """
+        if self.measurement == "M(H)":
+            self.plot_MH(filepath=filepath, demag=demag, label=label)
+        elif self.measurement == "M(T)":
+            self.plot_MT(filepath=filepath)
+        plt.show()
+
+    def plot_MH(self, filepath=None, demag=True, label=None):
+        """
         Plot hysteresis loop, optionally with inset of demagnetization curve
         and save figure if a filepath is given.
 
@@ -518,6 +545,33 @@ class VSM:
             fig.tight_layout()
 
         # save figure if filepath is given
+        if filepath is not None:
+            plt.savefig(filepath, dpi=300)
+
+    def plot_MT(self, filepath=None):
+        """
+        Plot cooling curve of M(T) measurement. Save to file if path is given.
+
+        Parameters
+        ----------
+        filepath : TYPE, optional
+            Filepath for saving the figure. Default is None, in that case no
+            file is saved.
+
+        Returns
+        -------
+        None.
+        """
+        fig, ax = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
+
+        ax.plot(self.T[self.t > max(self.t) / 2], self.M[self.t > max(self.t) / 2])
+
+        ax.set_xlabel("Temperature in K")
+        ax.set_ylabel("Magnetic moment in a.u.")
+        ax.xaxis.set_inverted(True)
+        ax.set_yticks([])
+        fig.tight_layout()
+
         if filepath is not None:
             plt.savefig(filepath, dpi=300)
 

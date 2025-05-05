@@ -55,6 +55,13 @@ def cli():
         help="do not print output to terminal",
     )
 
+    parser.add_argument(
+        "-p",
+        "--plot",
+        action="store_true",
+        help="plot data, save as figure if combined with --dump",
+    )
+
     args = parser.parse_args()
 
     if args.silent and not args.dump:
@@ -72,6 +79,11 @@ def cli():
             if args.dump:
                 fn = p_dat.parent.joinpath(p_dat.stem + "_properties.json")
                 vsm_dat.properties_to_json(fn)
+            if args.plot and args.dump:
+                fn = p_dat.parent.joinpath(p_dat.stem + "_plot.png")
+                vsm_dat.plot(filepath=fn)
+            if args.plot and not args.dump:
+                vsm_dat.plot()
         else:
             all_dats = glob.glob(p_dat.joinpath("*.DAT").as_posix())
             for i in all_dats:
@@ -82,3 +94,8 @@ def cli():
                 if args.dump:
                     fn = i.parent.joinpath(i.stem + "_properties.json")
                     vsm_dat.properties_to_json(fn)
+                if args.plot and args.dump:
+                    fn = i.parent.joinpath(i.stem + "_plot.png")
+                    vsm_dat.plot(filepath=fn)
+                if args.plot and not args.dump:
+                    vsm_dat.plot()
