@@ -6,6 +6,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import h5py
 from matplotlib.ticker import MultipleLocator
 
 mu_0 = np.pi * 4e-7
@@ -670,6 +671,57 @@ class VSM:
             properties = {"Tc in K": [self.get_Tc()]}
         for key in properties:
             print(f"{key} = {properties[key][0]}")
+
+    def to_hdf5(self, unit='T'):
+        """
+        Save .DAT-file and calculated properties in hdf5 file.
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        None.
+
+        """
+        with open(self.path) as f:
+            s = str(f.read(-1))
+        head = s[s.index('INFO'):s.rindex('\nDATATYPE')]
+        head = head.split('\n')
+        info = {i[i.rindex(',')+1:]: i[i.index(',')+1:i.rindex(',')]
+                for i in head}
+        df = pd.read_csv(self.path, skiprows=34, encoding="cp1252")
+
+        f = h5py.File(self.path.parent.joinpath(self.path.stem + '.hdf5'), 'a')
+        for i in info.keys():
+            f.create_dataset('Info/'+i, data=info[i])
+        f['Info/SAMPLE_MASS'].attrs['unit'] = 'mg'
+        f['Info/SAMPLE_SIZE'].attrs['unit'] = 'mm'
+
+        for i in df.columns:
+            dat = np.array(df[i])
+            if dat.dtype != 'O':
+                f.create_dataset('Data/'+i, data=dat)
+            if dat.dtype == 'O':
+                f.create_dataset('Data/'+i, data=[str(j) for j in df[i]])
+
+        if self.measurement == "M(H)":
+            f.create_dataset('Properties/Remanence',
+                             data=self.get_remanence(unit))
+            f['Properties/Remanence'].attrs['unit'] = unit
+            f.create_dataset('Properties/Coercivity',
+                             data=self.get_coercivity(unit))
+            f['Properties/Coercivity'].attrs['unit'] = unit
+            f.create_dataset('Properties/BHmax',
+                             data=self.get_remanence(unit))
+            f['Properties/BHmax'].attrs['unit'] = 'kJ/m^3'
+            f.create_dataset('Properties/Squareness',
+                             data=self.get_squareness())
+        elif self.measurement == "M(T)":
+            f.create_dataset('Properties/Tc',
+                             data=self.get_remanence(unit))
+            f['Properties/Tc'].attrs['unit'] = 'K'
 
 
 def plot_multiple_VSM(data, labels, filepath=None, demag=True):
