@@ -62,6 +62,12 @@ def cli():
         help="plot data, save as figure if combined with --dump",
     )
 
+    parser.add_argument(
+        "--hdf5",
+        action="store_true",
+        help="save DAT-file contents and calculated properties to hdf5",
+    )
+
     args = parser.parse_args()
 
     if args.silent and not args.dump:
@@ -84,6 +90,8 @@ def cli():
                 vsm_dat.plot(filepath=fn)
             if args.plot and not args.dump:
                 vsm_dat.plot()
+            if args.hdf5:
+                vsm_dat.to_hdf5()
         else:
             all_dats = glob.glob(p_dat.joinpath("*.DAT").as_posix())
             for i in all_dats:
@@ -99,3 +107,5 @@ def cli():
                     vsm_dat.plot(filepath=fn)
                 if args.plot and not args.dump:
                     vsm_dat.plot()
+                if args.hdf5:
+                    vsm_dat.to_hdf5()
