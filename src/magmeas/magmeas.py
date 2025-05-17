@@ -1,6 +1,7 @@
 """VSM class and functions using it."""
 
 import json
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -127,7 +128,8 @@ class VSM:
             + (a2 * a + b2 * b - 2 * c2 * c) / (3 * abc)
             + ((a2 + b2 - 2 * c2) / (3 * abc)) * r_abc
             + (c / ab) * (r_ac + r_bc)
-            - (r_ab * r_ab * r_ab + r_bc * r_bc * r_bc + r_ac * r_ac * r_ac) / (3 * abc)
+            - (r_ab * r_ab * r_ab + r_bc * r_bc *
+               r_bc + r_ac * r_ac * r_ac) / (3 * abc)
         )
         # divide out the factor of pi
         D = pi_Dz / np.pi
@@ -258,7 +260,8 @@ class VSM:
         # let's only look at M(T) during cooling, this is usually more reliable
         # cooling is assumed to occur after half of the measurement time
         # also cut off last couple of measurement points as they are unstable
-        selec = (self.t > np.max(self.t) * 0.5) * (self.t < np.max(self.t) * 0.9)
+        selec = (self.t > np.max(self.t) * 0.5) * \
+            (self.t < np.max(self.t) * 0.9)
         nM = nM[selec]
         T = self.T[selec]
         # generous kernel for smoothing
@@ -287,10 +290,12 @@ class VSM:
 
         """
 
+        self.path = Path(datfile)
+
         def rextract(string, startsub, endsub):
             endind = string.index(endsub)
             startind = string.rindex(startsub, 0, endind)
-            return string[startind + len(startsub) : endind]
+            return string[startind + len(startsub): endind]
 
         err = """
               Sample parameters could not be read automatically.
@@ -307,7 +312,8 @@ class VSM:
                 s = str(f.read(-1))
 
             try:
-                mass = float(rextract(s, "INFO,", ",SAMPLE_MASS")) * 1e-3  # mass in g
+                mass = float(rextract(s, "INFO,", ",SAMPLE_MASS")
+                             ) * 1e-3  # mass in g
             except ValueError:
                 raise Exception(err) from None
 
@@ -325,9 +331,11 @@ class VSM:
             print("Manual input method selected")
             mass = float(input("Sample mass in mg: "))
             print(f"mass = {mass} mg")
-            a = float(input("Sample dimension a (perpendicular to field) in mm: "))
+            a = float(
+                input("Sample dimension a (perpendicular to field) in mm: "))
             print(f"a = {a} mm")
-            b = float(input("Sample dimension b (perpendicular to field) in mm: "))
+            b = float(
+                input("Sample dimension b (perpendicular to field) in mm: "))
             print(f"b = {b} mm")
             c = float(input("Sample dimension c (parallel to field) in mm: "))
             print(f"c = {c} mm")
@@ -504,8 +512,10 @@ class VSM:
         ax1.yaxis.set_minor_locator(MultipleLocator(0.05))
         ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
         ax1.set_ylabel(r"$J$ in $T$")
-        ax1.grid(visible=True, which="major", axis="both", linestyle=":", linewidth=1)
-        ax1.grid(visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5)
+        ax1.grid(visible=True, which="major",
+                 axis="both", linestyle=":", linewidth=1)
+        ax1.grid(visible=True, which="minor", axis="both",
+                 linestyle=":", linewidth=0.5)
         if label is not None:
             ax1.legend()
         fig.tight_layout()
@@ -564,7 +574,8 @@ class VSM:
         """
         fig, ax = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
 
-        ax.plot(self.T[self.t > max(self.t) / 2], self.M[self.t > max(self.t) / 2])
+        ax.plot(self.T[self.t > max(self.t) / 2],
+                self.M[self.t > max(self.t) / 2])
 
         ax.set_xlabel("Temperature in K")
         ax.set_ylabel("Magnetic moment in a.u.")
@@ -645,6 +656,9 @@ class VSM:
         -------
         None
         """
+
+        print(f"\n\n{self.path.name}:\n")
+
         if self.measurement == "M(H)":
             properties = {
                 "Jr in " + unit: [self.get_remanence(unit)],
@@ -694,8 +708,10 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     ax1.yaxis.set_minor_locator(MultipleLocator(0.05))
     ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
     ax1.set_ylabel(r"$J$ in $T$")
-    ax1.grid(visible=True, which="major", axis="both", linestyle=":", linewidth=1)
-    ax1.grid(visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5)
+    ax1.grid(visible=True, which="major",
+             axis="both", linestyle=":", linewidth=1)
+    ax1.grid(visible=True, which="minor", axis="both",
+             linestyle=":", linewidth=0.5)
     ax1.legend()
     fig.tight_layout()
     plt.gca().set_prop_cycle(None)
@@ -731,8 +747,10 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
         ax2.yaxis.set_minor_locator(MultipleLocator(0.05))
         ax2.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
         ax2.set_ylabel(r"$J$ in $T$")
-        ax2.grid(visible=True, which="major", axis="both", linestyle=":", linewidth=1)
-        ax2.grid(visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5)
+        ax2.grid(visible=True, which="major",
+                 axis="both", linestyle=":", linewidth=1)
+        ax2.grid(visible=True, which="minor", axis="both",
+                 linestyle=":", linewidth=0.5)
 
     # save figure if filepath is given
     if filepath is not None:
