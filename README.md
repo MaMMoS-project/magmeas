@@ -75,6 +75,13 @@ magmeas -d folder_with_files
 ```
 
 
+The content of the specified DAT-file can also be written into an hdf5-file together with the calculated properties
+
+```bash
+magmeas --hdf5 file.DAT
+```
+
+
 ### Python
 
 You can also import the module in python and use it with a bit more control. Most things are handled within the class "VSM".

@@ -9,8 +9,7 @@ requires-python = ">= 3.6"
 dependencies = [
     "numpy",
 	"pandas",
-	"matplotlib",
-	"tables"
+	"matplotlib"
 ]
 authors = [
   {name = "Jonas Winkler", email = "j.winkler@ifw-dresden.de"},
