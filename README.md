@@ -103,8 +103,9 @@ mult_properties_to_txt("properties.txt", [dat1, dat2], ["Measurement 1", "Measur
 
 
 ## Dependencies:
-- numpy
-- pandas
-- matplotlib
+* [NumPy] (https://numpy.org/)
+* [pandas] (https://pandas.pydata.org/)
+* [matplotlib] (https://matplotlib.org/stable/)
+* [h5py]  (https://h5py.org/) 
 
 Requires Python >= 3.6 because f-strings are used
