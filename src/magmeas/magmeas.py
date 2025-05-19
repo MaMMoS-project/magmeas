@@ -706,7 +706,7 @@ class VSM:
             f["Properties/BHmax"].attrs["unit"] = "kJ/m^3"
             f.create_dataset("Properties/Squareness", data=self.get_squareness())
         elif self.measurement == "M(T)":
-            f.create_dataset("Properties/Tc", data=self.get_remanence(unit))
+            f.create_dataset("Properties/Tc", data=self.get_Tc())
             f["Properties/Tc"].attrs["unit"] = "K"
 
 
