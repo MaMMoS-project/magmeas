@@ -4,12 +4,15 @@ import json
 from pathlib import Path
 
 import h5py
+import mammos_entity as me
+import mammos_units as mu
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.ticker import MultipleLocator
 
-mu_0 = np.pi * 4e-7
+mu_0 = mu.constants.mu0
+mu.set_enabled_equivalencies(mu.magnetic_flux_field())
 
 
 class VSM:
@@ -19,29 +22,33 @@ class VSM:
 
     Attributes
     ----------
-    H: NUMPY-ARRAY
-        Magnetic field strength in A/m
-    M: NUMPY-ARRAY
-        Magnetization in A/m
-    T: NUMPY-ARRAY
-        Absolute temperature in K
-    t: NUMPY-ARRAY
-        Time in seconds
+    H: Quantity
+        Internal magnetic field as mammos_units.Quantity
+    M: QUANTITY
+        Magnetization as mammos_units.Quantity
+    T: QUANTITY
+        Absolute temperature as mammos_units.Quantity
+    t: QUANTITY
+        Time as mammos_units.Quantity
+    D: ENTITY
+        Demagnetizing factor as mammos_entity.Entity
+    remanence: ENTITY
+        Remanent magnetization as mammos_entity.Entity
+    coercivity: ENTITY
+        Internal coercive field as mammos_entity.Entity
+    BHmax: ENTITY
+        Maximum energy product as mammos_entity.Entity
+    kneefield: ENTITY
+        Knee field as mammos_entity.Entity, see ontology
+    squareness: FLOAT
+        Squareness as kneefield / coercivity
+    Tc: ENTITY
+        Curie-temperature as mammos_entity.Entity
 
     Methods
     -------
     load_qd()
         Load VSM-data from a quantum design .DAT file
-    get_remanence()
-        Getter function for the remanent polarization or magnetization.
-    get_coercivity()
-        Getter function for the coercivity
-    get_BHmax()
-        Getter function for the maximum energy product BHmax
-    get_squareness()
-        Getter function for the squareness
-    get_Tc()
-        Getter function for the Curie-temperature
     plot()
         Plots hysteresis loop, optionally with inset of demagnetisation curve,
         optionally saves as png
@@ -66,14 +73,15 @@ class VSM:
         if calc_properties:
             # calculate properties
             if self.measurement == "M(H)":
-                self._remanence = self.calc_remanence()
-                self._coercivity = self.calc_coercivity()
-                self._BHmax = self.calc_BHmax()
-                self._squareness = self.calc_squareness()
+                self.remanence = self._calc_remanence()
+                self.coercivity = self._calc_coercivity()
+                self.BHmax = self._calc_BHmax()
+                self.kneefield = self._calc_kneefield()
+                self.squareness = self._calc_squareness()
             elif self.measurement == "M(T)":
-                self._Tc = self.calc_Tc()
+                self.Tc = self._calc_Tc()
 
-    def demag_prism(self, a, b, c):
+    def _demag_prism(self, dim):
         r"""
         Calculate demagnetization factor Dz for a rectangular prism.
         Dimensions are a, b, and c. c is assumed to be the axis along which
@@ -86,25 +94,19 @@ class VSM:
 
         Parameters
         ----------
-        a: FLOAT
-            One side length of rectangular prism, perpendicular to
-            magnetization direction.
-        b: FLOAT
-            One side length of rectangular prism, perpendicular to
-            magnetization direction.
-        c: FLOAT
-            One side length of rectangular prism, parallel to magnetization
-            direction.
+        dim: LIST | ARRAY
+            List of sample dimensions as mammos_units.Quantity values
 
         Returns
         -------
-        D: FLOAT
-            Demagnetization factor along axis of magnetization (c-axis).
+        D: ENTITY
+            Demagnetization factor along axis of magnetization (c-axis) as
+            mammos_entity.Entity
         """
         # the expression takes input as half of the semi-axes
-        a = 0.5 * a
-        b = 0.5 * b
-        c = 0.5 * c  # c is || axis along which the prism was magnetized
+        a = 0.5 * dim[0]
+        b = 0.5 * dim[1]
+        c = 0.5 * dim[2]  # c is || axis along which the prism was magnetized
         # define some convenience terms
         a2 = a * a
         b2 = b * b
@@ -125,7 +127,7 @@ class VSM:
             + (a / (2 * c)) * np.log((r_ab + b) / (r_ab - b))
             + (c / (2 * a)) * np.log((r_bc - b) / (r_bc + b))
             + (c / (2 * b)) * np.log((r_ac - a) / (r_ac + a))
-            + 2 * np.arctan2(ab, c * r_abc)
+            + 2 * np.arctan2(ab, c * r_abc) / mu.rad
             + (a2 * a + b2 * b - 2 * c2 * c) / (3 * abc)
             + ((a2 + b2 - 2 * c2) / (3 * abc)) * r_abc
             + (c / ab) * (r_ac + r_bc)
@@ -133,145 +135,7 @@ class VSM:
         )
         # divide out the factor of pi
         D = pi_Dz / np.pi
-        return D
-
-    def calc_remanence(self):
-        """
-        Extract remanent magnetization or polarization from hysteresis loop.
-
-        Parameters
-        ----------
-        NONE
-
-        Returns
-        -------
-        remanence: DICTIONARY
-            Dictionary of possible units as keys and the respective value of
-            the remanence in this unit
-        """
-        # find intersections of hysteresis loop with H=0
-        a = droot(self.M, self.H)
-        a = np.abs(a)  # get absolute values of all remanences
-
-        # test for initial magnetization curve, in this case the interception
-        # point of the hysteresis will be lower than the remanence and thus
-        # discarded
-        # a deviation of 2 % has been arbitrarily defined to distinguish the
-        # interception during the initial magnetization from the remanences
-        if np.abs((a[0] - np.mean(a[1:])) / np.mean(a[1:])) > 0.02:
-            a = a[1:]
-        # average all interception points at H=0 to one mean remanence
-        a = np.mean(a)
-        # save the remanence in different units to be called directly without
-        # need for later conversion
-        a = {"A/m": a, "kA/m": a * 1e-3, "T": a * mu_0, "mT": a * mu_0 * 1e3}
-        return a
-
-    def calc_coercivity(self):
-        """
-        Extract intrinsic Coercivity from hysteresis loop.
-
-        Parameters
-        ----------
-        NONE
-
-        Returns
-        -------
-        coercivity: DICTIONARY
-            Dictionary of possible units as keys and the respective value of
-            the coercivity in this unit
-        """
-        # find intersections of hysteresis loop with M=0
-        a = droot(self.H, self.M)
-        a = np.abs(a)  # get absolute values of all coercivities
-        # test for initial magnetization curve, in this case the interception
-        # point of the hysteresis will deviate from coercivity, thus discarded
-        # a deviation of 2 % has been arbitrarily defined to distinguish the
-        # interception during the initial magnetization from the coercivity
-        if np.abs((a[0] - np.mean(a[1:])) / np.mean(a[1:])) > 0.02:
-            a = a[1:]
-        # average all interception points at M=0 to one mean coercivity
-        a = np.mean(a)
-        # save the remanence in different units to be called directly without
-        # need for later conversion
-        a = {"A/m": a, "kA/m": a * 1e-3, "T": a * mu_0, "mT": a * mu_0 * 1e3}
-        return a
-
-    def calc_BHmax(self):
-        """
-        Extract maximum Energy product from demagnetization curve.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        BHmax: FLOAT
-            Maximum energy product in kJ/m^3
-        """
-        BH = (self.H + self.M) * mu_0 * self.H  # calculate BH
-        # product of B and H is positive in first and third quadrant, negative
-        # in second and third quadrant, so no finding of demagnetization curve
-        # is necessary
-        # BHmax is minimum of BH, should always be negative value
-        return np.min(BH) * -1e-3  # convert to positive value in kJ/m**3
-
-    def calc_squareness(self):
-        """
-        Calculate squareness of demagnetization curve.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        S: FLOAT
-        Squareness (dimensionless)
-        """
-        # value that magnetization is supposed to have at knee-point
-        Mk = 0.9 * self.get_remanence(unit="A/m")
-        # find intersections of Hysteresis loop with M=Mk
-        a = droot(self.H, self.M - Mk)
-        a = np.abs(a)  # get absolute values
-        a = a[1]  # second root should be knee field strength
-        S = a / self.get_coercivity(unit="A/m")
-        return S
-
-    def calc_Tc(self):
-        """
-        Calculate Curie-temperature from M(T) measurement, assuming only one
-        Curie-temperature.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        Tc: FLOAT
-            Curie-Temperature in K
-        """
-        # norm the moment to positive values between 0 and 1
-        # we are only interested in Tc, absolute moments don't matter
-        nM = np.abs(self.M) / np.max(np.abs(self.M))
-
-        # let's only look at M(T) during cooling, this is usually more reliable
-        # cooling is assumed to occur after half of the measurement time
-        # also cut off last couple of measurement points as they are unstable
-        selec = (self.t > np.max(self.t) * 0.5) * (self.t < np.max(self.t) * 0.9)
-        nM = nM[selec]
-        T = self.T[selec]
-        # generous kernel for smoothing
-        kernel = np.ones(20) / 20
-        # smooth measurement by convolution with kernel
-        sT = np.convolve(T, kernel, mode="valid")
-        sM = np.convolve(nM, kernel, mode="valid")
-        # Tc is temperature where dM/dT has minimum
-        Tc = sT[np.argmin(np.gradient(sM) / np.gradient(sT))]
-        a = {"K": Tc, "°C": Tc - 273.15}
-        return a
+        return me.Entity("DemagnetizingFactor", D)
 
     def load_qd(self, datfile, read_method):
         """
@@ -310,47 +174,48 @@ class VSM:
                 s = str(f.read(-1))
 
             try:
-                mass = float(rextract(s, "INFO,", ",SAMPLE_MASS")) * 1e-3  # mass in g
+                mass = float(rextract(s, "INFO,", ",SAMPLE_MASS")) * mu.mg
             except ValueError:
                 raise Exception(err) from None
 
             try:
                 dim = rextract(s, "INFO,(", "),SAMPLE_SIZE").split(",")
-                dim = [float(f) for f in dim]
+                dim = np.array([float(f) for f in dim]) * mu.mm
             except ValueError:
                 raise Exception(err) from None
-
-            density = mass / np.prod(dim) * 1e3
-            D = self.demag_prism(dim[0], dim[1], dim[2])
 
         # Input sample parameters manually
         elif read_method == "manual":
             print("Manual input method selected")
-            mass = float(input("Sample mass in mg: "))
-            print(f"mass = {mass} mg")
+            mass = float(input("Sample mass in mg: ")) * mu.mg
+            print(f"mass = {mass}")
             a = float(input("Sample dimension a (perpendicular to field) in mm: "))
-            print(f"a = {a} mm")
             b = float(input("Sample dimension b (perpendicular to field) in mm: "))
-            print(f"b = {b} mm")
             c = float(input("Sample dimension c (parallel to field) in mm: "))
-            print(f"c = {c} mm")
-            density = mass / (a * b * c) * 1e3
-            D = self.demag_prism(a, b, c)
+            dim = np.array([a, b, c]) * mu.mm
         else:
             raise Exception(err)
 
+        density = mass / (np.prod(dim.value) * dim.unit**3)  # calculate density
+        D = self._demag_prism(dim)
         # import measurement data
         df = pd.read_csv(datfile, skiprows=34, encoding="cp1252")
-        m = np.array(df["Moment (emu)"])  # save moments as np.array
-        # save field as np.array and convert from Oe to A/m
-        H = np.array(df["Magnetic Field (Oe)"]) * 1e-4 / mu_0
-        M = m / mass * density  # calc magnetisation in kA/m
-        M = M * 1e3  # convert magnetisation from kA/m to A/m
-        H = H - D * M  # correct field for demagnetisation
-        # save absolute temperature as np.array
-        T = np.array(df["Temperature (K)"])
+        # save magnetic moment
+        m = np.array(df["Moment (emu)"]) * mu.erg / mu.G
+        # save external magnetic field
+        eH = np.array(df["Magnetic Field (Oe)"]) * mu.Oe
+        # convert from Oe to A/m
+        eH = eH.to("A/m")
+        # calculate magnetisation
+        M = m / mass * density
+        # convert magnetization to reasonable units
+        M = M.to("A/m")
+        # calculate internal magnetic field
+        H = eH - D * M
+        # save absolute temperature
+        T = np.array(df["Temperature (K)"]) * mu.K
         # save time stamp
-        t = np.array(df["Time Stamp (sec)"])
+        t = np.array(df["Time Stamp (sec)"]) * mu.s
 
         # test datapoints for missing values (where value is nan)
         nanfilter = ~np.isnan(H) * ~np.isnan(M) * ~np.isnan(T) * ~np.isnan(t)
@@ -362,61 +227,13 @@ class VSM:
         self.t = t[nanfilter] - t[nanfilter][0]
 
         # Does H vary by more than 10 A/m?
-        self._H_var = float(np.max(self.H) - np.min(self.H)) > 10
+        self._H_var = (np.max(self.H) - np.min(self.H)) > 10 * mu.A / mu.m
         # Does T vary by more than 10 K?
-        self._T_var = float(np.max(self.T) - np.min(self.T)) > 10
+        self._T_var = (np.max(self.T) - np.min(self.T)) > 10 * mu.K
 
-    def get_remanence(self, unit="T"):
+    def _calc_remanence(self):
         """
-        Getter function for remanence. Depending on the given unit this will
-        be the remanent magnetization or remanent polarization.
-
-        Parameters
-        ----------
-        unit : STR, optional
-            Unit the value of the remanence is given in. The default is 'T'.
-
-        Returns
-        -------
-        FLOAT
-            Returns value of the remanence in the specified unit.
-        """
-        return self._remanence[unit]
-
-    def get_coercivity(self, unit="T"):
-        """
-        Getter function for coercivity. Depending on the given unit this might
-        return a product of coercivity and the vacuum permeability.
-
-        Parameters
-        ----------
-        unit : STR, optional
-            Unit the value of the coercivity is given in. The default is 'T'.
-
-        Returns
-        -------
-        FLOAT
-            Returns value of the coercivity in the specified unit.
-        """
-        return self._coercivity[unit]
-
-    def get_BHmax(self):
-        """
-        Getter function for BHmax. Implemented for consistency.
-
-        Parameters
-        ----------
-        NONE
-
-        -------
-        FLOAT
-            Returns value of BHmax in kJ/m**3
-        """
-        return self._BHmax
-
-    def get_squareness(self):
-        """
-        Getter function for squareness. Implemented for consistency.
+        Extract remanent magnetization or polarization from hysteresis loop.
 
         Parameters
         ----------
@@ -424,27 +241,148 @@ class VSM:
 
         Returns
         -------
-        FLOAT
-            Returns value of squareness
+        remanence: DICTIONARY
+            Dictionary of possible units as keys and the respective value of
+            the remanence in this unit
         """
-        return self._squareness
+        # find intersections of hysteresis loop with H=0
+        a = droot(self.M, self.H)
+        a = np.abs(a)  # get absolute values of all remanences
 
-    def get_Tc(self, unit="K"):
+        # test for initial magnetization curve, in this case the interception
+        # point of the hysteresis will be lower than the remanence and thus
+        # discarded
+        # a deviation of 2 % has been arbitrarily defined to distinguish the
+        # interception during the initial magnetization from the remanences
+        if np.abs((a[0] - np.mean(a[1:])) / np.mean(a[1:])) > 0.02:
+            a = a[1:]
+        # average all interception points at H=0 to one mean remanence
+        a = np.mean(a)
+        # save the remanence as Entity
+        Mr = me.Entity("Remanence", a)
+        return Mr
+
+    def _calc_coercivity(self):
         """
-        Getter function for Curie-temperature.
+        Extract intrinsic Coercivity from hysteresis loop.
 
         Parameters
         ----------
-        unit : STR, optional
-            Unit the value of the Curie-temperature is given in.
-            The default is 'K'.
+        NONE
 
         Returns
         -------
-        FLOAT
-            Returns value of the Curie-temperature in the specified unit.
+        coercivity: DICTIONARY
+            Dictionary of possible units as keys and the respective value of
+            the coercivity in this unit
         """
-        return self._Tc[unit]
+        # find intersections of hysteresis loop with M=0
+        a = droot(self.H, self.M)
+        a = np.abs(a)  # get absolute values of all coercivities
+        # test for initial magnetization curve, in this case the interception
+        # point of the hysteresis will deviate from coercivity, thus discarded
+        # a deviation of 2 % has been arbitrarily defined to distinguish the
+        # interception during the initial magnetization from the coercivity
+        if np.abs((a[0] - np.mean(a[1:])) / np.mean(a[1:])) > 0.02:
+            a = a[1:]
+        # average all interception points at M=0 to one mean coercivity
+        a = np.mean(a)
+        # save the remanence in different units to be called directly without
+        # need for later conversion
+        iHc = me.Entity("CoercivityHc", a)
+        return iHc
+
+    def _calc_BHmax(self):
+        """
+        Extract maximum Energy product from demagnetization curve.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        BHmax: FLOAT
+            Maximum energy product in kJ/m^3
+        """
+        BH = (self.H + self.M) * mu_0 * self.H  # calculate BH
+        # product of B and H is positive in first and third quadrant, negative
+        # in second and third quadrant, so no finding of demagnetization curve
+        # is necessary
+        # BHmax is minimum of BH, should always be negative value
+        BHmax = me.Entity("MaximumEnergyProduct", np.min(BH) * -1)
+        return BHmax
+
+    def _calc_kneefield(self):
+        """
+        Calculate kneefield of demagnetization curve.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        kneefield: ENTITY
+            knee field strength as mammos_entity.Entity
+        """
+        # value that magnetization is supposed to have at knee-point
+        Mk = 0.9 * self.remanence
+        # find intersections of Hysteresis loop with M=Mk
+        a = droot(self.H, self.M - Mk)
+        a = np.abs(a)  # get absolute values
+        a = a[1]  # second root should be knee field strength
+        Hk = me.Entity("KneeField", a)
+        return Hk
+
+    def _calc_squareness(self):
+        """
+        Calculate squareness of demagnetization curve.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        S: FLOAT
+        Squareness (dimensionless)
+        """
+        return self.kneefield / self.coercivity
+
+    def _calc_Tc(self):
+        """
+        Calculate Curie-temperature from M(T) measurement, assuming only one
+        Curie-temperature.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        Tc: FLOAT
+            Curie-Temperature in K
+        """
+        # norm the moment to positive values between 0 and 1
+        # we are only interested in Tc, absolute moments don't matter
+        nM = np.abs(self.M) / np.max(np.abs(self.M))
+
+        # let's only look at M(T) during cooling, this is usually more reliable
+        # cooling is assumed to occur after half of the measurement time
+        # also cut off last couple of measurement points as they are unstable
+        selec = (self.t > np.max(self.t) * 0.5) * (self.t < np.max(self.t) * 0.9)
+        nM = nM[selec]
+        T = self.T[selec]
+        # generous kernel for smoothing
+        kernel = np.ones(20) / 20
+        # smooth measurement by convolution with kernel
+        sT = np.convolve(T, kernel, mode="valid")
+        sM = np.convolve(nM, kernel, mode="valid")
+        # Tc is temperature where dM/dT has minimum
+        Tc = sT[np.argmin(np.gradient(sM) / np.gradient(sT))]
+        Tc = me.Entity("CurieTemperature", Tc)
+        return Tc
 
     def plot(self, filepath=None, demag=True, label=None):
         """
@@ -468,12 +406,12 @@ class VSM:
         None.
         """
         if self.measurement == "M(H)":
-            self.plot_MH(filepath=filepath, demag=demag, label=label)
+            self._plot_MH(filepath=filepath, demag=demag, label=label)
         elif self.measurement == "M(T)":
-            self.plot_MT(filepath=filepath)
+            self._plot_MT(filepath=filepath)
         plt.show()
 
-    def plot_MH(self, filepath=None, demag=True, label=None):
+    def _plot_MH(self, filepath=None, demag=True, label=None):
         """
         Plot hysteresis loop, optionally with inset of demagnetization curve
         and save figure if a filepath is given.
@@ -494,8 +432,8 @@ class VSM:
         -------
         None
         """
-        H = self.H * mu_0  # converts H from A/m to Tesla
-        M = self.M * mu_0  # converts M from A/m to Tesla
+        H = self.H.to("T")  # converts H from A/m to Tesla
+        M = self.M.to("T")  # converts M from A/m to Tesla
 
         fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
         ax1.plot(H, M, label=label)
@@ -551,7 +489,7 @@ class VSM:
         if filepath is not None:
             plt.savefig(filepath, dpi=300)
 
-    def plot_MT(self, filepath=None):
+    def _plot_MT(self, filepath=None):
         """
         Plot cooling curve of M(T) measurement. Save to file if path is given.
 
@@ -598,13 +536,13 @@ class VSM:
         """
         if self.measurement == "M(H)":
             properties = {
-                "Jr in " + unit: [self.get_remanence(unit)],
-                "iHc in " + unit: [self.get_coercivity(unit)],
-                r"BHmax in kJ/m^3": [self.get_BHmax()],
-                "S": [self.get_squareness()],
+                "Jr in " + unit: [self.remanence.to(unit).value],
+                "iHc in " + unit: [self.coercivity.to(unit).value],
+                r"BHmax in kJ/m^3": [self.BHmax.to(mu.kJ / mu.m**3).value],
+                "S": [self.squareness],
             }
         elif self.measurement == "M(T)":
-            properties = {"Tc in K": [self.get_Tc()]}
+            properties = {"Tc in K": [self.Tc.value]}
         df = pd.DataFrame(properties)
         df.to_csv(filepath, sep=sep)
 
@@ -626,13 +564,13 @@ class VSM:
         """
         if self.measurement == "M(H)":
             properties = {
-                "Jr in " + unit: [self.get_remanence(unit)],
-                "iHc in " + unit: [self.get_coercivity(unit)],
-                r"BHmax in kJ/m^3": [self.get_BHmax()],
-                "S": [self.get_squareness()],
+                "Jr in " + unit: [self.remanence.to(unit).value],
+                "iHc in " + unit: [self.coercivity.to(unit).value],
+                r"BHmax in kJ/m^3": [self.BHmax.to(mu.kJ / mu.m**3).value],
+                "S": [self.squareness],
             }
         elif self.measurement == "M(T)":
-            properties = {"Tc in K": [self.get_Tc()]}
+            properties = {"Tc in K": [self.Tc.value]}
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(properties, f, ensure_ascii=False, indent=4)
 
@@ -652,13 +590,13 @@ class VSM:
 
         if self.measurement == "M(H)":
             properties = {
-                "Jr in " + unit: [self.get_remanence(unit)],
-                "iHc in " + unit: [self.get_coercivity(unit)],
-                r"BHmax in kJ/m^3": [self.get_BHmax()],
-                "S": [self.get_squareness()],
+                "Jr in " + unit: [self.remanence.to(unit).value],
+                "iHc in " + unit: [self.coercivity.to(unit).value],
+                r"BHmax in kJ/m^3": [self.BHmax.to(mu.kJ / mu.m**3).value],
+                "S": [self.squareness],
             }
         elif self.measurement == "M(T)":
-            properties = {"Tc in K": [self.get_Tc()]}
+            properties = {"Tc in K": [self.Tc.to("K").value]}
         for key in properties:
             print(f"{key} = {properties[key][0]}")
 
@@ -910,7 +848,7 @@ def droot(x, y):
     FLOAT|ARRAY
         Array of root points. If only one is found, it's returned as float.
     """
-    r = np.array([])
+    r = np.array([]) * x.unit
     # scan over whole range of values to find the two points where the
     # y-axis is crossed
     for i in range(len(x) - 1):
