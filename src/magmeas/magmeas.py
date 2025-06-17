@@ -460,9 +460,9 @@ class VSM:
             # curve fits nicely
             Hmin, Jmax = None, None
             for i in np.arange(0, 5, 0.05):
-                if Hmin is None and -i <= -self.get_coercivity("T") - 0.02:
+                if Hmin is None and -i * mu.T <= -self.coercivity.to("T") - 0.02 * mu.T:
                     Hmin = -i
-                if Jmax is None and i >= self.get_remanence("T") + 0.02:
+                if Jmax is None and i * mu.T >= self.remanence.to("T") + 0.02 * mu.T:
                     Jmax = i
                 if Hmin is not None and Jmax is not None:
                     break
@@ -636,15 +636,15 @@ class VSM:
                 f.create_dataset("Data/" + i, data=[str(j) for j in df[i]])
 
         if self.measurement == "M(H)":
-            f.create_dataset("Properties/Remanence", data=self.get_remanence(unit))
+            f.create_dataset("Properties/Remanence", data=self.remanence.to(unit))
             f["Properties/Remanence"].attrs["unit"] = unit
-            f.create_dataset("Properties/Coercivity", data=self.get_coercivity(unit))
+            f.create_dataset("Properties/Coercivity", data=self.coercivity.to(unit))
             f["Properties/Coercivity"].attrs["unit"] = unit
-            f.create_dataset("Properties/BHmax", data=self.get_remanence(unit))
+            f.create_dataset("Properties/BHmax", data=self.BHmax.to(mu.kJ / mu.m**3))
             f["Properties/BHmax"].attrs["unit"] = "kJ/m^3"
-            f.create_dataset("Properties/Squareness", data=self.get_squareness())
+            f.create_dataset("Properties/Squareness", data=self.squareness())
         elif self.measurement == "M(T)":
-            f.create_dataset("Properties/Tc", data=self.get_Tc())
+            f.create_dataset("Properties/Tc", data=self.Tc())
             f["Properties/Tc"].attrs["unit"] = "K"
 
 
@@ -700,8 +700,8 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
 
         # find upper and lower border of plot, so that demagnetization
         # curve fits nicely
-        coercmax = max([i.get_coercivity for i in data])
-        remmax = max([i.get_remanence for i in data])
+        coercmax = max([i.coercivity.to("T") for i in data])
+        remmax = max([i.remanence.to("T") for i in data])
         Hmin, Jmax = None, None
         for i in np.arange(0, 5, 0.05):
             if Hmin is None and -i <= -coercmax - 0.02:
