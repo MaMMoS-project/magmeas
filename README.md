@@ -97,8 +97,8 @@ dat2 = mm.VSM("file2.DAT", read_method="manual")
 dat1.plot("file1_plot.png")
 dat2.properties_to_json("file2_properties.json")
 
-plot_multiple_VSM([dat1, dat2], ["Measurement 1", "Measurement 2"])
-mult_properties_to_txt("properties.txt", [dat1, dat2], ["Measurement 1", "Measurement 2"])
+mm.plot_multiple_VSM([dat1, dat2], ["Measurement 1", "Measurement 2"])
+mm.mult_properties_to_txt("properties.txt", [dat1, dat2], ["Measurement 1", "Measurement 2"])
 ```
 
 
