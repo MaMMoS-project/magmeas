@@ -141,9 +141,14 @@ class VSM:
 
         Parameters
         ----------
-        datfile: STRING
+        datfile: STR | PATH
             Path to quantum systems .DAT file that data is supposed to be
             imported from
+
+        read_method: STR
+            Determines whether magmeas will attempt to automatically read the
+            sample parameters necessary for the following calculations or not.
+            Can be "auto" or "manual"
 
         Returns
         -------
@@ -165,17 +170,16 @@ class VSM:
               INFO,(<a>, <b>, <c>),SAMPLE_SIZE
               sample dimensions a, b and c in mm, c parallel to field
               """
-
+        # Automatically read out sample parameters
         if read_method == "auto":
-            # Automatically read out sample parameters
             with open(datfile, "rb") as f:
                 s = str(f.read(-1))
-
+            # check if sample mass can be read from .DAT file
             try:
                 mass = float(rextract(s, "INFO,", ",SAMPLE_MASS")) * mu.mg
             except ValueError:
                 raise Exception(err) from None
-
+            # check if sample dimensions can be read from .DAT file
             try:
                 dim = rextract(s, "INFO,(", "),SAMPLE_SIZE").split(",")
                 dim = np.array([float(f) for f in dim]) * mu.mm
@@ -186,7 +190,6 @@ class VSM:
         elif read_method == "manual":
             print("Manual input method selected")
             mass = float(input("Sample mass in mg: ")) * mu.mg
-            print(f"mass = {mass}")
             a = float(input("Sample dimension a (perpendicular to field) in mm: "))
             b = float(input("Sample dimension b (perpendicular to field) in mm: "))
             c = float(input("Sample dimension c (parallel to field) in mm: "))
@@ -194,30 +197,32 @@ class VSM:
         else:
             raise Exception(err)
 
-        density = mass / (np.prod(dim.value) * dim.unit**3)  # calculate density
-        D = self._demag_prism(dim)
+        # calculate density from sample mass and dimensions
+        density = mass / (np.prod(dim.value) * dim.unit**3)
+        # calculate demagnetisation factor
+        self.D = self._demag_prism(dim)
         # import measurement data
         df = pd.read_csv(datfile, skiprows=34, encoding="cp1252")
-        # save magnetic moment
+        # extract magnetic moment
         m = np.array(df["Moment (emu)"]) * mu.erg / mu.G
-        # save external magnetic field
+        # extract external magnetic field
         eH = np.array(df["Magnetic Field (Oe)"]) * mu.Oe
-        # convert from Oe to A/m
+        # convert external magnetic field from Oe to A/m
         eH = eH.to("A/m")
-        # calculate magnetisation
+        # calculate magnetization
         M = m / mass * density
-        # convert magnetization to reasonable units
+        # convert magnetization to A/m
         M = M.to("A/m")
         # calculate internal magnetic field
-        H = eH - D * M
-        # save absolute temperature
+        H = eH - self.D * M
+        # extract absolute temperature
         T = np.array(df["Temperature (K)"]) * mu.K
-        # save time stamp
+        # extract time stamp
         t = np.array(df["Time Stamp (sec)"]) * mu.s
 
         # test datapoints for missing values (where value is nan)
         nanfilter = ~np.isnan(H) * ~np.isnan(M) * ~np.isnan(T) * ~np.isnan(t)
-        # delete all datapoints where any of H, M or T ar nan and assign them
+        # delete all datapoints where H, M, T or t are nan and assign them to object
         self.H = H[nanfilter]
         self.M = M[nanfilter]
         self.T = T[nanfilter]
@@ -231,7 +236,7 @@ class VSM:
 
     def _calc_remanence(self):
         """
-        Extract remanent magnetization or polarization from hysteresis loop.
+        Extract remanent magnetization from hysteresis loop.
 
         Parameters
         ----------
@@ -239,13 +244,12 @@ class VSM:
 
         Returns
         -------
-        remanence: DICTIONARY
-            Dictionary of possible units as keys and the respective value of
-            the remanence in this unit
+        remanence: ENTITY
+            Remanent magnetization as mammos_entity.Entity object
         """
         # find intersections of hysteresis loop with H=0
         a = droot(self.M, self.H)
-        a = np.abs(a)  # get absolute values of all remanences
+        a = np.abs(a)  # get absolute values of all intersections
 
         # test for initial magnetization curve, in this case the interception
         # point of the hysteresis will be lower than the remanence and thus
@@ -262,7 +266,7 @@ class VSM:
 
     def _calc_coercivity(self):
         """
-        Extract intrinsic Coercivity from hysteresis loop.
+        Extract internal coercivity from hysteresis loop.
 
         Parameters
         ----------
@@ -270,9 +274,8 @@ class VSM:
 
         Returns
         -------
-        coercivity: DICTIONARY
-            Dictionary of possible units as keys and the respective value of
-            the coercivity in this unit
+        coercivity: ENTITY
+            Internal coercivity as mammos_entity.Entity object
         """
         # find intersections of hysteresis loop with M=0
         a = droot(self.H, self.M)
@@ -285,8 +288,7 @@ class VSM:
             a = a[1:]
         # average all interception points at M=0 to one mean coercivity
         a = np.mean(a)
-        # save the remanence in different units to be called directly without
-        # need for later conversion
+        # save the coercivity as Entity
         iHc = me.Entity("CoercivityHc", a)
         return iHc
 
@@ -300,20 +302,25 @@ class VSM:
 
         Returns
         -------
-        BHmax: FLOAT
-            Maximum energy product in kJ/m^3
+        BHmax: ENTITY
+            Maximum energy product as mammos_entity.Entity object
         """
-        BH = (self.H + self.M) * mu_0 * self.H  # calculate BH
+        # calculate BH
+        BH = (self.H + self.M) * mu_0 * self.H
         # product of B and H is positive in first and third quadrant, negative
-        # in second and third quadrant, so no finding of demagnetization curve
-        # is necessary
-        # BHmax is minimum of BH, should always be negative value
+        # in second and fourth quadrant, so no finding of demagnetization curve
+        # is necessary, it will always be found at negative values
+        # BHmax is minimum of BH
+        # BH at BHmax should always be negative value
+        # As is common practice, we return and save BHmax with a positive value
         BHmax = me.Entity("MaximumEnergyProduct", np.min(BH) * -1)
         return BHmax
 
     def _calc_kneefield(self):
         """
-        Calculate kneefield of demagnetization curve.
+        Calculate kneefield of demagnetization curve. The knee field strength
+        is the internal magnetic field at which the magnetization in the
+        demagnetization curve is reduced to 90 % of the remanence.
 
         Parameters
         ----------
@@ -322,7 +329,7 @@ class VSM:
         Returns
         -------
         kneefield: ENTITY
-            knee field strength as mammos_entity.Entity
+            Knee field strength as mammos_entity.Entity
         """
         # value that magnetization is supposed to have at knee-point
         Mk = 0.9 * self.remanence
@@ -334,8 +341,10 @@ class VSM:
         return Hk
 
     def _calc_squareness(self):
-        """
+        r"""
         Calculate squareness of demagnetization curve.
+
+        .. math:: S = \frac{H_K}{H_C}
 
         Parameters
         ----------
@@ -344,14 +353,14 @@ class VSM:
         Returns
         -------
         S: FLOAT
-        Squareness (dimensionless)
+            Squareness (dimensionless)
         """
         return self.kneefield / self.coercivity
 
     def _calc_Tc(self):
         """
         Calculate Curie-temperature from M(T) measurement, assuming only one
-        Curie-temperature.
+        Curie-temperature. Use with caution.
 
         Parameters
         ----------
@@ -359,10 +368,10 @@ class VSM:
 
         Returns
         -------
-        Tc: FLOAT
-            Curie-Temperature in K
+        Tc: ENTITY
+            Curie-Temperature as mammos_entity.Entity
         """
-        # norm the moment to positive values between 0 and 1
+        # norm the magnetization to positive values between 0 and 1
         # we are only interested in Tc, absolute moments don't matter
         nM = np.abs(self.M) / np.max(np.abs(self.M))
 
@@ -388,14 +397,14 @@ class VSM:
 
         Parameters
         ----------
-        filepath : TYPE, optional
+        filepath : STR | PATH, optional
             Filepath for saving the figure. Default is None, in that case no
             file is saved.
-        demag : TYPE, optional
+        demag : BOOL, optional
             Boolean that determines if demagnetization curve is plotted as an
             inset next to hysteresis loop. Default is True. Only applies to
             M(H)-measurements.
-        label : TYPE, optional
+        label : STR, optional
             Optional label of hysteresis loop that can be displayed in the
             legend. Default is None, in that case no legend is displayed.
 
@@ -416,13 +425,13 @@ class VSM:
 
         Parameters
         ----------
-        filepath: STRING, optional
+        filepath: STR | PATH, optional
             Filepath for saving the figure. Default is None, in that case no
             file is saved.
         demag: BOOL, optional
             Boolean that determines if demagnetization curve is plotted as an
             inset next to hysteresis loop. Default is True.
-        label: STRING, optional
+        label: STR, optional
             Optional label of hysteresis loop that can be displayed in the
             legend. Default is None, in that case no legend is displayed.
 
@@ -493,7 +502,7 @@ class VSM:
 
         Parameters
         ----------
-        filepath : TYPE, optional
+        filepath : STR | PATH, optional
             Filepath for saving the figure. Default is None, in that case no
             file is saved.
 
@@ -506,7 +515,7 @@ class VSM:
         ax.plot(self.T[self.t > max(self.t) / 2], self.M[self.t > max(self.t) / 2])
 
         ax.set_xlabel("Temperature in K")
-        ax.set_ylabel("Magnetic moment in a.u.")
+        ax.set_ylabel("Magnetization in a.u.")
         ax.xaxis.set_inverted(True)
         ax.set_yticks([])
         fig.tight_layout()
@@ -520,12 +529,12 @@ class VSM:
 
         Parameters
         ----------
-        filepath: STRING
+        filepath: STR | PATH
             Fielpath to save the TXT-file to.
-        unit: STRING
+        unit: STR
             Unit the remanence and coercivity are given in.
             Default is Tesla
-        sep: STRING
+        sep: STR
             Seperator to be used during the pd.to_csv. Default is "\t"
 
         Returns
@@ -550,9 +559,9 @@ class VSM:
 
         Parameters
         ----------
-        filepath: STRING
+        filepath: STR | PATH
             Fielpath to save the TXT-file to.
-        unit: STRING
+        unit: STR
             Unit the remanence and coercivity are given in.
             Default is Tesla
 
@@ -588,13 +597,13 @@ class VSM:
 
         if self.measurement == "M(H)":
             properties = {
-                "Jr in " + unit: [self.remanence.to(unit).value],
-                "iHc in " + unit: [self.coercivity.to(unit).value],
-                r"BHmax in kJ/m^3": [self.BHmax.to(mu.kJ / mu.m**3).value],
+                "Remanence": [self.remanence.to(unit)],
+                "Coercivity": [self.coercivity.to(unit)],
+                "BHmax": [self.BHmax.to(mu.kJ / mu.m**3)],
                 "S": [self.squareness],
             }
         elif self.measurement == "M(T)":
-            properties = {"Tc in K": [self.Tc.to("K").value]}
+            properties = {"Tc": [self.Tc.to("K")]}
         for key in properties:
             print(f"{key} = {properties[key][0]}")
 
@@ -658,7 +667,7 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     labels: LIST
         List of labels that are going to be used in the legend of the plot.
         Has to have the same length as data.
-    filepath: STRING, optional
+    filepath: STR | PATH, optional
         Filepath for saving the figure. Default is None, in that case no file
         is saved.
     demag: BOOL, optional
@@ -735,17 +744,17 @@ def mult_properties_to_txt(filepath, data, labels, unit="T", sep="\t"):
 
     Parameters
     ----------
-    filepath: STRING
+    filepath: STR | PATH
         Fielpath to save the TXT-file to.
     data : LIST
         List of VSM objects.
     labels : LIST
         List of labels (string) identifying the data rows.
         Has to be of same length as data.
-    unit: STRING
+    unit: STR
         Unit the remanence and coercivity are given in.
         Default is Tesla
-    sep: STRING
+    sep: STR
         Seperator to be used during the pd.to_csv. Default is "\t"
 
     Returns
@@ -777,14 +786,14 @@ def mult_properties_to_json(filepath, data, labels, unit="T"):
 
     Parameters
     ----------
-    filepath: STRING
+    filepath: STR | PATH
         Fielpath to save the TXT-file to.
     data : LIST
         List of VSM objects.
     labels : LIST
         List of labels (string) identifying the data rows.
         Has to be of same length as data.
-    unit: STRING
+    unit: STR
         Unit the remanence and coercivity are given in.
         Default is Tesla
 
