@@ -50,8 +50,7 @@ class VSM:
     load_qd()
         Load VSM-data from a quantum design .DAT file
     plot()
-        Plots hysteresis loop, optionally with inset of demagnetisation curve,
-        optionally saves as png
+        Plot data according to measurement type, optionally saves as png.
     properties_to_txt()
         Saves all properties derived from VSM-measurement to CSV-file.
     properties_to_json()
@@ -70,16 +69,15 @@ class VSM:
         else:
             self.measurement = "unknown"
 
-        if calc_properties:
-            # calculate properties
-            if self.measurement == "M(H)":
-                self.remanence = self._calc_remanence()
-                self.coercivity = self._calc_coercivity()
-                self.BHmax = self._calc_BHmax()
-                self.kneefield = self._calc_kneefield()
-                self.squareness = self._calc_squareness()
-            elif self.measurement == "M(T)":
-                self.Tc = self._calc_Tc()
+        # calculate properties
+        if calc_properties and self.measurement == "M(H)":
+            self.remanence = self._calc_remanence()
+            self.coercivity = self._calc_coercivity()
+            self.BHmax = self._calc_BHmax()
+            self.kneefield = self._calc_kneefield()
+            self.squareness = self._calc_squareness()
+        elif calc_properties and self.measurement == "M(T)":
+            self.Tc = self._calc_Tc()
 
     def _demag_prism(self, dim):
         r"""
