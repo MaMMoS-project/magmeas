@@ -214,7 +214,7 @@ class VSM:
         # convert magnetization to A/m
         M = M.to("A/m")
         # calculate internal magnetic field
-        H = eH - self.D * M
+        H = eH - self.D.q * M
         # extract absolute temperature
         T = np.array(df["Temperature (K)"]) * mu.K
         # extract time stamp
@@ -332,7 +332,7 @@ class VSM:
             Knee field strength as mammos_entity.Entity
         """
         # value that magnetization is supposed to have at knee-point
-        Mk = 0.9 * self.remanence
+        Mk = 0.9 * self.remanence.q
         # find intersections of Hysteresis loop with M=Mk
         a = droot(self.H, self.M - Mk)
         a = np.abs(a)  # get absolute values
@@ -355,7 +355,7 @@ class VSM:
         S: FLOAT
             Squareness (dimensionless)
         """
-        return self.kneefield / self.coercivity
+        return (self.kneefield.q / self.coercivity.q).value
 
     def _calc_Tc(self):
         """
@@ -467,9 +467,12 @@ class VSM:
             # curve fits nicely
             Hmin, Jmax = None, None
             for i in np.arange(0, 5, 0.05):
-                if Hmin is None and -i * mu.T <= -self.coercivity.to("T") - 0.02 * mu.T:
+                if (
+                    Hmin is None
+                    and -i * mu.T <= -self.coercivity.q.to("T") - 0.02 * mu.T
+                ):
                     Hmin = -i
-                if Jmax is None and i * mu.T >= self.remanence.to("T") + 0.02 * mu.T:
+                if Jmax is None and i * mu.T >= self.remanence.q.to("T") + 0.02 * mu.T:
                     Jmax = i
                 if Hmin is not None and Jmax is not None:
                     break
@@ -543,13 +546,13 @@ class VSM:
         """
         if self.measurement == "M(H)":
             properties = {
-                "Jr in " + unit: [self.remanence.to(unit).value],
-                "iHc in " + unit: [self.coercivity.to(unit).value],
-                r"BHmax in kJ/m^3": [self.BHmax.to(mu.kJ / mu.m**3).value],
+                "Remanence in " + unit: [self.remanence.q.to(unit).value],
+                "Coercivity in " + unit: [self.coercivity.q.to(unit).value],
+                r"BHmax in kJ/m^3": [self.BHmax.q.to(mu.kJ / mu.m**3).value],
                 "S": [self.squareness],
             }
         elif self.measurement == "M(T)":
-            properties = {"Tc in K": [self.Tc.value]}
+            properties = {"Tc in K": [self.Tc.q.to("K").value]}
         df = pd.DataFrame(properties)
         df.to_csv(filepath, sep=sep)
 
@@ -571,13 +574,13 @@ class VSM:
         """
         if self.measurement == "M(H)":
             properties = {
-                "Jr in " + unit: [self.remanence.to(unit).value],
-                "iHc in " + unit: [self.coercivity.to(unit).value],
-                r"BHmax in kJ/m^3": [self.BHmax.to(mu.kJ / mu.m**3).value],
+                "Remanence in " + unit: [self.remanence.q.to(unit).value],
+                "Coercivity in " + unit: [self.coercivity.q.to(unit).value],
+                r"BHmax in kJ/m^3": [self.BHmax.q.to(mu.kJ / mu.m**3).value],
                 "S": [self.squareness],
             }
         elif self.measurement == "M(T)":
-            properties = {"Tc in K": [self.Tc.value]}
+            properties = {"Tc in K": [self.Tc.q.to("K").value]}
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(properties, f, ensure_ascii=False, indent=4)
 
@@ -597,13 +600,13 @@ class VSM:
 
         if self.measurement == "M(H)":
             properties = {
-                "Remanence": [self.remanence.to(unit)],
-                "Coercivity": [self.coercivity.to(unit)],
-                "BHmax": [self.BHmax.to(mu.kJ / mu.m**3)],
+                "Remanence": [self.remanence.q.to(unit)],
+                "Coercivity": [self.coercivity.q.to(unit)],
+                "BHmax": [self.BHmax.q.to(mu.kJ / mu.m**3)],
                 "S": [self.squareness],
             }
         elif self.measurement == "M(T)":
-            properties = {"Tc": [self.Tc.to("K")]}
+            properties = {"Tc": [self.Tc.q.to("K")]}
         for key in properties:
             print(f"{key} = {properties[key][0]}")
 
@@ -643,15 +646,19 @@ class VSM:
                 f.create_dataset("Data/" + i, data=[str(j) for j in df[i]])
 
         if self.measurement == "M(H)":
-            f.create_dataset("Properties/Remanence", data=self.remanence.to(unit))
+            f.create_dataset(
+                "Properties/Remanence", data=self.remanence.q.to(unit).value
+            )
             f["Properties/Remanence"].attrs["unit"] = unit
-            f.create_dataset("Properties/Coercivity", data=self.coercivity.to(unit))
+            f.create_dataset(
+                "Properties/Coercivity", data=self.coercivity.q.to(unit).value
+            )
             f["Properties/Coercivity"].attrs["unit"] = unit
-            f.create_dataset("Properties/BHmax", data=self.BHmax.to(mu.kJ / mu.m**3))
+            f.create_dataset("Properties/BHmax", data=self.BHmax.q.to(mu.kJ / mu.m**3))
             f["Properties/BHmax"].attrs["unit"] = "kJ/m^3"
             f.create_dataset("Properties/Squareness", data=self.squareness())
         elif self.measurement == "M(T)":
-            f.create_dataset("Properties/Tc", data=self.Tc())
+            f.create_dataset("Properties/Tc", data=self.Tc.q.value)
             f["Properties/Tc"].attrs["unit"] = "K"
 
 
@@ -707,8 +714,8 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
 
         # find upper and lower border of plot, so that demagnetization
         # curve fits nicely
-        coercmax = max([i.coercivity.to("T") for i in data])
-        remmax = max([i.remanence.to("T") for i in data])
+        coercmax = max([i.coercivity.q.to("T") for i in data])
+        remmax = max([i.remanence.q.to("T") for i in data])
         Hmin, Jmax = None, None
         for i in np.arange(0, 5, 0.05):
             if Hmin is None and -i <= -coercmax - 0.02:
@@ -764,13 +771,13 @@ def mult_properties_to_txt(filepath, data, labels, unit="T", sep="\t"):
     if all([i.measurement == "M(H)" for i in data]):
         properties = {
             "sample": labels,
-            "Jr in " + unit: [i.get_remanence(unit) for i in data],
-            "iHc in " + unit: [i.get_coercivity(unit) for i in data],
-            r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
-            "S": [i.get_squareness() for i in data],
+            "Remanence in " + unit: [i.remanence.q.to(unit).value for i in data],
+            "Coercivity in " + unit: [i.coercivity.q.to(unit).value for i in data],
+            r"BHmax in kJ/m^3": [i.BHmax.q.to(mu.kJ / mu.m**3).value for i in data],
+            "S": [i.squareness for i in data],
         }
     elif all([i.measurement == "M(T)" for i in data]):
-        properties = {"sample": labels, "Tc in K": [i.get_Tc() for i in data]}
+        properties = {"sample": labels, "Tc in K": [i.value for i in data]}
     else:
         raise Exception("""Please only export a list of VSM measurements if
                         all of them are the same measurement type. This
@@ -804,13 +811,13 @@ def mult_properties_to_json(filepath, data, labels, unit="T"):
     if all([i.measurement == "M(H)" for i in data]):
         properties = {
             "sample": labels,
-            "Jr in " + unit: [i.get_remanence(unit) for i in data],
-            "iHc in " + unit: [i.get_coercivity(unit) for i in data],
-            r"BHmax in kJ/m^3": [i.get_BHmax() for i in data],
-            "S": [i.get_squareness() for i in data],
+            "Remanence in " + unit: [i.remanence.q.to(unit).value for i in data],
+            "Coercivity in " + unit: [i.coercivity.q.to(unit).value for i in data],
+            r"BHmax in kJ/m^3": [i.BHmax.q.to(mu.kJ / mu.m**3).value for i in data],
+            "S": [i.squareness for i in data],
         }
     elif all([i.measurement == "M(T)" for i in data]):
-        properties = {"sample": labels, "Tc in K": [i.get_Tc() for i in data]}
+        properties = {"sample": labels, "Tc in K": [i.value for i in data]}
     else:
         raise Exception("""Please only export a list of VSM measurements if
                         all of them are the same measurement type. This
