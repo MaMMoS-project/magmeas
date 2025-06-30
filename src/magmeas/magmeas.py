@@ -133,7 +133,7 @@ class VSM:
         )
         # divide out the factor of pi
         D = pi_Dz / np.pi
-        return me.Entity("DemagnetizingFactor", D)
+        return me.Entity("DemagnetizingFactor", D.value)
 
     def load_qd(self, datfile, read_method):
         """
