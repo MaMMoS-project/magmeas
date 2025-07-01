@@ -110,3 +110,7 @@ mm.mult_properties_to_txt("properties.txt", [dat1, dat2], ["Measurement 1", "Mea
 * mammos-entity
 
 Requires Python >= 3.6 because f-strings are used
+
+### Code Archive
+
+This repository is archived on Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15782457.svg)](https://doi.org/10.5281/zenodo.15782457)
