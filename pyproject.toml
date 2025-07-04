@@ -11,7 +11,8 @@ dependencies = [
 	"pandas",
 	"matplotlib",
 	"h5py",
-	"mammos-entity >= 0.8.0"
+	"mammos-entity >= 0.8.0",
+	"PyQT6"
 ]
 authors = [
   {name = "Jonas Winkler", email = "j.winkler@ifw-dresden.de"},
