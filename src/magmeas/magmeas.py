@@ -9,7 +9,6 @@ import mammos_units as mu
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.ticker import MultipleLocator
 
 mu_0 = mu.constants.mu0
 mu.set_enabled_equivalencies(mu.magnetic_flux_field())
@@ -446,54 +445,23 @@ class VSM:
         ax1.plot(H, M, label=label)
 
         # format plot
-        ax1.xaxis.set_major_locator(MultipleLocator(2))
-        ax1.xaxis.set_minor_locator(MultipleLocator(0.5))
-        ax1.yaxis.set_major_locator(MultipleLocator(0.2))
-        ax1.yaxis.set_minor_locator(MultipleLocator(0.05))
         ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
         ax1.set_ylabel(r"$J$ in $T$")
-        ax1.grid(visible=True, which="major", axis="both", linestyle=":", linewidth=1)
-        ax1.grid(visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5)
         if label is not None:
             ax1.legend()
-        fig.tight_layout()
 
         # plot inset of demagnetization curve
         if demag:
-            ax2 = ax1.inset_axes([0.58, 0.15, 0.3, 0.5])
+            ax2 = ax1.inset_axes([0.625, 0.15, 0.3, 0.5])
             ax2.plot(H[100:-100], M[100:-100], label=label)
 
-            # find upper and lower border of plot, so that demagnetization
-            # curve fits nicely
-            Hmin, Jmax = None, None
-            for i in np.arange(0, 5, 0.05):
-                if (
-                    Hmin is None
-                    and -i * mu.T <= -self.coercivity.q.to("T") - 0.02 * mu.T
-                ):
-                    Hmin = -i
-                if Jmax is None and i * mu.T >= self.remanence.q.to("T") + 0.02 * mu.T:
-                    Jmax = i
-                if Hmin is not None and Jmax is not None:
-                    break
-
-            # format plot
+            # format inset
+            Hmin = self.coercivity.q.to("T").value * -1.1
+            Jmax = self.remanence.q.to("T").value * 1.1
             ax2.axis([Hmin, 0, 0, Jmax])
             ax2.yaxis.set_label_position("right")
-            ax2.yaxis.tick_right()
-            ax2.xaxis.set_major_locator(MultipleLocator(0.1))
-            ax2.xaxis.set_minor_locator(MultipleLocator(0.05))
-            ax2.yaxis.set_major_locator(MultipleLocator(0.1))
-            ax2.yaxis.set_minor_locator(MultipleLocator(0.05))
             ax2.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
             ax2.set_ylabel(r"$J$ in $T$")
-            ax2.grid(
-                visible=True, which="major", axis="both", linestyle=":", linewidth=1
-            )
-            ax2.grid(
-                visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5
-            )
-            fig.tight_layout()
 
         # save figure if filepath is given
         if filepath is not None:
@@ -513,15 +481,13 @@ class VSM:
         -------
         None.
         """
-        fig, ax = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
+        fig, ax = plt.subplots()
 
         ax.plot(self.T[self.t > max(self.t) / 2], self.M[self.t > max(self.t) / 2])
 
-        ax.set_xlabel("Temperature in K")
-        ax.set_ylabel("Magnetization in a.u.")
+        ax.set_xlabel(f"Temperature in {self.T.unit}")
+        ax.set_ylabel(f"Magnetization in {self.M.unit}")
         ax.xaxis.set_inverted(True)
-        ax.set_yticks([])
-        fig.tight_layout()
 
         if filepath is not None:
             plt.savefig(filepath, dpi=300)
@@ -692,16 +658,9 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
         ax1.plot(data[i].H * mu_0, data[i].M * mu_0, label=labels[i])
 
     # format plot
-    ax1.xaxis.set_major_locator(MultipleLocator(2))
-    ax1.xaxis.set_minor_locator(MultipleLocator(0.5))
-    ax1.yaxis.set_major_locator(MultipleLocator(0.2))
-    ax1.yaxis.set_minor_locator(MultipleLocator(0.05))
     ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
     ax1.set_ylabel(r"$J$ in $T$")
-    ax1.grid(visible=True, which="major", axis="both", linestyle=":", linewidth=1)
-    ax1.grid(visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5)
     ax1.legend()
-    fig.tight_layout()
     plt.gca().set_prop_cycle(None)
 
     # plot inset of demagnetization curves
@@ -712,31 +671,14 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
                 data[i].H[100:-100] * mu_0, data[i].M[100:-100] * mu_0, label=labels[i]
             )
 
-        # find upper and lower border of plot, so that demagnetization
-        # curve fits nicely
-        coercmax = max([i.coercivity.q.to("T") for i in data])
-        remmax = max([i.remanence.q.to("T") for i in data])
-        Hmin, Jmax = None, None
-        for i in np.arange(0, 5, 0.05):
-            if Hmin is None and -i <= -coercmax - 0.02:
-                Hmin = -i
-            if Jmax is None and i >= remmax + 0.02:
-                Jmax = i
-            if Hmin is not None and Jmax is not None:
-                break
-
         # format plot
+        Hmin = max([i.coercivity.q.to("T") for i in data]).value * -1.1
+        Jmax = max([i.remanence.q.to("T") for i in data]).value * 1.1
         ax2.axis([Hmin, 0, 0, Jmax])
         ax2.yaxis.set_label_position("right")
         ax2.yaxis.tick_right()
-        ax2.xaxis.set_major_locator(MultipleLocator(0.1))
-        ax2.xaxis.set_minor_locator(MultipleLocator(0.05))
-        ax2.yaxis.set_major_locator(MultipleLocator(0.1))
-        ax2.yaxis.set_minor_locator(MultipleLocator(0.05))
         ax2.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
         ax2.set_ylabel(r"$J$ in $T$")
-        ax2.grid(visible=True, which="major", axis="both", linestyle=":", linewidth=1)
-        ax2.grid(visible=True, which="minor", axis="both", linestyle=":", linewidth=0.5)
 
     # save figure if filepath is given
     if filepath is not None:
