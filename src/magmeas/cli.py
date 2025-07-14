@@ -72,7 +72,7 @@ def cli():
 
     if args.silent and not args.dump:
         err_msg = (
-            "Printing and saving both suppressed (-s but no -d): " "-> nothing to do."
+            "Printing and saving both suppressed (-s but no -d): -> nothing to do."
         )
         parser.error(err_msg)
 

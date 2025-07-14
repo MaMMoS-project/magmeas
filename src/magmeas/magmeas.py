@@ -21,14 +21,14 @@ class VSM:
 
     Attributes
     ----------
-    H: Quantity
-        Internal magnetic field as mammos_units.Quantity
-    M: QUANTITY
-        Magnetization as mammos_units.Quantity
-    T: QUANTITY
-        Absolute temperature as mammos_units.Quantity
-    t: QUANTITY
-        Time as mammos_units.Quantity
+    H: ENTITY
+        Internal magnetic field as mammos_entity.Entity
+    M: ENTITY
+        Magnetization as mammos_entity.Entity
+    T: ENTITY
+        Absolute temperature as mammos_entity.Entity
+    t: ENTITY
+        Time as mammos_entity.Entity
     D: ENTITY
         Demagnetizing factor as mammos_entity.Entity
     remanence: ENTITY
@@ -203,35 +203,35 @@ class VSM:
         # import measurement data
         df = pd.read_csv(datfile, skiprows=34, encoding="cp1252")
         # extract magnetic moment
+        # So far this is only a Quantity and no Entity because the wrong unit
+        # seems to be defined for the me.Entity('MagneticMoment')
         m = np.array(df["Moment (emu)"]) * mu.erg / mu.G
         # extract external magnetic field
-        eH = np.array(df["Magnetic Field (Oe)"]) * mu.Oe
-        # convert external magnetic field from Oe to A/m
-        eH = eH.to("A/m")
+        eH = me.Entity(
+            "ExternalMagneticField", np.array(df["Magnetic Field (Oe)"]) * mu.Oe
+        )
         # calculate magnetization
-        M = m / mass * density
-        # convert magnetization to A/m
-        M = M.to("A/m")
+        M = me.Entity("Magnetization", m / mass * density)
         # calculate internal magnetic field
-        H = eH - self.D.q * M
+        H = me.Entity("InternalMagneticField", eH.q - self.D.q * M.q)
         # extract absolute temperature
-        T = np.array(df["Temperature (K)"]) * mu.K
+        T = me.Entity("Temperature", np.array(df["Temperature (K)"]) * mu.K)
         # extract time stamp
-        t = np.array(df["Time Stamp (sec)"]) * mu.s
+        t = me.Entity("Time", np.array(df["Time Stamp (sec)"]) * mu.s)
 
         # test datapoints for missing values (where value is nan)
-        nanfilter = ~np.isnan(H) * ~np.isnan(M) * ~np.isnan(T) * ~np.isnan(t)
+        nanfilter = ~np.isnan(H.q) * ~np.isnan(M.q) * ~np.isnan(T.q) * ~np.isnan(t.q)
         # delete all datapoints where H, M, T or t are nan and assign them to object
-        self.H = H[nanfilter]
-        self.M = M[nanfilter]
-        self.T = T[nanfilter]
+        self.H = me.Entity(H.ontology_label, H.q.to("A/m")[nanfilter])
+        self.M = me.Entity(M.ontology_label, M.q.to("A/m")[nanfilter])
+        self.T = me.Entity(T.ontology_label, T.q[nanfilter])
         # convert time stamp to time since measurement start
-        self.t = t[nanfilter] - t[nanfilter][0]
+        self.t = me.Entity(t.ontology_label, t.q[nanfilter] - t.q[nanfilter][0])
 
         # Does H vary by more than 10 A/m?
-        self._H_var = (np.max(self.H) - np.min(self.H)) > 10 * mu.A / mu.m
+        self._H_var = (np.max(self.H.q) - np.min(self.H.q)) > 10 * mu.A / mu.m
         # Does T vary by more than 10 K?
-        self._T_var = (np.max(self.T) - np.min(self.T)) > 10 * mu.K
+        self._T_var = (np.max(self.T.q) - np.min(self.T.q)) > 10 * mu.K
 
     def _calc_remanence(self):
         """
@@ -247,7 +247,7 @@ class VSM:
             Remanent magnetization as mammos_entity.Entity object
         """
         # find intersections of hysteresis loop with H=0
-        a = droot(self.M, self.H)
+        a = droot(self.M.q, self.H.q)
         a = np.abs(a)  # get absolute values of all intersections
 
         # test for initial magnetization curve, in this case the interception
@@ -277,7 +277,7 @@ class VSM:
             Internal coercivity as mammos_entity.Entity object
         """
         # find intersections of hysteresis loop with M=0
-        a = droot(self.H, self.M)
+        a = droot(self.H.q, self.M.q)
         a = np.abs(a)  # get absolute values of all coercivities
         # test for initial magnetization curve, in this case the interception
         # point of the hysteresis will deviate from coercivity, thus discarded
@@ -305,7 +305,7 @@ class VSM:
             Maximum energy product as mammos_entity.Entity object
         """
         # calculate BH
-        BH = (self.H + self.M) * mu_0 * self.H
+        BH = (self.H.q + self.M.q) * mu_0 * self.H.q
         # product of B and H is positive in first and third quadrant, negative
         # in second and fourth quadrant, so no finding of demagnetization curve
         # is necessary, it will always be found at negative values
@@ -333,7 +333,7 @@ class VSM:
         # value that magnetization is supposed to have at knee-point
         Mk = 0.9 * self.remanence.q
         # find intersections of Hysteresis loop with M=Mk
-        a = droot(self.H, self.M - Mk)
+        a = droot(self.H.q, self.M.q - Mk)
         a = np.abs(a)  # get absolute values
         a = a[1]  # second root should be knee field strength
         Hk = me.Entity("KneeField", a)
@@ -372,14 +372,16 @@ class VSM:
         """
         # norm the magnetization to positive values between 0 and 1
         # we are only interested in Tc, absolute moments don't matter
-        nM = np.abs(self.M) / np.max(np.abs(self.M))
+        nM = np.abs(self.M.q) / np.max(np.abs(self.M.q))
 
         # let's only look at M(T) during cooling, this is usually more reliable
         # cooling is assumed to occur after half of the measurement time
         # also cut off last couple of measurement points as they are unstable
-        selec = (self.t > np.max(self.t) * 0.5) * (self.t < np.max(self.t) * 0.9)
+        selec = (self.t.q > np.max(self.t.q) * 0.5) * (
+            self.t.q < np.max(self.t.q) * 0.9
+        )
         nM = nM[selec]
-        T = self.T[selec]
+        T = self.T.q[selec]
         # generous kernel for smoothing
         kernel = np.ones(20) / 20
         # smooth measurement by convolution with kernel
@@ -438,8 +440,8 @@ class VSM:
         -------
         None
         """
-        H = self.H.to("T")  # converts H from A/m to Tesla
-        M = self.M.to("T")  # converts M from A/m to Tesla
+        H = self.H.q.to("T")  # converts H from A/m to Tesla
+        M = self.M.q.to("T")  # converts M from A/m to Tesla
 
         fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
         ax1.plot(H, M, label=label)
@@ -483,7 +485,10 @@ class VSM:
         """
         fig, ax = plt.subplots()
 
-        ax.plot(self.T[self.t > max(self.t) / 2], self.M[self.t > max(self.t) / 2])
+        ax.plot(
+            self.T.q[self.t.q > max(self.t.q) / 2],
+            self.M.q[self.t.q > max(self.t.q) / 2],
+        )
 
         ax.set_xlabel(f"Temperature in {self.T.unit}")
         ax.set_ylabel(f"Magnetization in {self.M.unit}")
@@ -651,11 +656,11 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     -------
     None
     """
-    fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
+    fig, ax1 = plt.subplots()
 
     # plot hysteresis loops
     for i in range(len(data)):
-        ax1.plot(data[i].H * mu_0, data[i].M * mu_0, label=labels[i])
+        ax1.plot(data[i].H.q.to("T"), data[i].M.q.to("T"), label=labels[i])
 
     # format plot
     ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
@@ -668,7 +673,9 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
         ax2 = ax1.inset_axes([0.58, 0.15, 0.3, 0.5])
         for i in range(len(data)):
             ax2.plot(
-                data[i].H[100:-100] * mu_0, data[i].M[100:-100] * mu_0, label=labels[i]
+                data[i].H.q.to("T")[100:-100],
+                data[i].M.q.to("T")[100:-100],
+                label=labels[i],
             )
 
         # format plot
