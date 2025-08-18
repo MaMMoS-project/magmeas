@@ -26,8 +26,8 @@ def cli():
         "full path(s) to any number of single .DAT file(s) or "
         "folder(s) containing several .DAT files. The files must "
         "have been produced by Quantum Design's PPMS or Dynacool system and "
-        "contain specimen formatted as specified by magmeas."
-        "In the case of folders, all the .tif images within each folder"
+        "contain specimen formatted as specified by magmeas (see README)."
+        "In the case of folders, all the .DAT files within each folder"
         "will be processed."
     )
     parser.add_argument("file_path", action="store", nargs="+", help=path_help)
