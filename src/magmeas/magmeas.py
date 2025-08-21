@@ -8,7 +8,8 @@ import mammos_units as mu
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from utils import droot, rextract
+
+from magmeas.utils import droot, rextract
 
 mu_0 = mu.constants.mu0
 mu.set_enabled_equivalencies(mu.magnetic_flux_field())

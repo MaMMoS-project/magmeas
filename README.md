@@ -53,14 +53,14 @@ magmeas -p file.DAT
 ```
 
 
-If you want to store the calculated properties in a JSON-file, use "-d" or "--dump":
+If you want to store the calculated properties in a YAML-file, use "-d" or "--dump":
 
 ```bash
 magmeas -d file.DAT
 ```
 
 
-The flags can also be combined. To store the properties in a JSON-file, plot the measurement and save it as a png
+The flags can also be combined. To store the properties in a YAML-file, plot the measurement and save it as a png
 and prevent the printing of any information to the console with the flag "-s" or "--silent":
 
 ```bash
@@ -86,7 +86,7 @@ magmeas --hdf5 file.DAT
 
 You can also import the module in python and use it with a bit more control. Most things are handled within the class "VSM".
 This reads in .DAT files which are formatted as specified above or those which had their properties entered manually in a console dialog.
-There are also functions that plot multiple VSM objects or write the properties of several measurements to a JSON or CSV-like .TXT file.
+There are also functions that plot multiple VSM objects or write the properties of several measurements to a YAML or CSV-like .TXT file.
 
 ```python
 import magmeas as mm
@@ -95,7 +95,7 @@ dat1 = mm.VSM("file1.DAT")
 dat2 = mm.VSM("file2.DAT", read_method="manual")
 
 dat1.plot("file1_plot.png")
-dat2.properties_to_json("file2_properties.json")
+dat2.properties_to_file("file2_properties.yaml")
 
 mm.plot_multiple_VSM([dat1, dat2], ["Measurement 1", "Measurement 2"])
 mm.mult_properties_to_txt("properties.txt", [dat1, dat2], ["Measurement 1", "Measurement 2"])
