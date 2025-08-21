@@ -47,21 +47,10 @@ def droot(x, y):
     FLOAT|ARRAY
         Array of root points. If only one is found, it's returned as float.
     """
-    r = np.array([]) * x.unit
-    # scan over whole range of values to find the two points where the
-    # y-axis is crossed
-    for i in range(len(x) - 1):
-        # y values on left and right side of root will only be negative if
-        # their product is negative
-        if y[i] * y[i + 1] <= 0:
-            # dataset between two points is assumed to be linear,
-            # calculate linear equation to get exact interception point
-            # with x-axis
-            m = (y[i + 1] - y[i]) / (x[i + 1] - x[i])  # slope
-            n = y[i] - m * x[i]  # y-intercept
-            x0 = -n / m  # x-intercept
-            # append x-intercepts as root to array
-            r = np.append(r, x0)
+    # Boolean array that's true at roots
+    r = np.abs(np.diff(np.sign(y))).astype(bool)
+    # Calculate roots with linear interception between points
+    r = x[:-1][r] + np.diff(x)[r] / (np.abs(y[1:][r] / y[:-1][r]) + 1)
     # Convert array of found roots to float if only one was found
     if np.shape(r) == (1,):
         r = r[0]
