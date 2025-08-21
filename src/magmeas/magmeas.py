@@ -1,6 +1,5 @@
 """VSM class and functions using it."""
 
-import json
 from pathlib import Path
 
 import h5py
@@ -493,7 +492,7 @@ class VSM:
         if filepath is not None:
             plt.savefig(filepath, dpi=300)
 
-    def properties_to_txt(self, filepath, unit="T", sep="\t"):
+    def properties_to_file(self, filepath):
         r"""
         Save all properties derived from the VSM-measurement to CSV-file.
 
@@ -501,55 +500,21 @@ class VSM:
         ----------
         filepath: STR | PATH
             Fielpath to save the TXT-file to.
-        unit: STR
-            Unit the remanence and coercivity are given in.
-            Default is Tesla
-        sep: STR
-            Seperator to be used during the pd.to_csv. Default is "\t"
 
         Returns
         -------
         None
         """
         if self.measurement == "M(H)":
-            properties = {
-                "Remanence in " + unit: [self.remanence.q.to(unit).value],
-                "Coercivity in " + unit: [self.coercivity.q.to(unit).value],
-                r"BHmax in kJ/m^3": [self.BHmax.q.to(mu.kJ / mu.m**3).value],
-                "S": [self.squareness],
-            }
+            me.io.entities_to_file(
+                filepath,
+                Mr=self.remanence,
+                Hc=self.coercivity,
+                BHmax=self.BHmax,
+                Hk=self.kneefield,
+            )
         elif self.measurement == "M(T)":
-            properties = {"Tc in K": [self.Tc.q.to("K").value]}
-        df = pd.DataFrame(properties)
-        df.to_csv(filepath, sep=sep)
-
-    def properties_to_json(self, filepath, unit="T"):
-        """
-        Save all properties derived from the VSM-measurement to json-file.
-
-        Parameters
-        ----------
-        filepath: STR | PATH
-            Fielpath to save the TXT-file to.
-        unit: STR
-            Unit the remanence and coercivity are given in.
-            Default is Tesla
-
-        Returns
-        -------
-        None
-        """
-        if self.measurement == "M(H)":
-            properties = {
-                "Remanence in " + unit: [self.remanence.q.to(unit).value],
-                "Coercivity in " + unit: [self.coercivity.q.to(unit).value],
-                r"BHmax in kJ/m^3": [self.BHmax.q.to(mu.kJ / mu.m**3).value],
-                "S": [self.squareness],
-            }
-        elif self.measurement == "M(T)":
-            properties = {"Tc in K": [self.Tc.q.to("K").value]}
-        with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(properties, f, ensure_ascii=False, indent=4)
+            me.io.entities_to_file(filepath, Tc=self.Tc)
 
     def print_properties(self, unit="T"):
         """
@@ -687,85 +652,3 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     if filepath is not None:
         plt.savefig(filepath, dpi=300)
     return None
-
-
-def mult_properties_to_txt(filepath, data, labels, unit="T", sep="\t"):
-    r"""
-    Save magnetic properties derived from the several VSM-measurements to
-    CSV-file.
-
-    Parameters
-    ----------
-    filepath: STR | PATH
-        Fielpath to save the TXT-file to.
-    data : LIST
-        List of VSM objects.
-    labels : LIST
-        List of labels (string) identifying the data rows.
-        Has to be of same length as data.
-    unit: STR
-        Unit the remanence and coercivity are given in.
-        Default is Tesla
-    sep: STR
-        Seperator to be used during the pd.to_csv. Default is "\t"
-
-    Returns
-    -------
-    None
-    """
-    if all([i.measurement == "M(H)" for i in data]):
-        properties = {
-            "sample": labels,
-            "Remanence in " + unit: [i.remanence.q.to(unit).value for i in data],
-            "Coercivity in " + unit: [i.coercivity.q.to(unit).value for i in data],
-            r"BHmax in kJ/m^3": [i.BHmax.q.to(mu.kJ / mu.m**3).value for i in data],
-            "S": [i.squareness for i in data],
-        }
-    elif all([i.measurement == "M(T)" for i in data]):
-        properties = {"sample": labels, "Tc in K": [i.value for i in data]}
-    else:
-        raise Exception("""Please only export a list of VSM measurements if
-                        all of them are the same measurement type. This
-                        does not seem to be the case.""")
-    df = pd.DataFrame(properties)
-    df.to_csv(filepath, sep=sep)
-
-
-def mult_properties_to_json(filepath, data, labels, unit="T"):
-    """
-    Save magnetic properties derived from the several VSM-measurements to
-    json-file.
-
-    Parameters
-    ----------
-    filepath: STR | PATH
-        Fielpath to save the TXT-file to.
-    data : LIST
-        List of VSM objects.
-    labels : LIST
-        List of labels (string) identifying the data rows.
-        Has to be of same length as data.
-    unit: STR
-        Unit the remanence and coercivity are given in.
-        Default is Tesla
-
-    Returns
-    -------
-    None
-    """
-    if all([i.measurement == "M(H)" for i in data]):
-        properties = {
-            "sample": labels,
-            "Remanence in " + unit: [i.remanence.q.to(unit).value for i in data],
-            "Coercivity in " + unit: [i.coercivity.q.to(unit).value for i in data],
-            r"BHmax in kJ/m^3": [i.BHmax.q.to(mu.kJ / mu.m**3).value for i in data],
-            "S": [i.squareness for i in data],
-        }
-    elif all([i.measurement == "M(T)" for i in data]):
-        properties = {"sample": labels, "Tc in K": [i.value for i in data]}
-    else:
-        raise Exception("""Please only export a list of VSM measurements if
-                        all of them are the same measurement type. This
-                        does not seem to be the case.""")
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(properties, f, ensure_ascii=False, indent=4)

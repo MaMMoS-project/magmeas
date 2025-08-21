@@ -36,10 +36,10 @@ def cli():
         "-v", "--version", action="version", version=f"%(prog)s {__version__}"
     )
     dump_help = (
-        "dump selected magnetic properties to json. One json file per DAT-file"
+        "dump selected magnetic properties to YAML. One YAML file per DAT-file"
         " will be stored in the same directory as the DAT-file. "
-        "The name of each json file is the corresponding DAT-file name "
-        "(without the .DAT extension) plus _properties.json"
+        "The name of each YAML file is the corresponding DAT-file name "
+        "(without the .DAT extension) plus _properties.yaml"
     )
     parser.add_argument(
         "-d",
@@ -83,7 +83,7 @@ def cli():
             if not args.silent:
                 vsm_dat.print_properties()
             if args.dump:
-                fn = p_dat.parent.joinpath(p_dat.stem + "_properties.json")
+                fn = p_dat.parent.joinpath(p_dat.stem + "_properties.yaml")
                 vsm_dat.properties_to_json(fn)
             if args.plot and args.dump:
                 fn = p_dat.parent.joinpath(p_dat.stem + "_plot.png")
@@ -100,7 +100,7 @@ def cli():
                 if not args.silent:
                     vsm_dat.print_properties()
                 if args.dump:
-                    fn = i.parent.joinpath(i.stem + "_properties.json")
+                    fn = i.parent.joinpath(i.stem + "_properties.yaml")
                     vsm_dat.properties_to_json(fn)
                 if args.plot and args.dump:
                     fn = i.parent.joinpath(i.stem + "_plot.png")
