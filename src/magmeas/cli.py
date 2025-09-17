@@ -17,7 +17,7 @@ def cli():
     optionally dump them in a json file.
     """
     d_0 = (
-        "Prints and/or stores various extrinsic magnetic properties"
+        "Prints and/or stores various extrinsic magnetic properties "
         "calculated from a VSM measurement."
     )
     parser = argparse.ArgumentParser(description=d_0)
