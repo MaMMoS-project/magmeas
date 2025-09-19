@@ -229,6 +229,20 @@ class VSM:
         # Does T vary by more than 10 K?
         self._T_var = (np.max(self.T.q) - np.min(self.T.q)) > 10 * mu.K
 
+    def __repr__(self):
+        """
+        Represent VSM object more helpfully.
+
+        Parameters
+        ----------
+        NONE
+
+        Returns
+        -------
+        NONE
+        """
+        return f"{self.__module__}.VSM({self.path.name})"
+
     def _calc_remanence(self):
         """
         Extract remanent magnetization from hysteresis loop.
