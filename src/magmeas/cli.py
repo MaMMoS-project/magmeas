@@ -84,7 +84,7 @@ def cli():
                 vsm_dat.print_properties()
             if args.dump:
                 fn = p_dat.parent.joinpath(p_dat.stem + "_properties.yaml")
-                vsm_dat.properties_to_json(fn)
+                vsm_dat.properties_to_file(fn)
             if args.plot and args.dump:
                 fn = p_dat.parent.joinpath(p_dat.stem + "_plot.png")
                 vsm_dat.plot(filepath=fn)
@@ -101,7 +101,7 @@ def cli():
                     vsm_dat.print_properties()
                 if args.dump:
                     fn = i.parent.joinpath(i.stem + "_properties.yaml")
-                    vsm_dat.properties_to_json(fn)
+                    vsm_dat.properties_to_file(fn)
                 if args.plot and args.dump:
                     fn = i.parent.joinpath(i.stem + "_plot.png")
                     vsm_dat.plot(filepath=fn)
