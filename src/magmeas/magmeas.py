@@ -51,10 +51,11 @@ class VSM:
         Load VSM-data from a quantum design .DAT file
     plot()
         Plot data according to measurement type, optionally saves as png.
-    properties_to_txt()
-        Saves all properties derived from VSM-measurement to CSV-file.
-    properties_to_json()
-        Saves all properties derived from VSM-measurement to JSON-file.
+    properties_to_file()
+        Save all properties derived from the VSM-measurement to CSV-file or to
+        YAML file, using the mammos-entity io functionality.
+    to_hdf5()
+        Save contents of .DAT-file and calculated properties in hdf5 file.
     """
 
     def __init__(self, datfile, read_method="auto", calc_properties=True):
@@ -241,7 +242,7 @@ class VSM:
         -------
         NONE
         """
-        return f"{self.__module__}.VSM({self.path.name})"
+        return f"{self.__module__.split('.')[0]}.VSM({self.path.name})"
 
     def _calc_remanence(self):
         """
@@ -509,7 +510,8 @@ class VSM:
 
     def properties_to_file(self, filepath):
         r"""
-        Save all properties derived from the VSM-measurement to CSV-file.
+        Save all properties derived from the VSM-measurement to CSV-file or to
+        YAML file, using the mammos-entity io functionality.
 
         Parameters
         ----------
@@ -559,7 +561,7 @@ class VSM:
 
     def to_hdf5(self, unit="T"):
         """
-        Save .DAT-file and calculated properties in hdf5 file.
+        Save contents of .DAT-file and calculated properties in hdf5 file.
 
         Parameters
         ----------
@@ -579,34 +581,36 @@ class VSM:
         }
         df = pd.read_csv(self.path, skiprows=34, encoding="cp1252")
 
-        f = h5py.File(self.path.parent.joinpath(self.path.stem + ".hdf5"), "a")
-        for i in info:
-            f.create_dataset("Info/" + i, data=info[i])
-        f["Info/SAMPLE_MASS"].attrs["unit"] = "mg"
-        f["Info/SAMPLE_SIZE"].attrs["unit"] = "mm"
+        with h5py.File(self.path.parent.joinpath(self.path.stem + ".hdf5"), "a") as f:
+            for i in info:
+                f.create_dataset("Info/" + i, data=info[i])
+            f["Info/SAMPLE_MASS"].attrs["unit"] = "mg"
+            f["Info/SAMPLE_SIZE"].attrs["unit"] = "mm"
 
-        for i in df.columns:
-            dat = np.array(df[i])
-            if dat.dtype != "O":
-                f.create_dataset("Data/" + i, data=dat)
-            if dat.dtype == "O":
-                f.create_dataset("Data/" + i, data=[str(j) for j in df[i]])
+            for i in df.columns:
+                dat = np.array(df[i])
+                if dat.dtype != "O":
+                    f.create_dataset("Data/" + i, data=dat)
+                if dat.dtype == "O":
+                    f.create_dataset("Data/" + i, data=[str(j) for j in df[i]])
 
-        if self.measurement == "M(H)":
-            f.create_dataset(
-                "Properties/Remanence", data=self.remanence.q.to(unit).value
-            )
-            f["Properties/Remanence"].attrs["unit"] = unit
-            f.create_dataset(
-                "Properties/Coercivity", data=self.coercivity.q.to(unit).value
-            )
-            f["Properties/Coercivity"].attrs["unit"] = unit
-            f.create_dataset("Properties/BHmax", data=self.BHmax.q.to(mu.kJ / mu.m**3))
-            f["Properties/BHmax"].attrs["unit"] = "kJ/m^3"
-            f.create_dataset("Properties/Squareness", data=self.squareness())
-        elif self.measurement == "M(T)":
-            f.create_dataset("Properties/Tc", data=self.Tc.q.value)
-            f["Properties/Tc"].attrs["unit"] = "K"
+            if self.measurement == "M(H)":
+                f.create_dataset(
+                    "Properties/Remanence", data=self.remanence.q.to(unit).value
+                )
+                f["Properties/Remanence"].attrs["unit"] = unit
+                f.create_dataset(
+                    "Properties/Coercivity", data=self.coercivity.q.to(unit).value
+                )
+                f["Properties/Coercivity"].attrs["unit"] = unit
+                f.create_dataset(
+                    "Properties/BHmax", data=self.BHmax.q.to(mu.kJ / mu.m**3)
+                )
+                f["Properties/BHmax"].attrs["unit"] = "kJ/m^3"
+                f.create_dataset("Properties/Squareness", data=self.squareness)
+            elif self.measurement == "M(T)":
+                f.create_dataset("Properties/Tc", data=self.Tc.q.value)
+                f["Properties/Tc"].attrs["unit"] = "K"
 
 
 def plot_multiple_VSM(data, labels, filepath=None, demag=True):
