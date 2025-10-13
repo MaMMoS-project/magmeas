@@ -525,13 +525,14 @@ class VSM:
         if self.measurement == "M(H)":
             me.io.entities_to_file(
                 filepath,
+                self.path.name.split(".")[0],
                 Mr=self.remanence,
                 Hc=self.coercivity,
                 BHmax=self.BHmax,
                 Hk=self.kneefield,
             )
         elif self.measurement == "M(T)":
-            me.io.entities_to_file(filepath, Tc=self.Tc)
+            me.io.entities_to_file(filepath, self.path.name.split(".")[0], Tc=self.Tc)
 
     def print_properties(self, unit="T"):
         """
