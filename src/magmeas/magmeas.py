@@ -516,7 +516,7 @@ class VSM:
         Parameters
         ----------
         filepath: STR | PATH
-            Fielpath to save the TXT-file to.
+            Filepyth to save the file to. Ending also determines type of file.
 
         Returns
         -------
@@ -671,3 +671,58 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     if filepath is not None:
         plt.savefig(filepath, dpi=300)
     return None
+
+
+def mult_properties_to_file(filepath, data, labels=None):
+    """
+    Save all properties derived from list of VSM-measurements to CSV-file
+    or to YAML file, using the mammos-entity io functionality.
+
+    Parameters
+    ----------
+    filepath: STR | PATH
+        Filepath to save the file to. Ending also determines type of file.
+    data: LIST[VSM]
+        List of VSM objects that will have their properties exported.
+    labels: LIST[STR], optional
+        List of strings to identify the VSM objects more easily.
+        If not given, the filenames of each VSM-object are used instead.
+
+    Returns
+    -------
+    None
+    """
+    file_ext = filepath.name.split(".")[1].lower()
+    if labels is not None and any(file_ext == e for e in ["yaml", "yml"]):
+        description = labels
+    if labels is None and any(file_ext == e for e in ["yaml", "yml"]):
+        description = [vsm.path.name.split(".")[0] for vsm in data]
+    if labels is not None and file_ext == "csv":
+        description = ""
+        for label in labels:
+            description = description + label + "\n"
+    if labels is None and file_ext == "csv":
+        description = ""
+        for label in [vsm.path.name.split(".")[0] for vsm in data]:
+            description = description + label + "\n"
+
+    if all([vsm.measurement == "M(H)" for vsm in data]):
+        me.io.entities_to_file(
+            filepath,
+            description,
+            Mr=me.Entity("Remanence", [vsm.remanence.q for vsm in data]),
+            Hc=me.Entity("CoercivityHc", [vsm.coercivity.q for vsm in data]),
+            BHmax=me.Entity("MaximumEnergyProduct", [vsm.BHmax.q for vsm in data]),
+            Hk=me.Entity("KneeField", [vsm.kneefield.q for vsm in data]),
+        )
+    elif all([vsm.measurement == "M(T)" for vsm in data]):
+        me.io.entities_to_file(
+            filepath,
+            description,
+            Tc=me.Entity("CurieTemperature", [vsm.Tc.q for vsm in data]),
+        )
+    else:
+        raise Exception(
+            "VSM objects are incompatible. Please make sure\
+                         not to mix M(H) and M(T) measurements during export."
+        )
