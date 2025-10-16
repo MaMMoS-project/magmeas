@@ -95,7 +95,7 @@ def cli():
         else:
             filepaths = [
                 Path(fp) for fp in glob.glob(p_dat.joinpath("*.DAT").as_posix())
-            ]
+            ].sort()
             data = [VSM(filepath) for filepath in filepaths]
             if not args.silent:
                 for vsm in data:
