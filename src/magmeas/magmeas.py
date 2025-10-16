@@ -508,7 +508,7 @@ class VSM:
         if filepath is not None:
             plt.savefig(filepath, dpi=300)
 
-    def properties_to_file(self, filepath):
+    def properties_to_file(self, filepath, label=None):
         r"""
         Save all properties derived from the VSM-measurement to CSV-file or to
         YAML file, using the mammos-entity io functionality.
@@ -517,14 +517,23 @@ class VSM:
         ----------
         filepath: STR | PATH
             Filepyth to save the file to. Ending also determines type of file.
+        label: STR, optional
+            Label to be used in the description of file to be exported to.
+            If none is given then the name of the .DAT file the VSM object was
+            calculated from is used.
 
         Returns
         -------
         None
         """
+        if label is None:
+            description = self.path.name.split(".")[0]
+        if label is not None:
+            description = label
         if self.measurement == "M(H)":
             me.io.entities_to_file(
                 filepath,
+                description,
                 self.path.name.split(".")[0],
                 Mr=self.remanence,
                 Hc=self.coercivity,
@@ -614,7 +623,7 @@ class VSM:
                 f["Properties/Tc"].attrs["unit"] = "K"
 
 
-def plot_multiple_VSM(data, labels, filepath=None, demag=True):
+def plot_multiple_VSM(data, filepath=None, labels=None, demag=True):
     """
     Plot hysteresis loops and optionally demagnetization curves of
     several VSM measurements. Saves figure if filepath is given.
@@ -623,9 +632,10 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     ----------
     data: LIST
         List of several objects which have to be of the VSM class.
-    labels: LIST
+    labels: LIST, optional
         List of labels that are going to be used in the legend of the plot.
-        Has to have the same length as data.
+        Has to have the same length as data. If none is given then the names
+        of the .DAT files each VSM object was calculated from will be used.
     filepath: STR | PATH, optional
         Filepath for saving the figure. Default is None, in that case no file
         is saved.
@@ -637,6 +647,9 @@ def plot_multiple_VSM(data, labels, filepath=None, demag=True):
     -------
     None
     """
+    if labels is None:
+        labels = [vsm.path.name.split(".")[0] for vsm in data]
+
     fig, ax1 = plt.subplots()
 
     # plot hysteresis loops
