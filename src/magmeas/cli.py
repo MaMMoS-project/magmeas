@@ -70,7 +70,7 @@ def cli():
 
     args = parser.parse_args()
 
-    if args.silent and not args.dump:
+    if args.silent and not args.dump and not args.plot:
         err_msg = (
             "Printing and saving both suppressed (-s but no -d): -> nothing to do."
         )
@@ -95,7 +95,8 @@ def cli():
         else:
             filepaths = [
                 Path(fp) for fp in glob.glob(p_dat.joinpath("*.DAT").as_posix())
-            ].sort()
+            ]
+            filepaths.sort()
             data = [VSM(filepath) for filepath in filepaths]
             if not args.silent:
                 for vsm in data:
@@ -103,10 +104,8 @@ def cli():
             if args.dump:
                 export_path = p_dat.joinpath(p_dat.stem + "_properties.yml")
                 mult_properties_to_file(data, export_path)
-            if args.plot and args.dump:
+            if args.plot:
                 export_path = p_dat.joinpath(p_dat.stem + "_plot.png")
                 plot_multiple_VSM(data, export_path)
-            if args.plot and not args.dump:
-                plot_multiple_VSM(data)
             # if args.hdf5:
             #     vsm_dat.to_hdf5()

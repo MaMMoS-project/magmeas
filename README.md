@@ -108,7 +108,6 @@ mm.mult_properties_to_txt("properties.txt", [dat1, dat2], ["Measurement 1", "Mea
 * Matplotlib
 * h5py
 * mammos-entity
-* PyQT6
 
 Requires Python >= 3.6 because f-strings are used
 
