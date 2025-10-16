@@ -4,7 +4,7 @@ import argparse
 import glob
 from pathlib import Path
 
-from magmeas import VSM, __version__
+from magmeas import VSM, __version__, mult_properties_to_file, plot_multiple_VSM
 
 
 def cli():
@@ -28,7 +28,7 @@ def cli():
         "have been produced by Quantum Design's PPMS or Dynacool system and "
         "contain specimen formatted as specified by magmeas (see README)."
         "In the case of folders, all the .DAT files within each folder"
-        "will be processed."
+        "will be processed together."
     )
     parser.add_argument("file_path", action="store", nargs="+", help=path_help)
 
@@ -93,19 +93,20 @@ def cli():
             if args.hdf5:
                 vsm_dat.to_hdf5()
         else:
-            all_dats = glob.glob(p_dat.joinpath("*.DAT").as_posix())
-            for i in all_dats:
-                i = Path(i)
-                vsm_dat = VSM(i)
-                if not args.silent:
-                    vsm_dat.print_properties()
-                if args.dump:
-                    fn = i.parent.joinpath(i.stem + "_properties.yaml")
-                    vsm_dat.properties_to_file(fn)
-                if args.plot and args.dump:
-                    fn = i.parent.joinpath(i.stem + "_plot.png")
-                    vsm_dat.plot(filepath=fn)
-                if args.plot and not args.dump:
-                    vsm_dat.plot()
-                if args.hdf5:
-                    vsm_dat.to_hdf5()
+            filepaths = [
+                Path(fp) for fp in glob.glob(p_dat.joinpath("*.DAT").as_posix())
+            ]
+            data = [VSM(filepath) for filepath in filepaths]
+            if not args.silent:
+                for vsm in data:
+                    vsm.print_properties()
+            if args.dump:
+                export_path = p_dat.joinpath(p_dat.stem + "_properties.yml")
+                mult_properties_to_file(data, export_path)
+            if args.plot and args.dump:
+                export_path = p_dat.joinpath(p_dat.stem + "_plot.png")
+                plot_multiple_VSM(data, export_path)
+            if args.plot and not args.dump:
+                plot_multiple_VSM(data)
+            # if args.hdf5:
+            #     vsm_dat.to_hdf5()

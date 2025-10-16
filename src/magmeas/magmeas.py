@@ -478,7 +478,7 @@ class VSM:
 
         # save figure if filepath is given
         if filepath is not None:
-            plt.savefig(filepath, dpi=300)
+            fig.savefig(filepath, dpi=300)
 
     def _plot_MT(self, filepath=None):
         """
@@ -506,7 +506,7 @@ class VSM:
         ax.xaxis.set_inverted(True)
 
         if filepath is not None:
-            plt.savefig(filepath, dpi=300)
+            fig.savefig(filepath, dpi=300)
 
     def properties_to_file(self, filepath, label=None):
         r"""
@@ -527,21 +527,20 @@ class VSM:
         None
         """
         if label is None:
-            description = self.path.name.split(".")[0]
+            description = self.path.stem
         if label is not None:
             description = label
         if self.measurement == "M(H)":
             me.io.entities_to_file(
                 filepath,
                 description,
-                self.path.name.split(".")[0],
                 Mr=self.remanence,
                 Hc=self.coercivity,
                 BHmax=self.BHmax,
                 Hk=self.kneefield,
             )
         elif self.measurement == "M(T)":
-            me.io.entities_to_file(filepath, self.path.name.split(".")[0], Tc=self.Tc)
+            me.io.entities_to_file(filepath, description, Tc=self.Tc)
 
     def print_properties(self, unit="T"):
         """
@@ -632,13 +631,13 @@ def plot_multiple_VSM(data, filepath=None, labels=None, demag=True):
     ----------
     data: LIST
         List of several objects which have to be of the VSM class.
+    filepath: STR | PATH, optional
+        Filepath for saving the figure. Default is None, in that case no file
+        is saved.
     labels: LIST, optional
         List of labels that are going to be used in the legend of the plot.
         Has to have the same length as data. If none is given then the names
         of the .DAT files each VSM object was calculated from will be used.
-    filepath: STR | PATH, optional
-        Filepath for saving the figure. Default is None, in that case no file
-        is saved.
     demag: BOOL, optional
         Boolean that determines if demagnetization curve is plotted as an
         inset next to hysteresis loop. Default is True.
@@ -648,7 +647,7 @@ def plot_multiple_VSM(data, filepath=None, labels=None, demag=True):
     None
     """
     if labels is None:
-        labels = [vsm.path.name.split(".")[0] for vsm in data]
+        labels = [vsm.path.stem for vsm in data]
 
     fig, ax1 = plt.subplots()
 
@@ -683,21 +682,21 @@ def plot_multiple_VSM(data, filepath=None, labels=None, demag=True):
 
     # save figure if filepath is given
     if filepath is not None:
-        plt.savefig(filepath, dpi=300)
+        fig.savefig(filepath, dpi=300)
     return None
 
 
-def mult_properties_to_file(filepath, data, labels=None):
+def mult_properties_to_file(data, filepath, labels=None):
     """
     Save all properties derived from list of VSM-measurements to CSV-file
     or to YAML file, using the mammos-entity io functionality.
 
     Parameters
     ----------
-    filepath: STR | PATH
-        Filepath to save the file to. Ending also determines type of file.
     data: LIST[VSM]
         List of VSM objects that will have their properties exported.
+    filepath: STR | PATH
+        Filepath to save the file to. Ending also determines type of file.
     labels: LIST[STR], optional
         List of strings to identify the VSM objects more easily.
         If not given, the filenames of each VSM-object are used instead.
@@ -710,14 +709,14 @@ def mult_properties_to_file(filepath, data, labels=None):
     if labels is not None and any(file_ext == e for e in ["yaml", "yml"]):
         description = labels
     if labels is None and any(file_ext == e for e in ["yaml", "yml"]):
-        description = [vsm.path.name.split(".")[0] for vsm in data]
+        description = [vsm.path.stem for vsm in data]
     if labels is not None and file_ext == "csv":
         description = ""
         for label in labels:
             description = description + label + "\n"
     if labels is None and file_ext == "csv":
         description = ""
-        for label in [vsm.path.name.split(".")[0] for vsm in data]:
+        for label in [vsm.path.stem for vsm in data]:
             description = description + label + "\n"
 
     if all([vsm.measurement == "M(H)" for vsm in data]):
