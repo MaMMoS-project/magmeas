@@ -49,6 +49,9 @@ class VSM:
     -------
     load_qd()
         Load VSM-data from a quantum design .DAT file
+    segments()
+        Find indices of segmentation points which can be used to seperate each
+        measurement segment from each other.
     plot()
         Plot data according to measurement type, optionally saves as png.
     properties_to_file()
@@ -406,7 +409,7 @@ class VSM:
     def segments(self, kernel_size=10, edge=0.01):
         r"""
         Find indices of segmentation points which can be used to seperate each
-        measurement segmet from each other. The segments are seperated by a
+        measurement segment from each other. The segments are seperated by a
         changing sign of M (root) or a changing sign of dH/dt (peak).
         The segmentation points are chosen to be the index right after the root
         and right at the peak.
@@ -451,7 +454,7 @@ class VSM:
             kernel = np.ones(kernel_size) / kernel_size
             h = np.convolve(h, kernel, mode="same")
         r = np.nonzero(np.diff(np.sign(m)))[0] + 2  # roots
-        p = np.nonzero(np.diff(np.sign(np.diff(h))) != 0)[0] + 1  # peaks
+        p = np.nonzero(np.diff(np.sign(np.diff(h))))[0] + 1  # peaks
         s = np.sort(np.append(r, p))  # all segmentation points
         # discard segmentation points if they're very close to start
         s = s[len(s[s < (edge * len(t))]) :]
