@@ -403,6 +403,63 @@ class VSM:
         Tc = me.Entity("CurieTemperature", Tc)
         return Tc
 
+    def segments(self, kernel_size=10, edge=0.01):
+        r"""
+        Find indices of segmentation points which can be used to seperate each
+        measurement segmet from each other. The segments are seperated by a
+        changing sign of M (root) or a changing sign of dH/dt (peak).
+        The segmentation points are chosen to be the index right after the root
+        and right at the peak.
+        Segmentation points with even indices (including 0) are peaks while
+        segmentation points with uneven indices are roots.
+        When plotting H over t, the cut-off points s are:
+        This is an ASCII sketch and will probably not render correctly. Look
+        at this method in the source code for illustration in that case.
+
+                /|\             /|\
+               / | \           / | \
+              /  |  \         /  |  \
+        H=0  ----|---|-------|---|---|-----> t
+                 |   |\     /|   |   |\
+                 |   | \   / |   |   | \
+                 |   |  \|/  |   |   |
+                 |   |   |   |   |   |
+        s:       0   1   2   3   4   5    and so on ...
+
+        Parameters
+        ----------
+        kernel_size: INT, optional
+            Width of smoothing kernel to be used to make sure, that noise in
+            measurement does not accidentally introduce more segments than
+            needed. The default is 10. Set to None for no smoothing.
+        edge: FLOAT, optional
+            Percentage of measurement to be treated as edge. Default is 0.01,
+            which means that segmentation points closer than 1 % of the total
+            measurement width to the edges will be discarded.
+
+        Returns
+        -------
+         s: ARRAY[INT]
+            Array of segmentation points that can be used to segmentise the
+            measurement.
+        """
+        t = self.t.q
+        h = self.H.q
+        m = self.M.q
+        # smooth H(t) to make sure only one index per peak is found
+        if kernel_size is not None:
+            kernel = np.ones(kernel_size) / kernel_size
+            h = np.convolve(h, kernel, mode="same")
+        r = np.nonzero(np.diff(np.sign(m)))[0] + 2  # roots
+        p = np.nonzero(np.diff(np.sign(np.diff(h))) != 0)[0] + 1  # peaks
+        s = np.sort(np.append(r, p))  # all segmentation points
+        # discard segmentation points if they're very close to start
+        s = s[len(s[s < (edge * len(t))]) :]
+        # discard segmentation points if they're very close to end
+        if len(s[s > ((1 - edge) * len(t))]) != 0:
+            s = s[: -len(s[s > ((1 - edge) * len(t))])]
+        return s
+
     def plot(self, filepath=None, demag=True, label=None):
         """
         Plot M(H) or M(T) measurement. Wrapper function.
