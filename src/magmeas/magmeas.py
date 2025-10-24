@@ -474,8 +474,9 @@ class VSM:
 
         # plot inset of demagnetization curve
         if demag:
+            start_idx, end_idx = self.segments()[:2]
             ax2 = ax1.inset_axes([0.625, 0.15, 0.3, 0.5])
-            ax2.plot(H[100:-100], M[100:-100], label=label)
+            ax2.plot(H[start_idx:end_idx], M[start_idx:end_idx], label=label)
 
             # format inset
             Hmin = self.coercivity.q.to("T").value * -1.1
@@ -505,14 +506,10 @@ class VSM:
         """
         fig, ax = plt.subplots()
 
-        ax.plot(
-            self.T.q[self.t.q > max(self.t.q) / 2],
-            self.M.q[self.t.q > max(self.t.q) / 2],
-        )
+        ax.plot(self.T.q, self.M.q)
 
         ax.set_xlabel(f"Temperature in {self.T.unit}")
         ax.set_ylabel(f"Magnetization in {self.M.unit}")
-        ax.xaxis.set_inverted(True)
 
         if filepath is not None:
             fig.savefig(filepath, dpi=300)
@@ -674,9 +671,10 @@ def plot_multiple_VSM(data, filepath=None, labels=None, demag=True):
     if demag:
         ax2 = ax1.inset_axes([0.58, 0.15, 0.3, 0.5])
         for i in range(len(data)):
+            start_idx, end_idx = data[i].segments()[:2]
             ax2.plot(
-                data[i].H.q.to("T")[100:-100],
-                data[i].M.q.to("T")[100:-100],
+                data[i].H.q.to("T")[start_idx:end_idx],
+                data[i].M.q.to("T")[start_idx:end_idx],
                 label=labels[i],
             )
 
