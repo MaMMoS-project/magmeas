@@ -106,8 +106,10 @@ mm.mult_properties_to_txt("properties.txt", [dat1, dat2], ["Measurement 1", "Mea
 * NumPy
 * Pandas
 * Matplotlib
+* SciPy
 * h5py
 * mammos-entity
+* mammos-analysis
 
 Requires Python >= 3.6 because f-strings are used
 

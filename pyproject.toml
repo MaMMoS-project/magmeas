@@ -10,8 +10,10 @@ dependencies = [
     "numpy",
 	"pandas",
 	"matplotlib",
+	"scipy",
 	"h5py",
-	"mammos-entity >= 0.10.0"
+	"mammos-entity >= 0.10.0",
+	"mammos-analysis"
 ]
 authors = [
   {name = "Jonas Winkler", email = "j.winkler@ifw-dresden.de"},

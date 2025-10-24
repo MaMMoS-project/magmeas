@@ -8,10 +8,11 @@ import mammos_units as mu
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from mammos_analysis.hysteresis import extrinsic_properties
+from scipy.signal import find_peaks
 
-from magmeas.utils import droot, rextract
+from magmeas.utils import rextract
 
-mu_0 = mu.constants.mu0
 mu.set_enabled_equivalencies(mu.magnetic_flux_field())
 
 
@@ -75,9 +76,30 @@ class VSM:
 
         # calculate properties
         if calc_properties and self.measurement == "M(H)":
-            self.remanence = self._calc_remanence()
-            self.coercivity = self._calc_coercivity()
-            self.BHmax = self._calc_BHmax()
+            s = self.segments()
+            idx0 = np.argsort(self.H.q[s[0] : s[2]])
+            prop0 = extrinsic_properties(
+                self.H.q[s[0] : s[2]][idx0], self.M.q[s[0] : s[2]][idx0], 0
+            )
+            if len(s) >= 5:
+                idx1 = np.argsort(self.H.q[s[2] : s[4]])
+                prop1 = extrinsic_properties(
+                    self.H.q[s[2] : s[4]][idx1], self.M.q[s[2] : s[4]][idx1], 0
+                )
+                self.remanence = me.Entity("Remanence", max([prop0.Mr.q, prop1.Mr.q]))
+                self.coercivity = me.Entity(
+                    "CoercivityHc", max([prop0.Hc.q, prop1.Hc.q])
+                )
+                self.BHmax = me.Entity(
+                    "MaximumEnergyProduct",
+                    max([prop0.BHmax.q, prop1.BHmax.q]),
+                    "kJ / m3",
+                )
+            else:
+                self.remanence = prop0.Mr
+                self.coercivity = prop0.Hc
+                self.BHmax = me.Entity("MaximumEnergyProduct", prop0.BHmax, "kJ / m3")
+
             self.kneefield = self._calc_kneefield()
             self.squareness = self._calc_squareness()
         elif calc_properties and self.measurement == "M(T)":
@@ -171,7 +193,7 @@ class VSM:
               """
         # Automatically read out sample parameters
         if read_method == "auto":
-            with open(datfile, "rb") as f:
+            with open(self.path, "rb") as f:
                 s = str(f.read(-1))
             # check if sample mass can be read from .DAT file
             try:
@@ -201,7 +223,7 @@ class VSM:
         # calculate demagnetisation factor
         self.D = self._demag_prism(dim)
         # import measurement data
-        df = pd.read_csv(datfile, skiprows=34, encoding="cp1252")
+        df = pd.read_csv(self.path, skiprows=34, encoding="cp1252")
         # extract magnetic moment
         # So far this is only a Quantity and no Entity because the wrong unit
         # seems to be defined for the me.Entity('MagneticMoment')
@@ -247,88 +269,6 @@ class VSM:
         """
         return f"{self.__module__.split('.')[0]}.VSM({self.path.name})"
 
-    def _calc_remanence(self):
-        """
-        Extract remanent magnetization from hysteresis loop.
-
-        Parameters
-        ----------
-        NONE
-
-        Returns
-        -------
-        remanence: ENTITY
-            Remanent magnetization as mammos_entity.Entity object
-        """
-        # find intersections of hysteresis loop with H=0
-        a = droot(self.M.q, self.H.q)
-        a = np.abs(a)  # get absolute values of all intersections
-
-        # test for initial magnetization curve, in this case the interception
-        # point of the hysteresis will be lower than the remanence and thus
-        # discarded
-        # a deviation of 2 % has been arbitrarily defined to distinguish the
-        # interception during the initial magnetization from the remanences
-        if np.abs((a[0] - np.mean(a[1:])) / np.mean(a[1:])) > 0.02:
-            a = a[1:]
-        # average all interception points at H=0 to one mean remanence
-        a = np.mean(a)
-        # save the remanence as Entity
-        Mr = me.Entity("Remanence", a)
-        return Mr
-
-    def _calc_coercivity(self):
-        """
-        Extract internal coercivity from hysteresis loop.
-
-        Parameters
-        ----------
-        NONE
-
-        Returns
-        -------
-        coercivity: ENTITY
-            Internal coercivity as mammos_entity.Entity object
-        """
-        # find intersections of hysteresis loop with M=0
-        a = droot(self.H.q, self.M.q)
-        a = np.abs(a)  # get absolute values of all coercivities
-        # test for initial magnetization curve, in this case the interception
-        # point of the hysteresis will deviate from coercivity, thus discarded
-        # a deviation of 2 % has been arbitrarily defined to distinguish the
-        # interception during the initial magnetization from the coercivity
-        if np.abs((a[0] - np.mean(a[1:])) / np.mean(a[1:])) > 0.02:
-            a = a[1:]
-        # average all interception points at M=0 to one mean coercivity
-        a = np.mean(a)
-        # save the coercivity as Entity
-        iHc = me.Entity("CoercivityHc", a)
-        return iHc
-
-    def _calc_BHmax(self):
-        """
-        Extract maximum Energy product from demagnetization curve.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        BHmax: ENTITY
-            Maximum energy product as mammos_entity.Entity object
-        """
-        # calculate BH
-        BH = (self.H.q + self.M.q) * mu_0 * self.H.q
-        # product of B and H is positive in first and third quadrant, negative
-        # in second and fourth quadrant, so no finding of demagnetization curve
-        # is necessary, it will always be found at negative values
-        # BHmax is minimum of BH
-        # BH at BHmax should always be negative value
-        # As is common practice, we return and save BHmax with a positive value
-        BHmax = me.Entity("MaximumEnergyProduct", np.min(BH) * -1)
-        return BHmax
-
     def _calc_kneefield(self):
         """
         Calculate kneefield of demagnetization curve. The knee field strength
@@ -344,13 +284,23 @@ class VSM:
         kneefield: ENTITY
             Knee field strength as mammos_entity.Entity
         """
-        # value that magnetization is supposed to have at knee-point
-        Mk = 0.9 * self.remanence.q
-        # find intersections of Hysteresis loop with M=Mk
-        a = droot(self.H.q, self.M.q - Mk)
-        a = np.abs(a)  # get absolute values
-        a = a[1]  # second root should be knee field strength
-        Hk = me.Entity("KneeField", a)
+        s = self.segments()
+        idx0 = np.argsort(self.M.q[s[0] : s[1]])
+        Hk0 = np.interp(
+            self.remanence.q * 0.9,
+            self.M.q[s[0] : s[1]][idx0],
+            self.H.q[s[0] : s[1]][idx0],
+        )
+        if len(s) >= 5:
+            idx1 = np.argsort(self.M.q[s[2] : s[3]])
+            Hk1 = np.interp(
+                self.remanence.q * -0.9,
+                self.M.q[s[2] : s[3]][idx1],
+                self.H.q[s[2] : s[3]][idx1],
+            )
+            Hk = me.Entity("KneeField", max(np.abs(Hk) for Hk in [Hk0, Hk1]))
+        else:
+            Hk = me.Entity("KneeField", Hk0)
         return Hk
 
     def _calc_squareness(self):
@@ -406,7 +356,7 @@ class VSM:
         Tc = me.Entity("CurieTemperature", Tc)
         return Tc
 
-    def segments(self, kernel_size=10, edge=0.01):
+    def segments(self, edge=0.05):
         r"""
         Find indices of segmentation points which can be used to seperate each
         measurement segment from each other. The segments are seperated by a
@@ -449,13 +399,12 @@ class VSM:
         t = self.t.q
         h = self.H.q
         m = self.M.q
-        # smooth H(t) to make sure only one index per peak is found
-        if kernel_size is not None:
-            kernel = np.ones(kernel_size) / kernel_size
-            h = np.convolve(h, kernel, mode="same")
-        r = np.nonzero(np.diff(np.sign(m)))[0] + 2  # roots
-        p = np.nonzero(np.diff(np.sign(np.diff(h))))[0] + 1  # peaks
-        s = np.sort(np.append(r, p))  # all segmentation points
+        # find all roots
+        r = np.nonzero(np.diff(np.sign(m)))[0] + 2
+        # find peaks, we know that they must be higher than 3e6 A/m and far apart
+        p = find_peaks(np.abs(h), distance=100, height=3e6)[0]
+        # all segmentation points
+        s = np.sort(np.append(r, p))
         # discard segmentation points if they're very close to start
         s = s[len(s[s < (edge * len(t))]) :]
         # discard segmentation points if they're very close to end
