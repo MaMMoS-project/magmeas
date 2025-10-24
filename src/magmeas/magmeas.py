@@ -334,25 +334,21 @@ class VSM:
         Tc: ENTITY
             Curie-Temperature as mammos_entity.Entity
         """
-        # norm the magnetization to positive values between 0 and 1
-        # we are only interested in Tc, absolute moments don't matter
-        nM = np.abs(self.M.q) / np.max(np.abs(self.M.q))
-
-        # let's only look at M(T) during cooling, this is usually more reliable
-        # cooling is assumed to occur after half of the measurement time
-        # also cut off last couple of measurement points as they are unstable
-        selec = (self.t.q > np.max(self.t.q) * 0.5) * (
-            self.t.q < np.max(self.t.q) * 0.9
-        )
-        nM = nM[selec]
-        T = self.T.q[selec]
-        # generous kernel for smoothing
-        kernel = np.ones(20) / 20
-        # smooth measurement by convolution with kernel
-        sT = np.convolve(T, kernel, mode="valid")
-        sM = np.convolve(nM, kernel, mode="valid")
-        # Tc is temperature where dM/dT has minimum
-        Tc = sT[np.argmin(np.gradient(sM) / np.gradient(sT))]
+        M = self.M.q
+        T = self.T.q
+        # crop off measurement edges, where extreme noise usually occurs
+        cM = M[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
+        cT = T[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
+        # calculate dM/dT and smooth generously
+        dmdT = np.convolve(np.gradient(cM) / np.gradient(cT), np.ones(20) / 20, "same")
+        # norm dM/dT to values between -1 and 1
+        ndmdT = dmdT / np.max(np.abs(dmdT))
+        # find peaks in normed dM/dT
+        p = find_peaks(np.abs(ndmdT), distance=20, width=20, height=0.1)[0]
+        # sort peaks
+        Tc = np.sort(cT[p])
+        # pass all peaks of normed dM/dT to Curie-Temperature
+        # the user should decide themselves, whether heating or cooling is used
         Tc = me.Entity("CurieTemperature", Tc)
         return Tc
 
@@ -504,12 +500,21 @@ class VSM:
         -------
         None.
         """
-        fig, ax = plt.subplots()
+        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
 
-        ax.plot(self.T.q, self.M.q)
+        ax1.plot(self.T.q, self.M.q)
+        ax1.set_ylabel(f"Magnetization in {self.M.unit}")
 
-        ax.set_xlabel(f"Temperature in {self.T.unit}")
-        ax.set_ylabel(f"Magnetization in {self.M.unit}")
+        M = self.M.q
+        T = self.T.q
+        # crop off measurement edges, where extreme noise usually occurs
+        cM = M[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
+        cT = T[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
+        # calculate dM/dT and smooth generously
+        dmdT = np.convolve(np.gradient(cM) / np.gradient(cT), np.ones(20) / 20, "same")
+        ax2.plot(cT, dmdT)
+        ax2.set_ylabel("$\\frac{dM}{dT}$")
+        ax2.set_xlabel(f"Temperature in {self.T.unit}")
 
         if filepath is not None:
             fig.savefig(filepath, dpi=300)
