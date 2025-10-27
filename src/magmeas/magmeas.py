@@ -579,7 +579,7 @@ class VSM:
         for key in properties:
             print(f"{key} = {properties[key][0]}")
 
-    def to_hdf5(self, unit="T"):
+    def to_hdf5(self):
         """
         Save contents of .DAT-file and calculated properties in hdf5 file.
 
@@ -615,22 +615,23 @@ class VSM:
                     f.create_dataset("Data/" + i, data=[str(j) for j in df[i]])
 
             if self.measurement == "M(H)":
-                f.create_dataset(
-                    "Properties/Remanence", data=self.remanence.q.to(unit).value
-                )
-                f["Properties/Remanence"].attrs["unit"] = unit
-                f.create_dataset(
-                    "Properties/Coercivity", data=self.coercivity.q.to(unit).value
-                )
-                f["Properties/Coercivity"].attrs["unit"] = unit
-                f.create_dataset(
-                    "Properties/BHmax", data=self.BHmax.q.to(mu.kJ / mu.m**3)
-                )
-                f["Properties/BHmax"].attrs["unit"] = "kJ/m^3"
+                f.create_dataset("Properties/Remanence", data=self.remanence.value)
+                f["Properties/Remanence"].attrs["unit"] = str(self.remanence.unit)
+                f["Properties/Remanence"].attrs["IRI"] = self.remanence.ontology.iri
+                f.create_dataset("Properties/Coercivity", data=self.coercivity.value)
+                f["Properties/Coercivity"].attrs["unit"] = str(self.coercivity.unit)
+                f["Properties/Coercivity"].attrs["IRI"] = self.coercivity.ontology.iri
+                f.create_dataset("Properties/BHmax", data=self.BHmax.value)
+                f["Properties/BHmax"].attrs["unit"] = str(self.BHmax.unit)
+                f["Properties/BHmax"].attrs["IRI"] = self.BHmax.ontology.iri
+                f.create_dataset("Properties/KneeField", data=self.kneefield.value)
+                f["Properties/KneeField"].attrs["unit"] = str(self.kneefield.unit)
+                f["Properties/KneeField"].attrs["IRI"] = self.kneefield.ontology.iri
                 f.create_dataset("Properties/Squareness", data=self.squareness)
             elif self.measurement == "M(T)":
-                f.create_dataset("Properties/Tc", data=self.Tc.q.value)
-                f["Properties/Tc"].attrs["unit"] = "K"
+                f.create_dataset("Properties/Tc", data=self.Tc.value)
+                f["Properties/Tc"].attrs["unit"] = str(self.Tc.unit)
+                f["Properties/Tc"].attrs["IRI"] = self.Tc.ontology.iri
 
 
 def plot_multiple_VSM(data, filepath=None, labels=None, demag=True):
