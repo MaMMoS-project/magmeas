@@ -1,18 +1,18 @@
 # magmeas
 
 Python module that enables the import and handling of VSM-data acquired on a Quantum Design PPMS measurement system.
-Extrinsic magnetic properties can be calculated from M(H) hysteresis loops and exported to JSON- or CSV-files.
+Extrinsic magnetic properties can be calculated from M(H) hysteresis loops and exported to YAML- or CSV-files.
+The automatic handling of M(H)-measurements is mainly optimised for permanent magnets.
 Automatic plotting with matplotlib is also available.
-The same functionality is available for M(T) measurements, although it can only be used for measurements
-containing a single Curie-temperature and great care should be taken.
+The same functionality is available for M(T) measurements, although greater care should be taken.
+Manual inspection of the derived properties ist always encouraged.
 
 ## Installation
 
-Please clone or download this repository and install with pip.
+Just install with pip:
 
 ```bash
-cd magmeas
-pip install .
+pip install magmeas
 ```
 
 ## Usage

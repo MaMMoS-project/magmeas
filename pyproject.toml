@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "magmeas"
-description = "Functionality for handling magnetometry data."
+description = "Functionality for handling magnetometry data of permanent magnets."
 requires-python = ">= 3.6"
 dependencies = [
     "numpy",
@@ -37,7 +37,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 dev = [
     "ruff",
-    "pre-commit >= 1.16",
+    "pre-commit >= 1.16"
 ]
 
 [tool.ruff.lint]
