@@ -377,10 +377,6 @@ class VSM:
 
         Parameters
         ----------
-        kernel_size: INT, optional
-            Width of smoothing kernel to be used to make sure, that noise in
-            measurement does not accidentally introduce more segments than
-            needed. The default is 10. Set to None for no smoothing.
         edge: FLOAT, optional
             Percentage of measurement to be treated as edge. Default is 0.01,
             which means that segmentation points closer than 1 % of the total
@@ -718,6 +714,7 @@ def mult_properties_to_file(data, filepath, labels=None):
     -------
     None
     """
+    filepath = Path(filepath)
     file_ext = filepath.name.split(".")[1].lower()
     if labels is not None and any(file_ext == e for e in ["yaml", "yml"]):
         description = labels
