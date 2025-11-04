@@ -111,7 +111,7 @@ mm.mult_properties_to_txt("properties.txt", [dat1, dat2], ["Measurement 1", "Mea
 * mammos-entity
 * mammos-analysis
 
-Requires Python >= 3.6 because f-strings are used
+Requires Python >= 3.11 due to dependencies
 
 ### Code Archive
 
