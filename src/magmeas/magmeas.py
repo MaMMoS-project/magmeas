@@ -225,9 +225,27 @@ class VSM:
         # import measurement data
         df = pd.read_csv(self.path, skiprows=34, encoding="cp1252")
         # extract magnetic moment
+        # first, let's find the unit of the magnetic moment
+        for col in df.columns:
+            start_idx = col.find("Moment (")
+            if start_idx != -1:
+                start_idx = col.find("(") + 1
+                end_idx = col.find(")")
+                m_unit = col[start_idx:end_idx]
+        # if the unit is declared as 'emu', we need to specify it explicitly
+        # since emu is ambiguous and thus not included in mammos-units
+        if m_unit == "emu":
+            m = np.array(df["Moment (emu)"]) * mu.erg / mu.G
+        elif m_unit == "Am2":
+            m = np.array(df["Moment (Am2)"]) * mu.A * mu.m**2
         # So far this is only a Quantity and no Entity because the wrong unit
         # seems to be defined for the me.Entity('MagneticMoment')
-        m = np.array(df["Moment (emu)"]) * mu.erg / mu.G
+        else:
+            raise ValueError(
+                "Unit of magnetic moment seems to be neither emu,"
+                " nor Am2. Other units are not supported."
+            )
+
         # extract external magnetic field
         eH = me.Entity(
             "ExternalMagneticField", np.array(df["Magnetic Field (Oe)"]) * mu.Oe
