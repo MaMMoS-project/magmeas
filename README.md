@@ -7,6 +7,14 @@ Automatic plotting with matplotlib is also available.
 The same functionality is available for M(T) measurements, although greater care should be taken.
 Manual inspection of the derived properties ist always encouraged.
 
+
+| Description   | Badge |
+|---------------|-------|
+| Tests         | [![Test package](https://github.com/MaMMoS-project/magmeas/actions/workflows/test.yml/badge.svg)](https://github.com/MaMMoS-project/magmeas/actions/workflows/test.yml) |
+| Releases      | [![PyPI version](https://badge.fury.io/py/magmeas.svg)](https://badge.fury.io/py/magmeas) |
+| License       | [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) |
+| DOI           | [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15782457.svg)](https://doi.org/10.5281/zenodo.15782457) |
+
 ## Installation
 
 Just install with pip:
@@ -97,22 +105,18 @@ dat2 = mm.VSM("file2.DAT", read_method="manual")
 dat1.plot("file1_plot.png")
 dat2.properties_to_file("file2_properties.yaml")
 
-mm.plot_multiple_VSM([dat1, dat2], ["Measurement 1", "Measurement 2"])
-mm.mult_properties_to_txt("properties.txt", [dat1, dat2], ["Measurement 1", "Measurement 2"])
+mm.plot_multiple_VSM([dat1, dat2], labels=["Measurement 1", "Measurement 2"])
+mm.mult_properties_to_file([dat1, dat2], "properties.txt", ["Measurement 1", "Measurement 2"])
 ```
 
 
 ## Dependencies
-* NumPy
-* Pandas
-* Matplotlib
-* SciPy
-* h5py
-* mammos-entity
-* mammos-analysis
+* [NumPy](https://numpy.org/)
+* [Pandas](https://pandas.pydata.org/)
+* [Matplotlib](https://matplotlib.org/)
+* [SciPy](https://scipy.org/)
+* [h5py](https://www.h5py.org/)
+* [mammos-entity](https://mammos-project.github.io/mammos/index.html)
+* [mammos-analysis](https://mammos-project.github.io/mammos/index.html)
 
 Requires Python >= 3.11 due to dependencies
-
-### Code Archive
-
-This repository is archived on Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15782457.svg)](https://doi.org/10.5281/zenodo.15782457)
