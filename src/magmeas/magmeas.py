@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from mammos_analysis.hysteresis import extrinsic_properties
 from scipy.signal import find_peaks
+from scipy.stats import linregress
 
 from magmeas.utils import rextract
 
@@ -370,6 +371,60 @@ class VSM:
         Tc = me.Entity("CurieTemperature", Tc)
         return Tc
 
+    def estimate_saturation(self, threshold=None):
+        """
+        Calculate an estimation of the saturation magnetisation, return it and
+        simultaneously assign it to the VSM object. A possible high field
+        susceptibility can optionally be corrected for.
+
+        Parameters
+        ----------
+        threshold: NONE | FLOAT, optional
+            If a float instead of None is given, the saturation value will be
+            corrected for a high field susceptibility by substracting any
+            inclination at magnetisation values above the maximum field times
+            the threshold factor. The saturation magnetisation is then the
+            y-intersection from extrapolating M over 1/H to 0.
+            Default value is None.
+
+        Returns
+        -------
+        Ms: ENTITY
+            Saturation magnetisation as SpontaneousMagnetization.
+        """
+        if self.measurement == "M(T)":
+            raise Exception("Saturation cannot be calculated from M(T) measurement.")
+
+        if threshold is None:
+            Ms = []
+            for segment_num in range(0, len(self.segments()), 2):
+                start_idx = self.segments()[segment_num]
+                if start_idx == max(self.segments()):
+                    end_idx = None
+                else:
+                    end_idx = self.segments()[segment_num + 1]
+                Ms.append(max(np.abs(self.M.q[start_idx:end_idx])))
+
+        if threshold is not None:
+            Ms = []
+            for segment_num in range(0, len(self.segments()), 2):
+                start_idx = self.segments()[segment_num]
+                if start_idx == max(self.segments()):
+                    end_idx = None
+                else:
+                    end_idx = self.segments()[segment_num + 1]
+
+            H = np.abs(self.H.q[start_idx:end_idx])
+            M = np.abs(self.M.q[start_idx:end_idx])
+            filt = np.max(H) * threshold < H
+            linreg1 = linregress(H[filt], M[filt])
+            linreg2 = linregress(1 / H[filt], M[filt] - H[filt] * linreg1.slope)
+            Ms.append(linreg2.intercept * mu.A / mu.m)
+
+        Ms = me.Entity("SpontaneousMagnetization", max(Ms))
+        self.saturation = Ms
+        return Ms
+
     def segments(self, edge=0.05):
         r"""
         Find indices of segmentation points which can be used to seperate each
@@ -672,6 +727,12 @@ def plot_multiple_VSM(data, filepath=None, labels=None, demag=True):
     -------
     None
     """
+    if any(d.measurement != "M(H)" for d in data):
+        raise Exception(
+            "Different measurement types cannot be exported together."
+            "This function is currently only supported for several"
+            " M(H) measurements."
+        )
     if labels is None:
         labels = [vsm.path.stem for vsm in data]
 
@@ -732,6 +793,11 @@ def mult_properties_to_file(data, filepath, labels=None):
     -------
     None
     """
+    if any(vsm.measurement != data[0].measurement for vsm in data):
+        raise Exception(
+            "VSM objects are incompatible. Please make sure\
+                         not to mix M(H) and M(T) measurements during export."
+        )
     filepath = Path(filepath)
     file_ext = filepath.name.split(".")[1].lower()
     if labels is not None and any(file_ext == e for e in ["yaml", "yml"]):
@@ -761,9 +827,4 @@ def mult_properties_to_file(data, filepath, labels=None):
             filepath,
             description,
             Tc=me.Entity("CurieTemperature", [vsm.Tc.q for vsm in data]),
-        )
-    else:
-        raise Exception(
-            "VSM objects are incompatible. Please make sure\
-                         not to mix M(H) and M(T) measurements during export."
         )
