@@ -610,10 +610,20 @@ class VSM:
             description = self.path.stem
         if label is not None:
             description = label
-        if self.measurement == "M(H)":
+        if self.measurement == "M(H)" and ~hasattr(self, "saturation"):
             me.io.entities_to_file(
                 filepath,
                 description,
+                Mr=self.remanence,
+                Hc=self.coercivity,
+                BHmax=self.BHmax,
+                Hk=self.kneefield,
+            )
+        elif self.measurement == "M(H)" and hasattr(self, "saturation"):
+            me.io.entities_to_file(
+                filepath,
+                description,
+                Ms=self.saturation,
                 Mr=self.remanence,
                 Hc=self.coercivity,
                 BHmax=self.BHmax,
@@ -813,7 +823,23 @@ def mult_properties_to_file(data, filepath, labels=None):
         for label in [vsm.path.stem for vsm in data]:
             description = description + label + "\n"
 
-    if all([vsm.measurement == "M(H)" for vsm in data]):
+    if all([vsm.measurement == "M(H)" for vsm in data]) and all(
+        [hasattr(vsm, "saturation") for vsm in data]
+    ):
+        me.io.entities_to_file(
+            filepath,
+            description,
+            Ms=me.Entity(
+                "SpontaneousMagnetization", [vsm.saturation.q for vsm in data]
+            ),
+            Mr=me.Entity("Remanence", [vsm.remanence.q for vsm in data]),
+            Hc=me.Entity("CoercivityHc", [vsm.coercivity.q for vsm in data]),
+            BHmax=me.Entity("MaximumEnergyProduct", [vsm.BHmax.q for vsm in data]),
+            Hk=me.Entity("KneeField", [vsm.kneefield.q for vsm in data]),
+        )
+    elif all([vsm.measurement == "M(H)" for vsm in data]) and any(
+        [~hasattr(vsm, "saturation") for vsm in data]
+    ):
         me.io.entities_to_file(
             filepath,
             description,
