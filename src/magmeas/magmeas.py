@@ -54,6 +54,10 @@ class VSM:
     segments()
         Find indices of segmentation points which can be used to seperate each
         measurement segment from each other.
+    estimate_saturation()
+        Calculate an estimation of the saturation magnetisation, return it and
+        simultaneously assign it to the VSM object. A possible high field
+        susceptibility can optionally be corrected for.
     plot()
         Plot data according to measurement type, optionally saves as png.
     properties_to_file()
