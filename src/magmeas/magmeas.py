@@ -79,12 +79,17 @@ class VSM:
         else:
             self.measurement = "unknown"
 
+        # Check, whether Mr and Hc exists, don't calculate properties otherwise
+        if self.measurement == "M(H)" and (len(self.segments()) <= 1):
+            calc_properties = False
+
         # calculate properties
         if calc_properties and self.measurement == "M(H)":
             s = self.segments()
-            idx0 = np.argsort(self.H.q[s[0] : s[2]])
+            start_idx, end_idx = s[0:2]
+            idx0 = np.argsort(self.H.q[start_idx:end_idx])
             prop0 = extrinsic_properties(
-                self.H.q[s[0] : s[2]][idx0], self.M.q[s[0] : s[2]][idx0], 0
+                self.H.q[start_idx:end_idx][idx0], self.M.q[start_idx:end_idx][idx0], 0
             )
             if len(s) >= 5:
                 idx1 = np.argsort(self.H.q[s[2] : s[4]])
@@ -813,16 +818,16 @@ def mult_properties_to_file(data, filepath, labels=None):
                          not to mix M(H) and M(T) measurements during export."
         )
     filepath = Path(filepath)
-    file_ext = filepath.name.split(".")[1].lower()
-    if labels is not None and any(file_ext == e for e in ["yaml", "yml"]):
+    file_ext = filepath.suffix
+    if labels is not None and any(file_ext == e for e in [".yaml", ".yml"]):
         description = labels
-    if labels is None and any(file_ext == e for e in ["yaml", "yml"]):
+    if labels is None and any(file_ext == e for e in [".yaml", ".yml"]):
         description = [vsm.path.stem for vsm in data]
-    if labels is not None and file_ext == "csv":
+    if labels is not None and file_ext == ".csv":
         description = ""
         for label in labels:
             description = description + label + "\n"
-    if labels is None and file_ext == "csv":
+    if labels is None and file_ext == ".csv":
         description = ""
         for label in [vsm.path.stem for vsm in data]:
             description = description + label + "\n"
@@ -833,13 +838,11 @@ def mult_properties_to_file(data, filepath, labels=None):
         me.io.entities_to_file(
             filepath,
             description,
-            Ms=me.Entity(
-                "SpontaneousMagnetization", [vsm.saturation.q for vsm in data]
-            ),
-            Mr=me.Entity("Remanence", [vsm.remanence.q for vsm in data]),
-            Hc=me.Entity("CoercivityHc", [vsm.coercivity.q for vsm in data]),
-            BHmax=me.Entity("MaximumEnergyProduct", [vsm.BHmax.q for vsm in data]),
-            Hk=me.Entity("KneeField", [vsm.kneefield.q for vsm in data]),
+            Ms=me.concat_flat([vsm.saturation for vsm in data]),
+            Mr=me.concat_flat([vsm.remanence for vsm in data]),
+            Hc=me.concat_flat([vsm.coercivity for vsm in data]),
+            BHmax=me.concat_flat([vsm.BHmax for vsm in data]),
+            Hk=me.concat_flat([vsm.kneefield for vsm in data]),
         )
     elif all([vsm.measurement == "M(H)" for vsm in data]) and any(
         [~hasattr(vsm, "saturation") for vsm in data]
@@ -847,14 +850,14 @@ def mult_properties_to_file(data, filepath, labels=None):
         me.io.entities_to_file(
             filepath,
             description,
-            Mr=me.Entity("Remanence", [vsm.remanence.q for vsm in data]),
-            Hc=me.Entity("CoercivityHc", [vsm.coercivity.q for vsm in data]),
-            BHmax=me.Entity("MaximumEnergyProduct", [vsm.BHmax.q for vsm in data]),
-            Hk=me.Entity("KneeField", [vsm.kneefield.q for vsm in data]),
+            Mr=me.concat_flat([vsm.remanence for vsm in data]),
+            Hc=me.concat_flat([vsm.coercivity for vsm in data]),
+            BHmax=me.concat_flat([vsm.BHmax for vsm in data]),
+            Hk=me.concat_flat([vsm.kneefield for vsm in data]),
         )
     elif all([vsm.measurement == "M(T)" for vsm in data]):
         me.io.entities_to_file(
             filepath,
             description,
-            Tc=me.Entity("CurieTemperature", [vsm.Tc.q for vsm in data]),
+            Tc=me.concat_flat([vsm.Tc for vsm in data]),
         )
