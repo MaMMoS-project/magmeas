@@ -423,12 +423,12 @@ class VSM:
                 else:
                     end_idx = self.segments()[segment_num + 1]
 
-            H = np.abs(self.H.q[start_idx:end_idx])
-            M = np.abs(self.M.q[start_idx:end_idx])
-            filt = np.max(H) * threshold < H
-            linreg1 = linregress(H[filt], M[filt])
-            linreg2 = linregress(1 / H[filt], M[filt] - H[filt] * linreg1.slope)
-            Ms.append(linreg2.intercept * mu.A / mu.m)
+                H = np.abs(self.H.q[start_idx:end_idx])
+                M = np.abs(self.M.q[start_idx:end_idx])
+                filt = np.max(H) * threshold < H
+                linreg1 = linregress(H[filt], M[filt])
+                linreg2 = linregress(1 / H[filt], M[filt] - H[filt] * linreg1.slope)
+                Ms.append(linreg2.intercept * mu.A / mu.m)
 
         Ms = me.Entity("SpontaneousMagnetization", max(Ms))
         self.saturation = Ms
