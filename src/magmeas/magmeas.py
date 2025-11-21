@@ -463,7 +463,7 @@ class VSM:
         Parameters
         ----------
         edge: FLOAT, optional
-            Percentage of measurement to be treated as edge. Default is 0.01,
+            Percentage of measurement to be treated as edge. Default is 0.05,
             which means that segmentation points closer than 1 % of the total
             measurement width to the edges will be discarded.
 
@@ -474,12 +474,12 @@ class VSM:
             measurement.
         """
         t = self.t.q
-        h = self.H.q
+        h = self.H_ext.q
         m = self.M.q
         # find all roots
         r = np.nonzero(np.diff(np.sign(m)))[0] + 2
         # find peaks, we know that they must be higher than 3e6 A/m and far apart
-        p = find_peaks(np.abs(h), distance=100, height=3e6)[0]
+        p = find_peaks(np.abs(h), distance=10, height=50)[0]
         # all segmentation points
         s = np.sort(np.append(r, p))
         # discard segmentation points if they're very close to start
