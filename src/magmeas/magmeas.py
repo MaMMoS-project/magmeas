@@ -26,6 +26,8 @@ class VSM:
     ----------
     H: ENTITY
         Internal magnetic field as mammos_entity.Entity
+    H_ext: ENTITY
+        External magnetic field as mammos_entity.Entity
     M: ENTITY
         Magnetization as mammos_entity.Entity
     T: ENTITY
@@ -273,6 +275,7 @@ class VSM:
         nanfilter = ~np.isnan(H.q) * ~np.isnan(M.q) * ~np.isnan(T.q) * ~np.isnan(t.q)
         # delete all datapoints where H, M, T or t are nan and assign them to object
         self.H = me.Entity(H.ontology_label, H.q.to("A/m")[nanfilter])
+        self.H_ext = me.Entity(eH.ontology_label, eH.q.to("A/m")[nanfilter])
         self.M = me.Entity(M.ontology_label, M.q.to("A/m")[nanfilter])
         self.T = me.Entity(T.ontology_label, T.q[nanfilter])
         # convert time stamp to time since measurement start
