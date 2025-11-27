@@ -622,7 +622,7 @@ class VSM:
             description = self.path.stem
         if label is not None:
             description = label
-        if self.measurement == "M(H)" and ~hasattr(self, "saturation"):
+        if self.measurement == "M(H)" and not hasattr(self, "saturation"):
             me.io.entities_to_file(
                 filepath,
                 description,
@@ -848,7 +848,7 @@ def mult_properties_to_file(data, filepath, labels=None):
             Hk=me.concat_flat([vsm.kneefield for vsm in data]),
         )
     elif all([vsm.measurement == "M(H)" for vsm in data]) and any(
-        [~hasattr(vsm, "saturation") for vsm in data]
+        [not hasattr(vsm, "saturation") for vsm in data]
     ):
         me.io.entities_to_file(
             filepath,
