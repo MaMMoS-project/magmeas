@@ -683,7 +683,7 @@ class VSM:
         None.
 
         """
-        with open(self.path) as f:
+        with open(self.path, encoding="cp1252") as f:
             s = str(f.read(-1))
         head = s[s.index("INFO") : s.rindex("\nDATATYPE")]
         head = head.split("\n")

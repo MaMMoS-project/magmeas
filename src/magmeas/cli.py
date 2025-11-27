@@ -107,5 +107,6 @@ def cli():
             if args.plot:
                 export_path = p_dat.joinpath(p_dat.stem + "_plot.png")
                 plot_multiple_VSM(data, export_path)
-            # if args.hdf5:
-            #     vsm_dat.to_hdf5()
+            if args.hdf5:
+                for vsm in data:
+                    vsm.to_hdf5()
