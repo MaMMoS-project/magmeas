@@ -114,8 +114,17 @@ class VSM:
 
             self.kneefield = self._calc_kneefield()
             self.squareness = self._calc_squareness()
+
+            self.properties = {'Mr': self.remanence,
+                               'Hc': self.coercivity,
+                               'BHmax': self.BHmax,
+                               'Hk': self.kneefield,
+                               'S': self.squareness}
+
         elif calc_properties and self.measurement == "M(T)":
             self.Tc = self._calc_Tc()
+
+            self.properties = {'Tc': self.Tc}
 
     def _demag_prism(self, dim):
         r"""
@@ -435,6 +444,7 @@ class VSM:
 
         Ms = me.Entity("SpontaneousMagnetization", max(Ms))
         self.saturation = Ms
+        self.properties['Ms'] = Ms
         return Ms
 
     def segments(self, edge=0.05):
@@ -622,27 +632,8 @@ class VSM:
             description = self.path.stem
         if label is not None:
             description = label
-        if self.measurement == "M(H)" and not hasattr(self, "saturation"):
-            me.io.entities_to_file(
-                filepath,
-                description,
-                Mr=self.remanence,
-                Hc=self.coercivity,
-                BHmax=self.BHmax,
-                Hk=self.kneefield,
-            )
-        elif self.measurement == "M(H)" and hasattr(self, "saturation"):
-            me.io.entities_to_file(
-                filepath,
-                description,
-                Ms=self.saturation,
-                Mr=self.remanence,
-                Hc=self.coercivity,
-                BHmax=self.BHmax,
-                Hk=self.kneefield,
-            )
-        elif self.measurement == "M(T)":
-            me.io.entities_to_file(filepath, description, Tc=self.Tc)
+
+        me.io.entities_to_file(filepath, description, **self.properties)
 
     def print_properties(self, unit="T"):
         """
