@@ -53,6 +53,7 @@ dat1.properties_to_file("file1_properties.yaml")
 
 mm.plot_multiple_VSM([dat1, dat2], labels=["Measurement 1", "Measurement 2"])
 mm.mult_properties_to_file([dat1, dat2], "properties.txt", ["Measurement 1", "Measurement 2"])
+```
 
 ### Command line
 
