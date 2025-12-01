@@ -39,7 +39,7 @@ is assumed to be m / (a * b * c)
 ### Python
 
 The main functionality is handled over the class magmeas.VSM and the two functions magmeas.mult_properties_to_file and plot_multiple_VSM which take VSM-objects as arguments.
-Documentation is mainly available in the form of detailed docstrings. Just use `help(magmeas.VSM)´ or similar to get more information. Some examples:
+Documentation is mainly available in the form of detailed docstrings. Just use `help(magmeas.VSM)` or similar to get more information. Some examples:
 
 ```python
 import magmeas as mm
