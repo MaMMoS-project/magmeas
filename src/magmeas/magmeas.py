@@ -88,43 +88,28 @@ class VSM:
         # calculate properties
         if calc_properties and self.measurement == "M(H)":
             s = self.segments()
-            start_idx, end_idx = s[0:2]
-            idx0 = np.argsort(self.H.q[start_idx:end_idx])
-            prop0 = extrinsic_properties(
-                self.H.q[start_idx:end_idx][idx0], self.M.q[start_idx:end_idx][idx0], 0
-            )
-            if len(s) >= 5:
-                idx1 = np.argsort(self.H.q[s[2] : s[4]])
-                prop1 = extrinsic_properties(
-                    self.H.q[s[2] : s[4]][idx1], self.M.q[s[2] : s[4]][idx1], 0
-                )
-                self.remanence = me.Entity("Remanence", max([prop0.Mr.q, prop1.Mr.q]))
-                self.coercivity = me.Entity(
-                    "CoercivityHc", max([prop0.Hc.q, prop1.Hc.q])
-                )
-                self.BHmax = me.Entity(
-                    "MaximumEnergyProduct",
-                    max([prop0.BHmax.q, prop1.BHmax.q]),
-                    "kJ / m3",
-                )
-            else:
-                self.remanence = prop0.Mr
-                self.coercivity = prop0.Hc
-                self.BHmax = me.Entity("MaximumEnergyProduct", prop0.BHmax, "kJ / m3")
+            idx = np.argsort(self.H.q[s[0] : s[1]]) + s[0]
+            prop = extrinsic_properties(self.H.q[idx], self.M.q[idx], 0)
+
+            self.remanence = prop.Mr
+            self.coercivity = prop.Hc
+            self.BHmax = prop.BHmax
 
             self.kneefield = self._calc_kneefield()
             self.squareness = self._calc_squareness()
 
-            self.properties = {'Mr': self.remanence,
-                               'Hc': self.coercivity,
-                               'BHmax': self.BHmax,
-                               'Hk': self.kneefield,
-                               'S': self.squareness}
+            self.properties = {
+                "Mr": self.remanence,
+                "Hc": self.coercivity,
+                "BHmax": self.BHmax,
+                "Hk": self.kneefield,
+                "S": self.squareness,
+            }
 
         elif calc_properties and self.measurement == "M(T)":
             self.Tc = self._calc_Tc()
 
-            self.properties = {'Tc': self.Tc}
+            self.properties = {"Tc": self.Tc}
 
     def _demag_prism(self, dim):
         r"""
@@ -444,7 +429,7 @@ class VSM:
 
         Ms = me.Entity("SpontaneousMagnetization", max(Ms))
         self.saturation = Ms
-        self.properties['Ms'] = Ms
+        self.properties["Ms"] = Ms
         return Ms
 
     def segments(self, edge=0.05):
