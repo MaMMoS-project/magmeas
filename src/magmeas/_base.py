@@ -12,7 +12,7 @@ from mammos_analysis.hysteresis import extrinsic_properties
 from scipy.signal import find_peaks
 from scipy.stats import linregress
 
-from magmeas.utils import rextract
+from magmeas._utils import rextract
 
 mu.set_enabled_equivalencies(mu.magnetic_flux_field())
 
@@ -30,86 +30,26 @@ class VSM:
         External magnetic field as mammos_entity.Entity
     M: ENTITY
         Magnetization as mammos_entity.Entity
+    m: Quantity
+        Magnetic Moment as mammos_units.Quantity
     T: ENTITY
         Absolute temperature as mammos_entity.Entity
     t: ENTITY
         Time as mammos_entity.Entity
     D: ENTITY
         Demagnetizing factor as mammos_entity.Entity
-    remanence: ENTITY
-        Remanent magnetization as mammos_entity.Entity
-    coercivity: ENTITY
-        Internal coercive field as mammos_entity.Entity
-    BHmax: ENTITY
-        Maximum energy product as mammos_entity.Entity
-    kneefield: ENTITY
-        Knee field as mammos_entity.Entity, see ontology
-    squareness: FLOAT
-        Squareness as kneefield / coercivity
-    Tc: ENTITY
-        Curie-temperature as mammos_entity.Entity
 
     Methods
     -------
     load_qd()
         Load VSM-data from a quantum design .DAT file
-    segments()
-        Find indices of segmentation points which can be used to seperate each
-        measurement segment from each other.
-    estimate_saturation()
-        Calculate an estimation of the saturation magnetisation, return it and
-        simultaneously assign it to the VSM object. A possible high field
-        susceptibility can optionally be corrected for.
-    plot()
-        Plot data according to measurement type, optionally saves as png.
-    properties_to_file()
-        Save all properties derived from the VSM-measurement to CSV-file or to
-        YAML file, using the mammos-entity io functionality.
     to_hdf5()
         Save contents of .DAT-file and calculated properties in hdf5 file.
     """
 
-    def __init__(self, datfile, read_method="auto", calc_properties=True):
+    def __init__(self, datfile, read_method="auto"):
         # import data
         self.load_qd(datfile, read_method=read_method)
-
-        # Determine type of measurement
-        if self._H_var and not self._T_var:
-            self.measurement = "M(H)"
-        elif self._T_var:
-            self.measurement = "M(T)"
-        else:
-            self.measurement = "unknown"
-
-        # Check, whether Mr and Hc exists, don't calculate properties otherwise
-        if self.measurement == "M(H)" and (len(self.segments()) <= 1):
-            calc_properties = False
-
-        # calculate properties
-        if calc_properties and self.measurement == "M(H)":
-            s = self.segments()
-            idx = np.argsort(self.H.q[s[0] : s[1]]) + s[0]
-            prop = extrinsic_properties(self.H.q[idx], self.M.q[idx], 0)
-
-            self.remanence = prop.Mr
-            self.coercivity = prop.Hc
-            self.BHmax = prop.BHmax
-
-            self.kneefield = self._calc_kneefield()
-            self.squareness = self._calc_squareness()
-
-            self.properties = {
-                "Mr": self.remanence,
-                "Hc": self.coercivity,
-                "BHmax": self.BHmax,
-                "Hk": self.kneefield,
-                "S": self.squareness,
-            }
-
-        elif calc_properties and self.measurement == "M(T)":
-            self.Tc = self._calc_Tc()
-
-            self.properties = {"Tc": self.Tc}
 
     def _demag_prism(self, dim):
         r"""
@@ -266,19 +206,25 @@ class VSM:
         t = me.Entity("Time", np.array(df["Time Stamp (sec)"]) * mu.s)
 
         # test datapoints for missing values (where value is nan)
-        nanfilter = ~np.isnan(H.q) * ~np.isnan(M.q) * ~np.isnan(T.q) * ~np.isnan(t.q)
-        # delete all datapoints where H, M, T or t are nan and assign them to object
+        # H is derived from H_ext, and m so this is sufficient to test both
+        nanfilter = ~np.isnan(H.q) * ~np.isnan(T.q) * ~np.isnan(t.q)
+        # delete all datapoints where H_ext, m, T or t are nan and assign them
         self.H = me.Entity(H.ontology_label, H.q.to("A/m")[nanfilter])
         self.H_ext = me.Entity(eH.ontology_label, eH.q.to("A/m")[nanfilter])
         self.M = me.Entity(M.ontology_label, M.q.to("A/m")[nanfilter])
+        self.m = mu.Quantity(m.to("A m2")[nanfilter])
         self.T = me.Entity(T.ontology_label, T.q[nanfilter])
         # convert time stamp to time since measurement start
         self.t = me.Entity(t.ontology_label, t.q[nanfilter] - t.q[nanfilter][0])
-
-        # Does H vary by more than 10 A/m?
-        self._H_var = (np.max(self.H.q) - np.min(self.H.q)) > 10 * mu.A / mu.m
-        # Does T vary by more than 10 K?
-        self._T_var = (np.max(self.T.q) - np.min(self.T.q)) > 10 * mu.K
+        # collect all measurement data in one dictionary
+        self.measurement_data = {
+            "H": self.H,
+            "H_ext": self.H_ext,
+            "M": self.M,
+            "m": self.m,
+            "T": self.T,
+            "t": self.t,
+        }
 
     def __repr__(self):
         """
@@ -293,6 +239,294 @@ class VSM:
         NONE
         """
         return f"{self.__module__.split('.')[0]}.VSM({self.path.name})"
+
+    def to_hdf5(self):
+        """
+        Save contents of .DAT-file and calculated properties in hdf5 file.
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        None.
+
+        """
+        # read header of .DAT file
+        with open(self.path, encoding="cp1252") as f:
+            s = str(f.read(-1))
+        head = s[s.index("INFO") : s.rindex("\nDATATYPE")]
+        head = head.split("\n")
+        info = {
+            i[i.rindex(",") + 1 :]: i[i.index(",") + 1 : i.rindex(",")] for i in head
+        }
+
+        # read columns of .DAT file as csv
+        df = pd.read_csv(self.path, skiprows=34, encoding="cp1252")
+
+        #  write HDF5
+        hdf5_path = self.path.parent.joinpath(self.path.stem + ".hdf5")
+        with h5py.File(hdf5_path, "a") as f:
+            # write info (header of .DAT) to HDF5
+            for i in info:
+                f.create_dataset("Info/" + i, data=info[i])
+            f["Info/SAMPLE_MASS"].attrs["unit"] = "mg"
+            f["Info/SAMPLE_SIZE"].attrs["unit"] = "mm"
+
+            # write raw data (columns of .DAT) to HDF5
+            for i in df.columns:
+                dat = np.array(df[i])
+                if dat.dtype != "O":
+                    f.create_dataset("RawData/" + i, data=dat)
+                if dat.dtype == "O":
+                    f.create_dataset("RawData/" + i, data=[str(j) for j in df[i]])
+
+            # write derived measurement data (from VSM object) to HDF5
+            for key in self.measurement_data:
+                if isinstance(self.measurement_data[key], me.Entity):
+                    value = self.measurement_data[key].value
+                    unit = str(self.measurement_data[key].unit)
+                    iri = self.measurement_data[key].ontology.iri
+                    f.create_dataset(f"DerivedData/{key}", data=value)
+                    f[f"DerivedData/{key}"].attrs["unit"] = unit
+                    f[f"DerivedData/{key}"].attrs["IRI"] = iri
+
+                elif isinstance(self.measurement_data[key], mu.Quantity):
+                    value = self.measurement_data[key].value
+                    unit = str(self.measurement_data[key].unit)
+                    f.create_dataset(f"DerivedData/{key}", data=value)
+                    f[f"DerivedData/{key}"].attrs["unit"] = unit
+
+                else:
+                    value = self.measurement_data[key].value
+                    f.create_dataset(f"DerivedData/{key}", data=value)
+
+
+class MH(VSM):
+    """
+    Class for importing, storing and using of VSM-data from M(H) measurements.
+
+    Attributes
+    ----------
+    H: ENTITY
+        Internal magnetic field as mammos_entity.Entity
+    H_ext: ENTITY
+        External magnetic field as mammos_entity.Entity
+    M: ENTITY
+        Magnetization as mammos_entity.Entity
+    m: Quantity
+        Magnetic Moment as mammos_units.Quantity
+    T: ENTITY
+        Absolute temperature as mammos_entity.Entity
+    t: ENTITY
+        Time as mammos_entity.Entity
+    D: ENTITY
+        Demagnetizing factor as mammos_entity.Entity
+
+    Methods
+    -------
+    load_qd()
+        Load VSM-data from a quantum design .DAT file
+    plot()
+        Plot data according to measurement type, optionally saves as png.
+    to_hdf5()
+        Save contents of .DAT-file to hdf5 file.
+    """
+
+    def plot(self, filepath=None, label=None):
+        """
+        Plot M(H) measurement and save figure if a filepath is given.
+
+        Parameters
+        ----------
+        filepath: STR | PATH, optional
+            Filepath for saving the figure. Default is None, in that case no
+            file is saved.
+        label: STR, optional
+            Optional label of M(H)-measurement that can be displayed as title.
+            Default is None, in that case no legend is displayed.
+
+        Returns
+        -------
+        None
+        """
+        H = self.H.q.to("T")  # converts H from A/m to Tesla
+        M = self.M.q.to("T")  # converts M from A/m to Tesla
+
+        fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
+        ax1.plot(H, M)
+
+        # format plot
+        ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
+        ax1.set_ylabel(r"$J$ in $T$")
+        if label is not None:
+            ax1.set_title(label)
+
+        # save figure if filepath is given
+        if filepath is not None:
+            fig.savefig(filepath, dpi=300)
+
+
+class _Property_Container:
+    """Abstract parent class that introduces handling of properties."""
+
+    def properties_to_file(self, filepath, label=None):
+        r"""
+        Save all properties derived from the major hysteresis loop
+        to CSV-file or to YAML file, using the mammos-entity io functionality.
+
+        Parameters
+        ----------
+        filepath: STR | PATH
+            Filepyth to save the file to. Ending also determines type of file.
+        label: STR, optional
+            Label to be used in the description of file to be exported to.
+            If none is given then the name of the .DAT file the VSM object was
+            calculated from is used.
+
+        Returns
+        -------
+        None
+        """
+        if label is None:
+            description = self.path.stem
+        if label is not None:
+            description = label
+
+        me.io.entities_to_file(filepath, description, **self.properties)
+
+    def print_properties(self):
+        """
+        Print out properties of VSM object.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        print(f"\n\n{self.path.name}:\n")
+
+        for key in self.properties:
+            print(f"{key} = {self.properties[key]}")
+
+    def to_hdf5(self):
+        """
+        Save contents of .DAT-file and calculated properties in hdf5 file.
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        None.
+
+        """
+        # write contents of .DAT file and derived measurement data to HDF5
+        super().to_hdf5()
+
+        # write properties to HDF5
+        hdf5_path = self.path.parent.joinpath(self.path.stem + ".hdf5")
+        with h5py.File(hdf5_path, "a") as f:
+            for key in self.properties:
+                if isinstance(self.properties[key], me.Entity):
+                    value = self.properties[key].value
+                    unit = str(self.properties[key].unit)
+                    iri = self.properties[key].ontology.iri
+                    f.create_dataset(f"Properties/{key}", data=value)
+                    f[f"Properties/{key}"].attrs["unit"] = unit
+                    f[f"Properties/{key}"].attrs["IRI"] = iri
+
+                elif isinstance(self.properties[key], mu.Quantity):
+                    value = self.properties[key].value
+                    unit = str(self.properties[key].unit)
+                    f.create_dataset(f"Properties/{key}", data=value)
+                    f[f"Properties/{key}"].attrs["unit"] = unit
+
+                else:
+                    value = self.properties[key].value
+                    f.create_dataset(f"Properties/{key}", data=value)
+
+
+class MH_major(MH, _Property_Container):
+    """
+    Class for importing, storing and using of VSM-data from major loop M(H)
+    measurements aswell as derived properties.
+
+    Attributes
+    ----------
+    H: ENTITY
+        Internal magnetic field as mammos_entity.Entity
+    H_ext: ENTITY
+        External magnetic field as mammos_entity.Entity
+    M: ENTITY
+        Magnetization as mammos_entity.Entity
+    m: Quantity
+        Magnetic Moment as mammos_units.Quantity
+    T: ENTITY
+        Absolute temperature as mammos_entity.Entity
+    t: ENTITY
+        Time as mammos_entity.Entity
+    D: ENTITY
+        Demagnetizing factor as mammos_entity.Entity
+    remanence: ENTITY
+        Remanent magnetization as mammos_entity.Entity
+    coercivity: ENTITY
+        Internal coercive field as mammos_entity.Entity
+    BHmax: ENTITY
+        Maximum energy product as mammos_entity.Entity
+    kneefield: ENTITY
+        Knee field as mammos_entity.Entity, see ontology
+    squareness: FLOAT
+        Squareness as kneefield / coercivity
+
+    Methods
+    -------
+    load_qd()
+        Load VSM-data from a quantum design .DAT file
+    segments()
+        Find indices of segmentation points which can be used to seperate each
+        measurement segment from each other.
+    estimate_saturation()
+        Calculate an estimation of the saturation magnetisation, return it and
+        simultaneously assign it to the VSM object. A possible high field
+        susceptibility can optionally be corrected for.
+    plot()
+        Plot data according to measurement type, optionally saves as png.
+    properties_to_file()
+        Save all properties derived from the VSM-measurement to CSV-file or to
+        YAML file, using the mammos-entity io functionality.
+    to_hdf5()
+        Save contents of .DAT-file and calculated properties in hdf5 file.
+    """
+
+    def __init__(self, datfile, read_method="auto"):
+        # import data
+        super().load_qd(datfile, read_method=read_method)
+
+        # calculate properties
+        s = self.segments()
+        idx = np.argsort(self.H.q[s[0] : s[1]]) + s[0]
+        prop = extrinsic_properties(self.H.q[idx], self.M.q[idx], 0)
+
+        self.remanence = prop.Mr
+        self.coercivity = prop.Hc
+        self.BHmax = prop.BHmax
+
+        self.kneefield = self._calc_kneefield()
+        self.squareness = self._calc_squareness()
+
+        self.properties = {
+            "Mr": self.remanence,
+            "Hc": self.coercivity,
+            "BHmax": self.BHmax,
+            "Hk": self.kneefield,
+            "S": self.squareness,
+        }
 
     def _calc_kneefield(self):
         """
@@ -345,38 +579,6 @@ class VSM:
         """
         return (self.kneefield.q / self.coercivity.q).value
 
-    def _calc_Tc(self):
-        """
-        Calculate Curie-temperature from M(T) measurement, assuming only one
-        Curie-temperature. Use with caution.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        Tc: ENTITY
-            Curie-Temperature as mammos_entity.Entity
-        """
-        M = self.M.q
-        T = self.T.q
-        # crop off measurement edges, where extreme noise usually occurs
-        cM = M[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
-        cT = T[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
-        # calculate dM/dT and smooth generously
-        dmdT = np.convolve(np.gradient(cM) / np.gradient(cT), np.ones(20) / 20, "same")
-        # norm dM/dT to values between -1 and 1
-        ndmdT = dmdT / np.max(np.abs(dmdT))
-        # find peaks in normed dM/dT
-        p = find_peaks(np.abs(ndmdT), distance=20, width=20, height=0.1)[0]
-        # sort peaks
-        Tc = np.sort(cT[p])
-        # pass all peaks of normed dM/dT to Curie-Temperature
-        # the user should decide themselves, whether heating or cooling is used
-        Tc = me.Entity("CurieTemperature", Tc)
-        return Tc
-
     def estimate_saturation(self, threshold=None):
         """
         Calculate an estimation of the saturation magnetisation, return it and
@@ -398,9 +600,6 @@ class VSM:
         Ms: ENTITY
             Saturation magnetisation as SpontaneousMagnetization.
         """
-        if self.measurement == "M(T)":
-            raise Exception("Saturation cannot be calculated from M(T) measurement.")
-
         if threshold is None:
             Ms = []
             for segment_num in range(0, len(self.segments()), 2):
@@ -486,35 +685,8 @@ class VSM:
 
     def plot(self, filepath=None, demag=True, label=None):
         """
-        Plot M(H) or M(T) measurement. Wrapper function.
-
-        Parameters
-        ----------
-        filepath : STR | PATH, optional
-            Filepath for saving the figure. Default is None, in that case no
-            file is saved.
-        demag : BOOL, optional
-            Boolean that determines if demagnetization curve is plotted as an
-            inset next to hysteresis loop. Default is True. Only applies to
-            M(H)-measurements.
-        label : STR, optional
-            Optional label of hysteresis loop that can be displayed in the
-            legend. Default is None, in that case no legend is displayed.
-
-        Returns
-        -------
-        None.
-        """
-        if self.measurement == "M(H)":
-            self._plot_MH(filepath=filepath, demag=demag, label=label)
-        elif self.measurement == "M(T)":
-            self._plot_MT(filepath=filepath)
-        plt.show()
-
-    def _plot_MH(self, filepath=None, demag=True, label=None):
-        """
-        Plot hysteresis loop, optionally with inset of demagnetization curve
-        and save figure if a filepath is given.
+        Plot major hysteresis loop, optionally with inset of demagnetization
+        curve and save figure if a filepath is given.
 
         Parameters
         ----------
@@ -525,8 +697,8 @@ class VSM:
             Boolean that determines if demagnetization curve is plotted as an
             inset next to hysteresis loop. Default is True.
         label: STR, optional
-            Optional label of hysteresis loop that can be displayed in the
-            legend. Default is None, in that case no legend is displayed.
+            Optional label of hysteresis loop that can be displayed as title.
+            Default is None, in that case no legend is displayed.
 
         Returns
         -------
@@ -536,19 +708,19 @@ class VSM:
         M = self.M.q.to("T")  # converts M from A/m to Tesla
 
         fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
-        ax1.plot(H, M, label=label)
+        ax1.plot(H, M)
 
         # format plot
         ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
         ax1.set_ylabel(r"$J$ in $T$")
         if label is not None:
-            ax1.legend()
+            ax1.set_title(label)
 
         # plot inset of demagnetization curve
         if demag:
             start_idx, end_idx = self.segments()[:2]
             ax2 = ax1.inset_axes([0.625, 0.15, 0.3, 0.5])
-            ax2.plot(H[start_idx:end_idx], M[start_idx:end_idx], label=label)
+            ax2.plot(H[start_idx:end_idx], M[start_idx:end_idx])
 
             # format inset
             Hmin = self.coercivity.q.to("T").value * -1.1
@@ -562,7 +734,118 @@ class VSM:
         if filepath is not None:
             fig.savefig(filepath, dpi=300)
 
-    def _plot_MT(self, filepath=None):
+
+class MT(VSM, _Property_Container):
+    """
+    Class for importing, storing and using of VSM-data from M(T)-measurement
+    aswell as derived properties.
+
+    Attributes
+    ----------
+    H: ENTITY
+        Internal magnetic field as mammos_entity.Entity
+    H_ext: ENTITY
+        External magnetic field as mammos_entity.Entity
+    M: ENTITY
+        Magnetization as mammos_entity.Entity
+    m: Quantity
+        Magnetic Moment as mammos_units.Quantity
+    T: ENTITY
+        Absolute temperature as mammos_entity.Entity
+    t: ENTITY
+        Time as mammos_entity.Entity
+    D: ENTITY
+        Demagnetizing factor as mammos_entity.Entity
+    Tc: ENTITY
+        Curie-temperature as mammos_entity.Entity
+
+    Methods
+    -------
+    load_qd()
+        Load VSM-data from a quantum design .DAT file
+    segments()
+        Find indices of segmentation points which can be used to seperate each
+        measurement segment from each other.
+    plot()
+        Plot data according to measurement type, optionally saves as png.
+    properties_to_file()
+        Save all properties derived from the VSM-measurement to CSV-file or to
+        YAML file, using the mammos-entity io functionality.
+    to_hdf5()
+        Save contents of .DAT-file and calculated properties in hdf5 file.
+    """
+
+    def __init__(self, datfile, read_method="auto"):
+        # import data
+        super().load_qd(datfile, read_method=read_method)
+
+        # calculate properties
+        self.Tc = self._calc_Tc()
+        self.properties = {"Tc": self.Tc}
+
+    def _calc_Tc(self):
+        """
+        Calculate Curie-temperature from M(T) measurement, assuming only one
+        Curie-temperature. Use with caution.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        Tc: ENTITY
+            Curie-Temperature as mammos_entity.Entity
+        """
+        M = self.M.q
+        T = self.T.q
+        # crop off measurement edges, where extreme noise usually occurs
+        cM = M[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
+        cT = T[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
+        # calculate dM/dT and smooth generously
+        dmdT = np.convolve(np.gradient(cM) / np.gradient(cT), np.ones(20) / 20, "same")
+        # norm dM/dT to values between -1 and 1
+        ndmdT = dmdT / np.max(np.abs(dmdT))
+        # find peaks in normed dM/dT
+        p = find_peaks(np.abs(ndmdT), distance=20, width=20, height=0.1)[0]
+        # sort peaks
+        Tc = np.sort(cT[p])
+        # pass all peaks of normed dM/dT to Curie-Temperature
+        # the user should decide themselves, whether heating or cooling is used
+        Tc = me.Entity("CurieTemperature", Tc)
+        return Tc
+
+    def segments(self, edge=0.05):
+        r"""
+        Find indices of segmentation points which can be used to seperate each
+        measurement segment from each other. The segments are seperated by a
+        changing sign of dT/dt.
+
+        Parameters
+        ----------
+        edge: FLOAT, optional
+            Percentage of measurement to be treated as edge. Default is 0.05,
+            which means that segmentation points closer than 1 % of the total
+            measurement width to the edges will be discarded.
+
+        Returns
+        -------
+         s: ARRAY[INT]
+            Array of segmentation points that can be used to segmentise the
+            measurement.
+        """
+        t = self.t.q
+        T = self.T.q
+        # find sall segmentation points (peaks of T(t))
+        s = find_peaks(np.abs(T), distance=10, prominence=5)[0]
+        # discard segmentation points if they're very close to start
+        s = s[len(s[s < (edge * len(t))]) :]
+        # discard segmentation points if they're very close to end
+        if len(s[s > ((1 - edge) * len(t))]) != 0:
+            s = s[: -len(s[s > ((1 - edge) * len(t))])]
+        return s
+
+    def plot(self, filepath=None):
         """
         Plot cooling curve of M(T) measurement. Save to file if path is given.
 
@@ -595,121 +878,17 @@ class VSM:
         if filepath is not None:
             fig.savefig(filepath, dpi=300)
 
-    def properties_to_file(self, filepath, label=None):
-        r"""
-        Save all properties derived from the VSM-measurement to CSV-file or to
-        YAML file, using the mammos-entity io functionality.
 
-        Parameters
-        ----------
-        filepath: STR | PATH
-            Filepyth to save the file to. Ending also determines type of file.
-        label: STR, optional
-            Label to be used in the description of file to be exported to.
-            If none is given then the name of the .DAT file the VSM object was
-            calculated from is used.
-
-        Returns
-        -------
-        None
-        """
-        if label is None:
-            description = self.path.stem
-        if label is not None:
-            description = label
-
-        me.io.entities_to_file(filepath, description, **self.properties)
-
-    def print_properties(self, unit="T"):
-        """
-        Print out properties of VSM object.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
-        print(f"\n\n{self.path.name}:\n")
-
-        if self.measurement == "M(H)":
-            properties = {
-                "Remanence": [self.remanence.q.to(unit)],
-                "Coercivity": [self.coercivity.q.to(unit)],
-                "BHmax": [self.BHmax.q.to(mu.kJ / mu.m**3)],
-                "S": [self.squareness],
-            }
-        elif self.measurement == "M(T)":
-            properties = {"Tc": [self.Tc.q.to("K")]}
-        for key in properties:
-            print(f"{key} = {properties[key][0]}")
-
-    def to_hdf5(self):
-        """
-        Save contents of .DAT-file and calculated properties in hdf5 file.
-
-        Parameters
-        ----------
-        None.
-
-        Returns
-        -------
-        None.
-
-        """
-        with open(self.path, encoding="cp1252") as f:
-            s = str(f.read(-1))
-        head = s[s.index("INFO") : s.rindex("\nDATATYPE")]
-        head = head.split("\n")
-        info = {
-            i[i.rindex(",") + 1 :]: i[i.index(",") + 1 : i.rindex(",")] for i in head
-        }
-        df = pd.read_csv(self.path, skiprows=34, encoding="cp1252")
-
-        with h5py.File(self.path.parent.joinpath(self.path.stem + ".hdf5"), "a") as f:
-            for i in info:
-                f.create_dataset("Info/" + i, data=info[i])
-            f["Info/SAMPLE_MASS"].attrs["unit"] = "mg"
-            f["Info/SAMPLE_SIZE"].attrs["unit"] = "mm"
-
-            for i in df.columns:
-                dat = np.array(df[i])
-                if dat.dtype != "O":
-                    f.create_dataset("Data/" + i, data=dat)
-                if dat.dtype == "O":
-                    f.create_dataset("Data/" + i, data=[str(j) for j in df[i]])
-
-            if self.measurement == "M(H)":
-                f.create_dataset("Properties/Remanence", data=self.remanence.value)
-                f["Properties/Remanence"].attrs["unit"] = str(self.remanence.unit)
-                f["Properties/Remanence"].attrs["IRI"] = self.remanence.ontology.iri
-                f.create_dataset("Properties/Coercivity", data=self.coercivity.value)
-                f["Properties/Coercivity"].attrs["unit"] = str(self.coercivity.unit)
-                f["Properties/Coercivity"].attrs["IRI"] = self.coercivity.ontology.iri
-                f.create_dataset("Properties/BHmax", data=self.BHmax.value)
-                f["Properties/BHmax"].attrs["unit"] = str(self.BHmax.unit)
-                f["Properties/BHmax"].attrs["IRI"] = self.BHmax.ontology.iri
-                f.create_dataset("Properties/KneeField", data=self.kneefield.value)
-                f["Properties/KneeField"].attrs["unit"] = str(self.kneefield.unit)
-                f["Properties/KneeField"].attrs["IRI"] = self.kneefield.ontology.iri
-                f.create_dataset("Properties/Squareness", data=self.squareness)
-            elif self.measurement == "M(T)":
-                f.create_dataset("Properties/Tc", data=self.Tc.value)
-                f["Properties/Tc"].attrs["unit"] = str(self.Tc.unit)
-                f["Properties/Tc"].attrs["IRI"] = self.Tc.ontology.iri
-
-
-def plot_multiple_VSM(data, filepath=None, labels=None, demag=True):
+def plot_multiple_MH_major(data, filepath=None, labels=None, demag=True):
     """
     Plot hysteresis loops and optionally demagnetization curves of
-    several VSM measurements. Saves figure if filepath is given.
+    several major hysteresis loop measurements.
+    Saves figure if filepath is given.
 
     Parameters
     ----------
-    data: LIST
-        List of several objects which have to be of the VSM class.
+    data: LIST[MH_major]
+        List of several objects which have to be of the MH_major class.
     filepath: STR | PATH, optional
         Filepath for saving the figure. Default is None, in that case no file
         is saved.
@@ -725,12 +904,6 @@ def plot_multiple_VSM(data, filepath=None, labels=None, demag=True):
     -------
     None
     """
-    if any(d.measurement != "M(H)" for d in data):
-        raise Exception(
-            "Different measurement types cannot be exported together."
-            "This function is currently only supported for several"
-            " M(H) measurements."
-        )
     if labels is None:
         labels = [vsm.path.stem for vsm in data]
 
@@ -744,7 +917,6 @@ def plot_multiple_VSM(data, filepath=None, labels=None, demag=True):
     ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
     ax1.set_ylabel(r"$J$ in $T$")
     ax1.legend()
-    plt.gca().set_prop_cycle(None)
 
     # plot inset of demagnetization curves
     if demag:
@@ -779,7 +951,7 @@ def mult_properties_to_file(data, filepath, labels=None):
 
     Parameters
     ----------
-    data: LIST[VSM]
+    data: LIST[MH_major | MT]
         List of VSM objects that will have their properties exported.
     filepath: STR | PATH
         Filepath to save the file to. Ending also determines type of file.
@@ -791,52 +963,46 @@ def mult_properties_to_file(data, filepath, labels=None):
     -------
     None
     """
-    if any(vsm.measurement != data[0].measurement for vsm in data):
+    # check if all objects in data are of the same type
+    ref_type = type(data[0])
+    if not all([type(vsm) is ref_type for vsm in data]):
         raise Exception(
-            "VSM objects are incompatible. Please make sure\
-                         not to mix M(H) and M(T) measurements during export."
+            "Objects in data are not all of the same type.\n"
+            + "Please only export the properties from objects of\n"
+            + "the same type together."
         )
-    filepath = Path(filepath)
-    file_ext = filepath.suffix
-    if labels is not None and any(file_ext == e for e in [".yaml", ".yml"]):
-        description = labels
-    if labels is None and any(file_ext == e for e in [".yaml", ".yml"]):
-        description = [vsm.path.stem for vsm in data]
-    if labels is not None and file_ext == ".csv":
-        description = ""
-        for label in labels:
-            description = description + label + "\n"
-    if labels is None and file_ext == ".csv":
-        description = ""
-        for label in [vsm.path.stem for vsm in data]:
-            description = description + label + "\n"
 
-    if all([vsm.measurement == "M(H)" for vsm in data]) and all(
+    if labels is None:
+        labels = [vsm.path.stem for vsm in data]
+
+    if all([isinstance(vsm, MH_major) for vsm in data]) and all(
         [hasattr(vsm, "saturation") for vsm in data]
     ):
         me.io.entities_to_file(
             filepath,
-            description,
+            labels=labels,
             Ms=me.concat_flat([vsm.saturation for vsm in data]),
             Mr=me.concat_flat([vsm.remanence for vsm in data]),
             Hc=me.concat_flat([vsm.coercivity for vsm in data]),
             BHmax=me.concat_flat([vsm.BHmax for vsm in data]),
             Hk=me.concat_flat([vsm.kneefield for vsm in data]),
         )
-    elif all([vsm.measurement == "M(H)" for vsm in data]) and any(
+
+    elif all([isinstance(vsm, MH_major) for vsm in data]) and any(
         [not hasattr(vsm, "saturation") for vsm in data]
     ):
         me.io.entities_to_file(
             filepath,
-            description,
+            labels=labels,
             Mr=me.concat_flat([vsm.remanence for vsm in data]),
             Hc=me.concat_flat([vsm.coercivity for vsm in data]),
             BHmax=me.concat_flat([vsm.BHmax for vsm in data]),
             Hk=me.concat_flat([vsm.kneefield for vsm in data]),
         )
-    elif all([vsm.measurement == "M(T)" for vsm in data]):
+
+    elif all([isinstance(vsm, MT) for vsm in data]):
         me.io.entities_to_file(
             filepath,
-            description,
+            labels=labels,
             Tc=me.concat_flat([vsm.Tc for vsm in data]),
         )

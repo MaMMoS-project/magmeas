@@ -5,8 +5,15 @@ calculated from M(H) hysteresis loops and exported to JSON- or CSV-files.
 Automatic plotting with matplotlib is also available.
 """
 
-__version__ = "0.4.3"
+__version__ = "0.4.4"
 
-from magmeas.magmeas import VSM, mult_properties_to_file, plot_multiple_VSM
+from magmeas._base import (
+    MH,
+    MT,
+    VSM,
+    MH_major,
+    mult_properties_to_file,
+    plot_multiple_MH_major,
+)
 
-__all__ = [VSM, plot_multiple_VSM, mult_properties_to_file]
+__all__ = [VSM, MH, MH_major, MT, mult_properties_to_file, plot_multiple_MH_major]
