@@ -38,22 +38,25 @@ is assumed to be m / (a * b * c)
 
 ### Python
 
-The main functionality is handled over the class magmeas.VSM and the two functions magmeas.mult_properties_to_file and plot_multiple_VSM which take VSM-objects as arguments.
-Documentation is mainly available in the form of detailed docstrings. Just use `help(magmeas.VSM)` or similar to get more information. Some examples:
+As of right now there are four distinct classes that conveniently handle specific types of measurement data:
+* VSM: general for all types of VSM measurements
+* MH: for all M(H) measurements, still quite unspecific
+* MH_major: for major hysteresis loop measurements
+* MT: for M(T) measurements
+  
+Here is what each of them do at initialisation or automatically with a method:
 
-```python
-import magmeas as mm
+|  | VSM | MH | MH_major | MT |
+|--|-----|----|----------|----|
+| import measurement data from Quantum Design .DAT file | ✅ | ✅ | ✅ | ✅ |
+| export to HDF5 | ✅ | ✅ | ✅ | ✅ |
+| plotting | ❌ | ✅ | ✅ | ✅ |
+| calculate properties | ❌ | ❌ | ✅ $H_c$, $M_r$, $BH_{max}$, $H_k$, S, $M_s$ (optional) | ✅ $T_c$ |
+|export properties to csv/yml | ❌ | ❌ | ✅ | ✅ |
 
-dat1 = mm.VSM("file1.DAT")
-dat2 = mm.VSM("file2.DAT")
-dat3 = mm.VSM("file3.DAT", read_method="manual", calc_properties=False)
+Additionally, exporting the properties of several MT or MH_major objects together is possible with `magmeas.mult_properties_to_file`. Plotting of several MH_major objects together in one graph is conveniently done with `magmeas.plot_mult_MH_major`.
+Documentation is mainly available in the form of detailed docstrings. Just use `help(magmeas.VSM)` or similar to get more information.
 
-dat1.plot("file1_plot.png")
-dat1.properties_to_file("file1_properties.yaml")
-
-mm.plot_multiple_VSM([dat1, dat2], labels=["Measurement 1", "Measurement 2"])
-mm.mult_properties_to_file([dat1, dat2], "properties.txt", ["Measurement 1", "Measurement 2"])
-```
 
 ### Command line
 
