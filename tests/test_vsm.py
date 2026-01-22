@@ -1,5 +1,6 @@
 """Testing routine for magmeas.VSM objects."""
 
+import os
 from pathlib import Path
 
 import mammos_entity as me
@@ -9,6 +10,7 @@ import magmeas
 
 matplotlib.use("Agg")
 cwd = Path(__file__).parent.resolve()
+os.chdir(cwd)  # just to make sure, especially for CI
 
 
 def test_version():
