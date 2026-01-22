@@ -7,6 +7,7 @@ Automatic plotting with matplotlib is also available.
 
 __version__ = "0.4.4"
 
+import magmeas.data as data
 from magmeas.base import (
     MH,
     MT,
@@ -25,4 +26,5 @@ __all__ = [
     MT,
     mult_properties_to_file,
     plot_multiple_MH_major,
+    data,
 ]
