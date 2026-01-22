@@ -21,6 +21,7 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install .
           pwd
+          ls -lah
       - name: Test with pytest
         run: |
           python -m pip install pytest
