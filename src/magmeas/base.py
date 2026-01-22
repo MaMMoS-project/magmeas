@@ -41,8 +41,6 @@ class VSM:
 
     Methods
     -------
-    load_qd()
-        Load VSM-data from a quantum design .DAT file
     to_hdf5()
         Save contents of .DAT-file and calculated properties in hdf5 file.
     """
@@ -327,8 +325,6 @@ class MH(VSM):
 
     Methods
     -------
-    load_qd()
-        Load VSM-data from a quantum design .DAT file
     plot()
         Plot data according to measurement type, optionally saves as png.
     to_hdf5()
@@ -485,8 +481,6 @@ class MH_major(MH, _Property_Container):
 
     Methods
     -------
-    load_qd()
-        Load VSM-data from a quantum design .DAT file
     segments()
         Find indices of segmentation points which can be used to seperate each
         measurement segment from each other.
@@ -764,8 +758,6 @@ class MH_recoil(MH):
 
     Methods
     -------
-    load_qd()
-        Load VSM-data from a quantum design .DAT file
     segments()
         Find indices of segmentation points which can be used to extract each
         recoil loop.
@@ -942,8 +934,6 @@ class MT(VSM, _Property_Container):
 
     Methods
     -------
-    load_qd()
-        Load VSM-data from a quantum design .DAT file
     segments()
         Find indices of segmentation points which can be used to seperate each
         measurement segment from each other.
