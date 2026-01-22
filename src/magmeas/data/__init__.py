@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 
-from magmeas._base import MT, MH_major
+from magmeas.base import MT, MH_major
 
 dir_path = Path(os.path.realpath(__file__)).parent
 

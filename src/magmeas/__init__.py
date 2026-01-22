@@ -7,7 +7,7 @@ Automatic plotting with matplotlib is also available.
 
 __version__ = "0.4.4"
 
-from magmeas._base import (
+from magmeas.base import (
     MH,
     MT,
     VSM,
