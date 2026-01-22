@@ -20,6 +20,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install .
+          pwd
       - name: Test with pytest
         run: |
           python -m pip install pytest

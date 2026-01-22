@@ -1,6 +1,5 @@
 """Testing routine for magmeas.VSM objects."""
 
-import os
 from pathlib import Path
 
 import mammos_entity as me
@@ -10,7 +9,6 @@ import magmeas
 
 matplotlib.use("Agg")
 cwd = Path(__file__).parent.resolve()
-os.chdir(cwd)  # just to make sure, especially for CI
 
 
 def test_version():
@@ -29,7 +27,7 @@ def test_init_MT():
     """Test initialisation of M(T) measurement as magmeas.VSM object."""
     from magmeas.data import MT_MnAl as mt
 
-    assert isinstance(mt, magmeas.VSM)
+    assert isinstance(mt, magmeas.MT)
 
 
 def test_calc_Ms():
