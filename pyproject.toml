@@ -73,6 +73,9 @@ known-local-folder = ["src"]
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
+[tool.ruff.lint.per-file-ignores]
+"base.py" = ["D301", "D400"]
+
 [tool.ruff.format]
 docstring-code-format = true
 

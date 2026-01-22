@@ -12,8 +12,17 @@ from magmeas.base import (
     MT,
     VSM,
     MH_major,
+    MH_recoil,
     mult_properties_to_file,
     plot_multiple_MH_major,
 )
 
-__all__ = [VSM, MH, MH_major, MT, mult_properties_to_file, plot_multiple_MH_major]
+__all__ = [
+    VSM,
+    MH,
+    MH_major,
+    MH_recoil,
+    MT,
+    mult_properties_to_file,
+    plot_multiple_MH_major,
+]

@@ -734,6 +734,188 @@ class MH_major(MH, _Property_Container):
             fig.savefig(filepath, dpi=300)
 
 
+class MH_recoil(MH):
+    """
+    Class for importing, storing and using of VSM-data from recoil loop M(H)
+    measurements.
+    Recoil loop measurements are assumed to be measurements where
+    the sample is first saturated at some positive field. After this, a number
+    of recoil loops are performed, where the magnetic field is reduced to some
+    negative value (which often includes fields that do not fully demagnetise
+    the sample) and is then increased to an external field of 0 or to a
+    positive external field which increases the internal field to 0.
+
+    Attributes
+    ----------
+    H: ENTITY
+        Internal magnetic field as mammos_entity.Entity
+    H_ext: ENTITY
+        External magnetic field as mammos_entity.Entity
+    M: ENTITY
+        Magnetization as mammos_entity.Entity
+    m: Quantity
+        Magnetic Moment as mammos_units.Quantity
+    T: ENTITY
+        Absolute temperature as mammos_entity.Entity
+    t: ENTITY
+        Time as mammos_entity.Entity
+    D: ENTITY
+        Demagnetizing factor as mammos_entity.Entity
+
+    Methods
+    -------
+    load_qd()
+        Load VSM-data from a quantum design .DAT file
+    segments()
+        Find indices of segmentation points which can be used to extract each
+        recoil loop.
+    plot()
+        Plot data according to measurement type, optionally saves as png.
+    to_hdf5()
+        Save contents of .DAT-file and calculated properties in hdf5 file.
+    """
+
+    def segments(self, prominence=5e3):
+        """
+        Get indices of segmentation points. The first segmentation point occurs
+        at H = H_max. All uneven segmentation points are the start of a recoil
+        loop (only section with positive change in H) while all subsequent even
+        segmentation points are the respective ends of each recoil loop.
+
+        Parameters
+        ----------
+        prominence : FLOAT, optional
+            The prominence which is used to find all peaks in H_ext(t). See the
+            documentation of scipy.signal.find_peaks for more details.
+            The default is 5e3.
+
+        Returns
+        -------
+        segments: ARRAY
+            Segmentation points used to extract each recoil loop.
+        """
+        npeaks, _ = find_peaks(-self.H_ext.q, prominence=prominence)
+        # npeaks = npeaks[self.H.q[npeaks] < 0] + 1
+        npeaks = npeaks + 1
+        ppeaks, _ = find_peaks(self.H_ext.q, prominence=prominence)
+        # ppeaks = ppeaks[self.H.q[ppeaks] < 0]
+        ppeaks = np.append(ppeaks, len(self.H.q) - 1)
+        apeaks = np.sort(np.append(npeaks, ppeaks))
+        return apeaks
+
+    def recoil_susceptibility(self, prominence=5e3, take_mean=True):
+        """
+        Calculate recoil susceptibility from recoil loop measurement as slope
+        of a linear regression of each recoil loop.
+
+        Parameters
+        ----------
+        prominence: FLOAT, optional
+            Prominence used to find segmentation points, see MH_recoil.segments
+            The default is 5e3.
+        take_mean: BOOL, optional
+            Wether to take the mean of all recoil susceptibilities instead of
+            returning an individual one for each loop. Default is True.
+
+        Returns
+        -------
+        recoil_susceptibility: FLOAT | ARRAY
+            Recoil susceptibility calculated from recoil loop measurement.
+        """
+        segments = self.segments(prominence=prominence)
+        starts = segments[1::2]
+        ends = segments[2::2]
+        num_loops = min([len(starts), len(ends)])
+
+        recoil_suscep = np.array(
+            [
+                linregress(
+                    self.H.q[starts[i] : ends[i]], self.M.q[starts[i] : ends[i]]
+                ).slope
+                for i in range(num_loops)
+            ]
+        )
+
+        if take_mean:
+            recoil_suscep = np.mean(recoil_suscep)
+
+        return recoil_suscep
+
+    def external_comp_field(self, prominence=5e3):
+        """
+        Return external compensation fields, that will lead to an endpoint
+        close to an internal magnetic field of zero for each recoil loop. This
+        only makes sense to be calculated from recoil loop measurements, where
+        the endpoint for each recoil loop was an external magnetic field of 0,
+        which will lead to the respective internal magnetic field being
+        non-zero. The external compensation fields can then be used in a new
+        measurement which will then enable a recoil loop measurement corrected
+        for demagnetisation.\n
+        External compensation field is calculated from the internal recoil
+        fields (at the end of each recoil loop) and the recoil susceptibility
+        according to:
+            .. math:: H^e_{comp} = \\frac{- H^i_{recoil}}{1 - D * \\chi_{recoil}}
+
+        Parameters
+        ----------
+        prominence: FLOAT, optional
+            Prominence used to find segmentation points, see MH_recoil.segments
+            The default is 5e3.
+
+        Returns
+        -------
+        external_compensation_field: ARRAY
+            External compensation fields, that would lead to an internal field
+            close to zero at the end of each recoil loop.
+
+        """
+        # get demagnetising factor
+        D = self.D.value
+        # get internal recoil fields as end points of each recoil loop
+        i_r_f = self.H.q[self.segments(prominence=prominence)[2::2]]
+        # get recoil susceptibilities individually for each recoil loop
+        r_chi = self.recoil_susceptibility(prominence=prominence, take_mean=False)
+
+        # calculate external compensation fields
+        e_c_f = -i_r_f / (1 - D * r_chi)
+
+        return e_c_f
+
+    def plot(self, filepath=None, label=None):
+        """
+        Plot M(H) measurement and save figure if a filepath is given.
+
+        Parameters
+        ----------
+        filepath: STR | PATH, optional
+            Filepath for saving the figure. Default is None, in that case no
+            file is saved.
+        label: STR, optional
+            Optional label of M(H)-measurement that can be displayed as title.
+            Default is None, in that case no legend is displayed.
+
+        Returns
+        -------
+        None
+        """
+        H = self.H.q.to("T")[self.segments()[0] :]  # converts H from A/m to Tesla
+        M = self.M.q.to("T")[self.segments()[0] :]  # converts M from A/m to Tesla
+
+        fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
+        ax1.plot(H, M)
+
+        # format plot
+        ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
+        ax1.set_ylabel(r"$J$ in $T$")
+        ax1.set_xlim([np.min(self.H.q.to("T")).value * 1.1, 0])
+        if label is not None:
+            ax1.set_title(label)
+
+        # save figure if filepath is given
+        if filepath is not None:
+            fig.savefig(filepath, dpi=300)
+
+
 class MT(VSM, _Property_Container):
     """
     Class for importing, storing and using of VSM-data from M(T)-measurement
