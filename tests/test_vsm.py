@@ -18,21 +18,24 @@ def test_version():
 
 def test_init_MH_major():
     """Test initialisation of M(H) measurement as magmeas.VSM object."""
-    from magmeas.data import MH_MnAl as mh
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
 
     assert isinstance(mh, magmeas.MH_major)
 
 
 def test_init_MT():
     """Test initialisation of M(T) measurement as magmeas.VSM object."""
-    from magmeas.data import MT_MnAl as mt
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
 
     assert isinstance(mt, magmeas.MT)
 
 
 def test_calc_Ms():
     """Test initialisation of M(H) measurement as magmeas.VSM object."""
-    from magmeas.data import MH_MnAl as mh
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
 
     mh.estimate_saturation()
     mh.estimate_saturation(0.9)
@@ -42,7 +45,8 @@ def test_calc_Ms():
 
 def test_MH_major_to_yml():
     """Test export of M(H) measurement to YAML."""
-    from magmeas.data import MH_MnAl as mh
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
 
     file_path = cwd.joinpath("VSM_MH.DAT")
     output_path = cwd.joinpath(file_path.stem + "_properties.yml")
@@ -56,7 +60,8 @@ def test_MH_major_to_yml():
 
 def test_MH_major_to_csv():
     """Test export of M(H) measurement to CSV."""
-    from magmeas.data import MH_MnAl as mh
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
 
     file_path = cwd.joinpath("VSM_MH.DAT")
     output_path = cwd.joinpath(file_path.stem + "_properties.csv")
@@ -70,7 +75,8 @@ def test_MH_major_to_csv():
 
 def test_MH_major_to_hdf5():
     """Test export of M(H) measurement to HDF5."""
-    from magmeas.data import MH_MnAl as mh
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
 
     file_path = cwd.joinpath("VSM_MH.hdf5")
     try:
@@ -83,7 +89,8 @@ def test_MH_major_to_hdf5():
 
 def test_MH_major_plot():
     """Test export of M(H) measurement to PNG."""
-    from magmeas.data import MH_MnAl as mh
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
 
     file_path = cwd.joinpath("VSM_MH.DAT")
     output_path = cwd.joinpath(file_path.stem + ".png")
@@ -97,7 +104,8 @@ def test_MH_major_plot():
 
 def test_MT_to_yml():
     """Test export of M(T) measurement to YAML."""
-    from magmeas.data import MT_MnAl as mt
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
 
     file_path = cwd.joinpath("VSM_MT.DAT")
     output_path = cwd.joinpath(file_path.stem + "_properties.yml")
@@ -111,7 +119,8 @@ def test_MT_to_yml():
 
 def test_MT_to_csv():
     """Test export of M(T) measurement to CSV."""
-    from magmeas.data import MT_MnAl as mt
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
 
     file_path = cwd.joinpath("VSM_MT.DAT")
     output_path = cwd.joinpath(file_path.stem + "_properties.csv")
@@ -125,7 +134,8 @@ def test_MT_to_csv():
 
 def test_MT_to_hdf5():
     """Test export of M(T) measurement to HDF5."""
-    from magmeas.data import MT_MnAl as mt
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
 
     file_path = cwd.joinpath("VSM_MT.hdf5")
     try:
@@ -138,7 +148,8 @@ def test_MT_to_hdf5():
 
 def test_MT_plot():
     """Test export of M(T) measurement to PNG."""
-    from magmeas.data import MT_MnAl as mt
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
 
     file_path = cwd.joinpath("VSM_MT.DAT")
     output_path = cwd.joinpath(file_path.stem + ".png")
@@ -153,8 +164,8 @@ def test_MT_plot():
 def test_mult_MH_major_to_yml():
     """Test export of multiple M(H) measurement to YAML."""
     file_path = cwd.joinpath("VSM_MH.DAT")
-    from magmeas.data import MH_MnAl as mh1
-    from magmeas.data import MH_MnAl as mh2
+    mh1 = magmeas.MH_major(file_path)
+    mh2 = magmeas.MH_major(file_path)
 
     output_path = cwd.joinpath(file_path.stem + "_properties.yml")
     try:
@@ -168,8 +179,8 @@ def test_mult_MH_major_to_yml():
 def test_plot_mult_MH_major():
     """Test export of multiple M(H) measurement to YAML."""
     file_path = cwd.joinpath("VSM_MH.DAT")
-    from magmeas.data import MH_MnAl as mh1
-    from magmeas.data import MH_MnAl as mh2
+    mh1 = magmeas.MH_major(file_path)
+    mh2 = magmeas.MH_major(file_path)
 
     output_path = cwd.joinpath(file_path.stem + "_plot.png")
     try:
