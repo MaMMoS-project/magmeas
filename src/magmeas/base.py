@@ -240,7 +240,9 @@ class VSM:
         -------
         NONE
         """
-        return f"{self.__module__.split('.')[0]}.VSM({self.path.name})"
+        module = self.__module__.split(".")[0]
+        vsm_type = str(type(self)).split(".")[-1][: str(type(self)).find("'") + 1]
+        return f"{module}.{vsm_type}({self.path.name})"
 
     def to_hdf5(self, file_path):
         """
