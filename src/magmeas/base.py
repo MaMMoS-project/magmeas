@@ -135,10 +135,14 @@ class VSM:
               INFO,(<a>, <b>, <c>),SAMPLE_SIZE
               sample dimensions a, b and c in mm, c parallel to field
               """
+        # open file and extract content as string
+        with open(self.path) as f:
+            s = f.read()
+        # figure out in which line actual CSV-like data starts for later import
+        head_length = s[: s.find("[Data]")].count("\n") + 1
+
         # Automatically read out sample parameters
         if read_method == "auto":
-            with open(self.path, "rb") as f:
-                s = str(f.read(-1))
             # check if sample mass can be read from .DAT file
             try:
                 mass = float(rextract(s, "INFO,", ",SAMPLE_MASS")) * mu.mg
@@ -167,7 +171,7 @@ class VSM:
         # calculate demagnetisation factor
         self.D = self._demag_prism(dim)
         # import measurement data
-        df = pd.read_csv(self.path, skiprows=34, encoding="cp1252")
+        df = pd.read_csv(self.path, skiprows=head_length, encoding="cp1252")
         # extract magnetic moment
         # first, let's find the unit of the magnetic moment
         for col in df.columns:
@@ -769,7 +773,7 @@ class MH_recoil(MH):
 
     def segments(self, prominence=5e3):
         """
-        Get indices of segmentation points. The first segmentation point occurs
+        Get indices of segmentation points. Segmentation point 0 occurs
         at H = H_max. All uneven segmentation points are the start of a recoil
         loop (only section with positive change in H) while all subsequent even
         segmentation points are the respective ends of each recoil loop.
