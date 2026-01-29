@@ -8,6 +8,7 @@ Automatic plotting with matplotlib is also available.
 __version__ = "0.4.4"
 
 from magmeas.base import (
+    FORC,
     MH,
     MT,
     VSM,
@@ -22,6 +23,7 @@ __all__ = [
     MH,
     MH_major,
     MH_recoil,
+    FORC,
     MT,
     mult_properties_to_file,
     plot_multiple_MH_major,
