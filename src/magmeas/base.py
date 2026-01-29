@@ -137,7 +137,7 @@ class VSM:
               sample dimensions a, b and c in mm, c parallel to field
               """
         # open file and extract content as string
-        with open(self.path) as f:
+        with open(self.path, encoding="cp1252") as f:
             s = f.read()
         # figure out in which line actual CSV-like data starts for later import
         head_length = s[: s.find("[Data]")].count("\n") + 1
