@@ -1,5 +1,6 @@
 """VSM class and functions using it."""
 
+from importlib.metadata import version
 from pathlib import Path
 
 import h5py
@@ -384,19 +385,17 @@ class _Property_Container:
         ----------
         filepath: STR | PATH
             Filepyth to save the file to. Ending also determines type of file.
-        label: STR, optional
-            Label to be used in the description of file to be exported to.
-            If none is given then the name of the .DAT file the VSM object was
-            calculated from is used.
 
         Returns
         -------
         None
         """
-        if label is None:
-            label = self.path.stem
+        description = (
+            f"mammos-entity version = {version('mammos-entity')}\n"
+            + f"magmeas       version = {version('magmeas')}"
+        )
 
-        me.io.entities_to_file(filepath, label, **self.properties)
+        me.io.entities_to_file(filepath, description, **self.properties)
 
     def print_properties(self):
         """
@@ -1377,6 +1376,11 @@ def mult_properties_to_file(data, filepath, labels=None):
             + "the same type together."
         )
 
+    description = (
+        f"mammos-entity version = {version('mammos-entity')}\n"
+        + f"magmeas       version = {version('magmeas')}"
+    )
+
     if labels is None:
         labels = [vsm.path.stem for vsm in data]
 
@@ -1385,6 +1389,7 @@ def mult_properties_to_file(data, filepath, labels=None):
     ):
         me.io.entities_to_file(
             filepath,
+            description,
             labels=labels,
             Ms=me.concat_flat([vsm.saturation for vsm in data]),
             Mr=me.concat_flat([vsm.remanence for vsm in data]),
@@ -1398,6 +1403,7 @@ def mult_properties_to_file(data, filepath, labels=None):
     ):
         me.io.entities_to_file(
             filepath,
+            description,
             labels=labels,
             Mr=me.concat_flat([vsm.remanence for vsm in data]),
             Hc=me.concat_flat([vsm.coercivity for vsm in data]),
@@ -1408,6 +1414,7 @@ def mult_properties_to_file(data, filepath, labels=None):
     elif all([isinstance(vsm, MT) for vsm in data]):
         me.io.entities_to_file(
             filepath,
+            description,
             labels=labels,
             Tc=me.concat_flat([vsm.Tc for vsm in data]),
         )
