@@ -630,7 +630,7 @@ class MH_major(MH, _Property_Container):
         self.properties["Ms"] = Ms
         return Ms
 
-    def segments(self, edge=0.05):
+    def segments(self, edge=0.05, prominence=1e6):
         r"""
         Find indices of segmentation points which can be used to seperate each
         measurement segment from each other. The segments are seperated by a
@@ -659,6 +659,10 @@ class MH_major(MH, _Property_Container):
             Percentage of measurement to be treated as edge. Default is 0.05,
             which means that segmentation points closer than 1 % of the total
             measurement width to the edges will be discarded.
+        prominence : FLOAT, optional
+            The prominence which is used to find all peaks in H_ext(t). See the
+            documentation of scipy.signal.find_peaks for more details.
+            The default is 1e6.
 
         Returns
         -------
@@ -672,7 +676,7 @@ class MH_major(MH, _Property_Container):
         # find all roots
         r = np.nonzero(np.diff(np.sign(m)))[0] + 2
         # find peaks, we know that they must be higher than 3e6 A/m and far apart
-        p = find_peaks(np.abs(h), distance=10, height=50)[0]
+        p = find_peaks(np.abs(h), prominence=prominence)[0]
         # all segmentation points
         s = np.sort(np.append(r, p))
         # discard segmentation points if they're very close to start
