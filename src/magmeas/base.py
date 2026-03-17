@@ -453,7 +453,7 @@ class _Property_Container:
                     f.create_dataset(f"Properties/{key}", data=value)
 
 
-class MH_major(MH, _Property_Container):
+class MH_major(_Property_Container, MH):
     """
     Class for importing, storing and using of VSM-data from major loop M(H)
     measurements aswell as derived properties.
