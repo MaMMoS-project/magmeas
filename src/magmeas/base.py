@@ -514,7 +514,8 @@ class MH_major(_Property_Container, MH):
 
         self.remanence = prop.Mr
         self.coercivity = prop.Hc
-        self.BHmax = prop.BHmax
+        # save BHmax in kJ/m3 instead of N/m2
+        self.BHmax = me.Entity("MaximumEnergyProduct", prop.BHmax.q.to("kJ/m3"))
 
         self.kneefield = self._calc_kneefield()
         self.squareness = self._calc_squareness()
