@@ -7,13 +7,12 @@ name = "magmeas"
 description = "Functionality for handling magnetometry data of permanent magnets."
 requires-python = ">= 3.11"
 dependencies = [
-    "numpy",
-	"pandas",
+	"mammos-analysis",
+	"mammos-entity >= 0.12.0",
 	"matplotlib",
+    "numpy",
+    "pandas",
 	"scipy",
-	"h5py",
-	"mammos-entity >= 0.10.0",
-	"mammos-analysis"
 ]
 authors = [
   {name = "Jonas Winkler", email = "j.winkler@ifw-dresden.de"},

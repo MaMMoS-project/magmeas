@@ -3,7 +3,6 @@
 from importlib.metadata import version
 from pathlib import Path
 
-import h5py
 import mammos_entity as me
 import mammos_units as mu
 import matplotlib.pyplot as plt
@@ -19,7 +18,7 @@ from magmeas._utils import rextract
 mu.set_enabled_equivalencies(mu.magnetic_flux_field())
 
 
-class VSM:
+class VSM(me.EntityCollection):
     """
     Class for importing, storing and using of VSM-data aswell as derived
     parameters.
@@ -48,6 +47,7 @@ class VSM:
     """
 
     def __init__(self, datfile, read_method="auto"):
+        super().__init__()
         # import data
         self.load_qd(datfile, read_method=read_method)
 
@@ -127,7 +127,7 @@ class VSM:
         None
 
         """
-        self.path = Path(datfile)
+        self._path = Path(datfile)
 
         err = """
               Sample parameters could not be read automatically.
@@ -138,7 +138,7 @@ class VSM:
               sample dimensions a, b and c in mm, c parallel to field
               """
         # open file and extract content as string
-        with open(self.path, encoding="cp1252") as f:
+        with open(self._path, encoding="cp1252") as f:
             s = f.read()
         # figure out in which line actual CSV-like data starts for later import
         head_length = s[: s.find("[Data]")].count("\n") + 1
@@ -173,7 +173,7 @@ class VSM:
         # calculate demagnetisation factor
         self.D = self._demag_prism(dim)
         # import measurement data
-        df = pd.read_csv(self.path, skiprows=head_length, encoding="cp1252")
+        df = pd.read_csv(self._path, skiprows=head_length, encoding="cp1252")
         # extract magnetic moment
         # first, let's find the unit of the magnetic moment
         for col in df.columns:
@@ -212,102 +212,72 @@ class VSM:
         # test datapoints for missing values (where value is nan)
         # H is derived from H_ext, and m so this is sufficient to test both
         nanfilter = ~np.isnan(H.q) * ~np.isnan(T.q) * ~np.isnan(t.q)
-        # delete all datapoints where H_ext, m, T or t are nan and assign them
-        self.H = me.Entity(H.ontology_label, H.q.to("A/m")[nanfilter])
-        self.H_ext = me.Entity(eH.ontology_label, eH.q.to("A/m")[nanfilter])
-        self.M = me.Entity(M.ontology_label, M.q.to("A/m")[nanfilter])
-        self.m = mu.Quantity(m.to("A m2")[nanfilter])
-        self.T = me.Entity(T.ontology_label, T.q[nanfilter])
+        # delete all datapoints where H_ext, m, T or t are nan
+        H = me.Entity(H.ontology_label, H.q.to("A/m")[nanfilter])
+        H_ext = me.Entity(eH.ontology_label, eH.q.to("A/m")[nanfilter])
+        M = me.Entity(M.ontology_label, M.q.to("A/m")[nanfilter])
+        m = mu.Quantity(m.to("A m2")[nanfilter])
+        T = me.Entity(T.ontology_label, T.q[nanfilter])
         # convert time stamp to time since measurement start
-        self.t = me.Entity(t.ontology_label, t.q[nanfilter] - t.q[nanfilter][0])
-        # collect all measurement data in one dictionary
-        self.measurement_data = {
-            "H": self.H,
-            "H_ext": self.H_ext,
-            "M": self.M,
-            "m": self.m,
-            "T": self.T,
-            "t": self.t,
-        }
+        t = me.Entity(t.ontology_label, t.q[nanfilter] - t.q[nanfilter][0])
+        # assign Entities to self as EntityCollection
+        self.measurement_data = me.EntityCollection(
+            "Data derived from the VSM-measurement.",
+            H=H,
+            H_ext=H_ext,
+            M=M,
+            m=m,
+            T=T,
+            t=t,
+        )
 
-    def __repr__(self):
+    @property
+    def H(self):
         """
-        Represent VSM object more helpfully.
-
-        Parameters
-        ----------
-        NONE
-
-        Returns
-        -------
-        NONE
+        Return the internal magnetic field directly without needing to access
+        it from within the measurement_data collection.
         """
-        module = self.__module__.split(".")[0]
-        vsm_type = str(type(self)).split(".")[-1][: str(type(self)).find("'") + 1]
-        return f"{module}.{vsm_type}({self.path.name})"
+        return self.measurement_data.H
 
-    def to_hdf5(self, file_path):
+    @property
+    def H_ext(self):
         """
-        Save contents of .DAT-file and calculated properties in hdf5 file.
-
-        Parameters
-        ----------
-        file_path: STR | PATH
-            File path the HDF5-file is going to be saved under.
-
-        Returns
-        -------
-        None.
-
+        Return the external magnetic field directly without needing to access it
+        from within the measurement_data collection.
         """
-        # read header of .DAT file
-        with open(self.path, encoding="cp1252") as f:
-            s = str(f.read(-1))
-        head = s[s.index("INFO") : s.rindex("\nDATATYPE")]
-        head = head.split("\n")
-        info = {
-            i[i.rindex(",") + 1 :]: i[i.index(",") + 1 : i.rindex(",")] for i in head
-        }
+        return self.measurement_data.H_ext
 
-        # read columns of .DAT file as csv
-        df = pd.read_csv(self.path, skiprows=34, encoding="cp1252")
+    @property
+    def M(self):
+        """
+        Return the magnetisation directly without needing to access it
+        from within the measurement_data collection.
+        """
+        return self.measurement_data.M
 
-        #  write HDF5
-        file_path = Path(file_path)
-        with h5py.File(file_path, "a") as f:
-            # write info (header of .DAT) to HDF5
-            for i in info:
-                f.create_dataset("Info/" + i, data=info[i])
-            f["Info/SAMPLE_MASS"].attrs["unit"] = "mg"
-            f["Info/SAMPLE_SIZE"].attrs["unit"] = "mm"
+    @property
+    def m(self):
+        """
+        Return the magnetic moment directly without needing to access it
+        from within the measurement_data collection.
+        """
+        return self.measurement_data.m
 
-            # write raw data (columns of .DAT) to HDF5
-            for i in df.columns:
-                dat = np.array(df[i])
-                if dat.dtype != "O":
-                    f.create_dataset("RawData/" + i, data=dat)
-                if dat.dtype == "O":
-                    f.create_dataset("RawData/" + i, data=[str(j) for j in df[i]])
+    @property
+    def T(self):
+        """
+        Return the thermodynamic temperature directly without needing to access it
+        from within the measurement_data collection.
+        """
+        return self.measurement_data.T
 
-            # write derived measurement data (from VSM object) to HDF5
-            for key in self.measurement_data:
-                if isinstance(self.measurement_data[key], me.Entity):
-                    value = self.measurement_data[key].value
-                    unit = str(self.measurement_data[key].unit)
-                    iri = self.measurement_data[key].ontology.iri
-                    f.create_dataset(f"DerivedData/{key}", data=value)
-                    f[f"DerivedData/{key}"].attrs["unit"] = unit
-                    f[f"DerivedData/{key}"].attrs["IRI"] = iri
-
-                elif isinstance(self.measurement_data[key], mu.Quantity):
-                    value = self.measurement_data[key].value
-                    unit = str(self.measurement_data[key].unit)
-                    f.create_dataset(f"DerivedData/{key}", data=value)
-                    f[f"DerivedData/{key}"].attrs["unit"] = unit
-
-                else:
-                    value = self.measurement_data[key].value
-                    f.create_dataset(f"DerivedData/{key}", data=value)
+    @property
+    def t(self):
+        """
+        Return the time directly without needing to access it
+        from within the measurement_data collection.
+        """
+        return self.measurement_data.t
 
 
 class MH(VSM):
@@ -373,87 +343,7 @@ class MH(VSM):
             fig.savefig(filepath, dpi=300)
 
 
-class _Property_Container:
-    """Abstract parent class that introduces handling of properties."""
-
-    def properties_to_file(self, filepath, label=None):
-        r"""
-        Save all properties derived from the major hysteresis loop
-        to CSV-file or to YAML file, using the mammos-entity io functionality.
-
-        Parameters
-        ----------
-        filepath: STR | PATH
-            Filepyth to save the file to. Ending also determines type of file.
-
-        Returns
-        -------
-        None
-        """
-        description = (
-            f"mammos-entity version = {version('mammos-entity')}\n"
-            + f"magmeas       version = {version('magmeas')}"
-        )
-
-        me.io.entities_to_file(filepath, description, **self.properties)
-
-    def print_properties(self):
-        """
-        Print out properties of VSM object.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
-        print(f"\n\n{self.path.name}:\n")
-
-        for key in self.properties:
-            print(f"{key} = {self.properties[key]}")
-
-    def to_hdf5(self, file_path):
-        """
-        Save contents of .DAT-file and calculated properties in hdf5 file.
-
-        Parameters
-        ----------
-        file_path: STR | PATH
-            File path the HDF5-file is going to be saved under.
-
-        Returns
-        -------
-        None.
-
-        """
-        # write contents of .DAT file and derived measurement data to HDF5
-        super().to_hdf5(file_path)
-
-        # write properties to HDF5
-        with h5py.File(file_path, "a") as f:
-            for key in self.properties:
-                if isinstance(self.properties[key], me.Entity):
-                    value = self.properties[key].value
-                    unit = str(self.properties[key].unit)
-                    iri = self.properties[key].ontology.iri
-                    f.create_dataset(f"Properties/{key}", data=value)
-                    f[f"Properties/{key}"].attrs["unit"] = unit
-                    f[f"Properties/{key}"].attrs["IRI"] = iri
-
-                elif isinstance(self.properties[key], mu.Quantity):
-                    value = self.properties[key].value
-                    unit = str(self.properties[key].unit)
-                    f.create_dataset(f"Properties/{key}", data=value)
-                    f[f"Properties/{key}"].attrs["unit"] = unit
-
-                else:
-                    value = self.properties[key].value
-                    f.create_dataset(f"Properties/{key}", data=value)
-
-
-class MH_major(_Property_Container, MH):
+class MH_major(MH):
     """
     Class for importing, storing and using of VSM-data from major loop M(H)
     measurements aswell as derived properties.
@@ -504,29 +394,73 @@ class MH_major(_Property_Container, MH):
     """
 
     def __init__(self, datfile, read_method="auto"):
-        # import data
-        super().load_qd(datfile, read_method=read_method)
+        super().__init__(datfile, read_method=read_method)
+
+        # initialise property container
+        self.properties = me.EntityCollection(
+            "Sample properties derived from the measurement data."
+        )
 
         # calculate properties
         s = self.segments()
         idx = np.argsort(self.H.q[s[0] : s[1]]) + s[0]
         prop = extrinsic_properties(self.H.q[idx], self.M.q[idx], 0)
-
-        self.remanence = prop.Mr
-        self.coercivity = prop.Hc
+        self.properties.remanence = prop.Mr
+        self.properties.coercivity = prop.Hc
         # save BHmax in kJ/m3 instead of N/m2
-        self.BHmax = me.Entity("MaximumEnergyProduct", prop.BHmax.q.to("kJ/m3"))
+        self.properties.BHmax = me.Entity(
+            "MaximumEnergyProduct", prop.BHmax.q.to("kJ/m3")
+        )
+        self.properties.kneefield = self._calc_kneefield()
+        self.properties.squareness = self._calc_squareness()
 
-        self.kneefield = self._calc_kneefield()
-        self.squareness = self._calc_squareness()
+    @property
+    def remanence(self):
+        """
+        Return the remanence directly without needing to access it from within
+        the property collection.
+        """
+        return self.properties.remanence
 
-        self.properties = {
-            "Mr": self.remanence,
-            "Hc": self.coercivity,
-            "BHmax": self.BHmax,
-            "Hk": self.kneefield,
-            "S": self.squareness,
-        }
+    @property
+    def coercivity(self):
+        """
+        Return the coercivity directly without needing to access it from within
+        the property collection.
+        """
+        return self.properties.coercivity
+
+    @property
+    def BHmax(self):
+        """
+        Return the remanence directly without needing to access it from within
+        the property collection.
+        """
+        return self.properties.BHmax
+
+    @property
+    def kneefield(self):
+        """
+        Return the kneefield strength directly without needing to access it
+        from within the property collection.
+        """
+        return self.properties.kneefield
+
+    @property
+    def squareness(self):
+        """
+        Return the hysteresis loop squareness factor directly without needing
+        to access it from within the property collection.
+        """
+        return self.properties.squareness
+
+    @property
+    def saturation(self):
+        """
+        Return the saturation magnetisation directly without needing to access
+        it from within the property collection.
+        """
+        return self.properties.saturation
 
     def _calc_kneefield(self):
         """
@@ -627,8 +561,7 @@ class MH_major(_Property_Container, MH):
                 Ms.append(linreg2.intercept * mu.A / mu.m)
 
         Ms = me.Entity("SpontaneousMagnetization", max(Ms))
-        self.saturation = Ms
-        self.properties["Ms"] = Ms
+        self.properties.saturation = Ms
         return Ms
 
     def segments(self, edge=0.05, prominence=1e6):
@@ -1146,7 +1079,7 @@ class FORC(MH):
         return H_c, H_i, rho
 
 
-class MT(VSM, _Property_Container):
+class MT(VSM):
     """
     Class for importing, storing and using of VSM-data from M(T)-measurement
     aswell as derived properties.
@@ -1186,16 +1119,26 @@ class MT(VSM, _Property_Container):
 
     def __init__(self, datfile, read_method="auto"):
         # import data
-        super().load_qd(datfile, read_method=read_method)
+        super().__init__(datfile, read_method=read_method)
 
+        # Initialise property collection
+        self.properties = me.EntityCollection(
+            "Sample properties derived from the measurement data."
+        )
         # calculate properties
-        self.Tc = self._calc_Tc()
-        self.properties = {"Tc": self.Tc}
+        self.properties.Tc = self._calc_Tc()
+
+    @property
+    def Tc(self):
+        """
+        Return the Curie-temperature directly without needing to access it
+        from within the property collection.
+        """
+        return self.properties.Tc
 
     def _calc_Tc(self):
         """
-        Calculate Curie-temperature from M(T) measurement, assuming only one
-        Curie-temperature. Use with caution.
+        Calculate Curie-temperature from M(T) measurement.
 
         Parameters
         ----------

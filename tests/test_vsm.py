@@ -40,7 +40,6 @@ def test_calc_Ms():
     mh.estimate_saturation()
     mh.estimate_saturation(0.9)
     assert isinstance(mh.saturation, me.Entity)
-    assert isinstance(mh.properties["Ms"], me.Entity)
 
 
 def test_MH_major_to_yml():
@@ -51,7 +50,7 @@ def test_MH_major_to_yml():
     file_path = cwd.joinpath("VSM_MH.DAT")
     output_path = cwd.joinpath(file_path.stem + "_properties.yml")
     try:
-        mh.properties_to_file(output_path)
+        mh.to_yaml(output_path)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
     assert output_path.is_file()
@@ -110,7 +109,7 @@ def test_MT_to_yml():
     file_path = cwd.joinpath("VSM_MT.DAT")
     output_path = cwd.joinpath(file_path.stem + "_properties.yml")
     try:
-        mt.properties_to_file(output_path)
+        mt.to_yaml(output_path)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
     assert output_path.is_file()
