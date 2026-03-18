@@ -279,6 +279,15 @@ class VSM(me.EntityCollection):
         """
         return self.measurement_data.t
 
+    def to_csv(self, filename):
+        """
+        Write measurement data to CSV-file.
+
+        filename: STR | PATH
+            Name of the generated file.
+        """
+        self.measurement_data.to_csv(filename)
+
 
 class MH(VSM):
     """
@@ -343,7 +352,30 @@ class MH(VSM):
             fig.savefig(filepath, dpi=300)
 
 
-class MH_major(MH):
+class _Property_Container:
+    """Abstract parent class that introduces handling of properties."""
+
+    def to_csv(self, filename):
+        """
+        Write measurement data and calculated properties to two seperate
+        CSV-files.
+
+        Parameters
+        ----------
+        filename: STR | PATH
+            Base of the generated files. Measurement data will have a '_data'
+            attached before the file extension and properties '_properties'.
+
+        Returns
+        -------
+        None
+        """
+        path = Path(filename)
+        self.measurement_data.to_csv(path.with_stem(path.stem + "_data"))
+        self.properties.to_csv(path.with_stem(path.stem + "_properties"))
+
+
+class MH_major(_Property_Container, MH):
     """
     Class for importing, storing and using of VSM-data from major loop M(H)
     measurements aswell as derived properties.
@@ -1079,7 +1111,7 @@ class FORC(MH):
         return H_c, H_i, rho
 
 
-class MT(VSM):
+class MT(_Property_Container, VSM):
     """
     Class for importing, storing and using of VSM-data from M(T)-measurement
     aswell as derived properties.

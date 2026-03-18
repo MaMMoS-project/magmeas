@@ -63,13 +63,15 @@ def test_MH_major_to_csv():
     mh = magmeas.MH_major(file_path)
 
     file_path = cwd.joinpath("VSM_MH.DAT")
-    output_path = cwd.joinpath(file_path.stem + "_properties.csv")
+    output_path = cwd.joinpath("VSM_MH_major_export.csv")
     try:
-        mh.properties_to_file(output_path)
+        mh.to_csv(output_path)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
-    assert output_path.is_file()
-    output_path.unlink()
+    assert output_path.with_stem(output_path.stem + "_data").is_file()
+    assert output_path.with_stem(output_path.stem + "_properties").is_file()
+    output_path.with_stem(output_path.stem + "_data").unlink()
+    output_path.with_stem(output_path.stem + "_properties").unlink()
 
 
 def test_MH_major_to_hdf5():
@@ -122,13 +124,15 @@ def test_MT_to_csv():
     mt = magmeas.MT(file_path)
 
     file_path = cwd.joinpath("VSM_MT.DAT")
-    output_path = cwd.joinpath(file_path.stem + "_properties.csv")
+    output_path = cwd.joinpath("VSM_MT_export.csv")
     try:
-        mt.properties_to_file(output_path)
+        mt.to_csv(output_path)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
-    assert output_path.is_file()
-    output_path.unlink()
+    assert output_path.with_stem(output_path.stem + "_data").is_file()
+    assert output_path.with_stem(output_path.stem + "_properties").is_file()
+    output_path.with_stem(output_path.stem + "_data").unlink()
+    output_path.with_stem(output_path.stem + "_properties").unlink()
 
 
 def test_MT_to_hdf5():
