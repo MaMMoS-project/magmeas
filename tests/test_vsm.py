@@ -16,6 +16,29 @@ def test_version():
     assert isinstance(magmeas.__version__, str)
 
 
+def test_init_MH():
+    """Test initialisation of M(H) measurement as magmeas.VSM object."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH(file_path)
+
+    assert isinstance(mh, magmeas.MH)
+
+
+def test_MH_plot():
+    """Test export of M(H) measurement to PNG."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH(file_path)
+
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    output_path = cwd.joinpath(file_path.stem + ".png")
+    try:
+        mh.plot(output_path)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert output_path.is_file()
+    output_path.unlink()
+
+
 def test_init_MH_major():
     """Test initialisation of M(H) measurement as magmeas.VSM object."""
     file_path = cwd.joinpath("VSM_MH.DAT")

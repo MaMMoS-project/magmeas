@@ -318,7 +318,7 @@ class MH(VSM):
         Save contents of .DAT-file to hdf5 file.
     """
 
-    def plot(self, filepath=None, label=None):
+    def plot(self, filepath=None, label=None, unit="T"):
         """
         Plot M(H) measurement and save figure if a filepath is given.
 
@@ -330,26 +330,65 @@ class MH(VSM):
         label: STR, optional
             Optional label of M(H)-measurement that can be displayed as title.
             Default is None, in that case no legend is displayed.
+        unit: STR | mu.unit | TUPLE(STR | mu.unit)
+            Unit H and M are going to be plotted in. If string is given then
+            both will have the same unit. Otherwise specify respective units
+            as tuple (H_unit, M_unit)
 
         Returns
         -------
-        None
+        None | (matplotlib.Figure, matplotlib.Axes)
+            Return figure and axes object if filepath is not specified.
         """
-        H = self.H.q.to("T")  # converts H from A/m to Tesla
-        M = self.M.q.to("T")  # converts M from A/m to Tesla
+        if isinstance(unit, str | mu.Unit):
+            H_unit = mu.Unit(unit)
+            M_unit = mu.Unit(unit)
+        else:
+            if len(unit) > 2:
+                raise ValueError(
+                    "Length of unit surpasses maximum of two.\n"
+                    + "Please only pass two values: (H_unit, M_unit)."
+                )
+            elif len(unit) == 2:
+                H_unit = mu.Unit(unit[0])
+                M_unit = mu.Unit(unit[1])
+            else:
+                H_unit = mu.Unit(unit[0])
+                M_unit = mu.Unit(unit[0])
+
+        if H_unit.is_equivalent(mu.T, equivalencies=None):
+            H_label = "$\\mu_0 H_{int}$"
+        elif H_unit.is_equivalent(mu.A / mu.m, equivalencies=None):
+            H_label = "$H_{int}$"
+        else:
+            raise ValueError(
+                f"Unit {H_unit} is incompatible with magnetic "
+                + "field or magnetic flux density units."
+            )
+        if M_unit.is_equivalent(mu.T, equivalencies=None):
+            M_label = "J$"
+        elif M_unit.is_equivalent(mu.A / mu.m, equivalencies=None):
+            M_label = "M"
+        else:
+            raise ValueError(
+                f"Unit {M_unit} is incompatible with magnetisation"
+                + " or magnetic polarisation units."
+            )
 
         fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
-        ax1.plot(H, M)
+        ax1.plot(self.H.q.to(H_unit), self.M.q.to(M_unit))
 
         # format plot
-        ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
-        ax1.set_ylabel(r"$J$ in $T$")
+        ax1.set_xlabel(f"{H_label} in {H_unit}")
+        ax1.set_ylabel(f"{M_label} in {M_unit}")
         if label is not None:
             ax1.set_title(label)
 
         # save figure if filepath is given
         if filepath is not None:
             fig.savefig(filepath, dpi=300)
+        if filepath is None:
+            return fig, ax1
 
 
 class _Property_Container:
@@ -652,7 +691,7 @@ class MH_major(_Property_Container, MH):
             s = s[: -len(s[s > ((1 - edge) * len(t))])]
         return s
 
-    def plot(self, filepath=None, demag=True, label=None):
+    def plot(self, filepath=None, demag=True, label=None, unit="T"):
         """
         Plot major hysteresis loop, optionally with inset of demagnetization
         curve and save figure if a filepath is given.
@@ -673,35 +712,35 @@ class MH_major(_Property_Container, MH):
         -------
         None
         """
-        H = self.H.q.to("T")  # converts H from A/m to Tesla
-        M = self.M.q.to("T")  # converts M from A/m to Tesla
-
-        fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
-        ax1.plot(H, M)
-
-        # format plot
-        ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
-        ax1.set_ylabel(r"$J$ in $T$")
-        if label is not None:
-            ax1.set_title(label)
+        fig, ax1 = super().plot(filepath=None, label=label, unit=unit)
 
         # plot inset of demagnetization curve
         if demag:
+            H_unit = mu.Unit(ax1.get_xlabel().split("in ")[-1])
+            M_unit = mu.Unit(ax1.get_ylabel().split("in ")[-1])
             start_idx, end_idx = self.segments()[:2]
             ax2 = ax1.inset_axes([0.625, 0.15, 0.3, 0.5])
-            ax2.plot(H[start_idx:end_idx], M[start_idx:end_idx])
+            ax2.plot(
+                self.H.q.to(H_unit)[start_idx:end_idx],
+                self.M.q.to(M_unit)[start_idx:end_idx],
+            )
 
             # format inset
-            Hmin = self.coercivity.q.to("T").value * -1.1
-            Jmax = self.remanence.q.to("T").value * 1.1
+            Hmin = self.coercivity.q.to(H_unit).value * -1.1
+            Jmax = self.remanence.q.to(M_unit).value * 1.1
             ax2.axis([Hmin, 0, 0, Jmax])
             ax2.yaxis.set_label_position("right")
-            ax2.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
-            ax2.set_ylabel(r"$J$ in $T$")
+            ax2.set_xlabel(ax1.get_xlabel())
+            ax2.set_ylabel(ax1.get_ylabel())
 
         # save figure if filepath is given
         if filepath is not None:
             fig.savefig(filepath, dpi=300)
+        if filepath is None:
+            if demag:
+                return fig, ax1, ax2
+            else:
+                return fig, ax1
 
 
 class MH_recoil(MH):
