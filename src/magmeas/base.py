@@ -1368,7 +1368,8 @@ def plot_multiple_MH_major(
 
     Returns
     -------
-    None
+    None | (matplotlib.Figure, matplotlib.Axes)
+        Return figure and axes object if filepath is not specified.
     """
     if "color" in kwargs or "c" in kwargs:
         raise AttributeError(
@@ -1431,7 +1432,10 @@ def plot_multiple_MH_major(
     # save figure if filepath is given
     if filepath is not None:
         fig.savefig(filepath, dpi=300)
-    return None
+    elif filepath is None and demag:
+        return fig, ax1, ax2
+    elif filepath is None and not demag:
+        return fig, ax1
 
 
 def mult_properties_to_file(data, filepath, labels=None):
