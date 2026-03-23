@@ -719,7 +719,8 @@ class MH_major(_Property_Container, MH):
 
         Returns
         -------
-        None
+        None | (matplotlib.Figure, matplotlib.Axes)
+            Return figure and axes object if filepath is not specified.
         """
         fig, ax1 = super().plot(filepath=None, label=label, unit=unit, **kwargs)
 
@@ -1296,7 +1297,8 @@ class MT(_Property_Container, VSM):
 
         Returns
         -------
-        None.
+        None | (matplotlib.Figure, matplotlib.Axes)
+            Return figure and axes object if filepath is not specified.
         """
         if derivative:
             fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
