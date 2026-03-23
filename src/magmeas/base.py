@@ -346,7 +346,7 @@ class MH(VSM):
         None | (matplotlib.Figure, matplotlib.Axes)
             Return figure and axes object if filepath is not specified.
         """
-        if isinstance(unit, str | mu.Unit):
+        if isinstance(unit, str | mu.Unit | mu.CompositeUnit):
             H_unit = mu.Unit(unit)
             M_unit = mu.Unit(unit)
         else:
