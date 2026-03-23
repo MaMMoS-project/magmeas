@@ -1278,7 +1278,7 @@ class MT(_Property_Container, VSM):
             s = s[: -len(s[s > ((1 - edge) * len(t))])]
         return s
 
-    def plot(self, filepath=None, **kwargs):
+    def plot(self, filepath=None, derivative=True, **kwargs):
         """
         Plot cooling curve of M(T) measurement. Save to file if path is given.
 
@@ -1287,6 +1287,9 @@ class MT(_Property_Container, VSM):
         filepath : STR | PATH, optional
             Filepath for saving the figure. Default is None, in that case no
             file is saved.
+        derivative: BOOL, optional
+            Whether to plot the first derivative dM/dT on a second axes.
+            Default is True.
         kwargs:
             Keyword arguments to change the appearance of plots.
             See documentation of matplotlib.pyplot.plot for more information.
@@ -1295,24 +1298,36 @@ class MT(_Property_Container, VSM):
         -------
         None.
         """
-        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+        if derivative:
+            fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+        else:
+            fig, ax1 = plt.subplots(1, 1)
+            ax1.set_xlabel(f"Temperature in {self.T.unit}")
 
         ax1.plot(self.T.q, self.M.q)
         ax1.set_ylabel(f"Magnetization in {self.M.unit}")
 
-        M = self.M.q
-        T = self.T.q
-        # crop off measurement edges, where extreme noise usually occurs
-        cM = M[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
-        cT = T[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
-        # calculate dM/dT and smooth generously
-        dmdT = np.convolve(np.gradient(cM) / np.gradient(cT), np.ones(20) / 20, "same")
-        ax2.plot(cT, dmdT, **kwargs)
-        ax2.set_ylabel("$\\frac{dM}{dT}$")
-        ax2.set_xlabel(f"Temperature in {self.T.unit}")
+        if derivative:
+            M = self.M.q
+            T = self.T.q
+            # crop off measurement edges, where extreme noise usually occurs
+            cM = M[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
+            cT = T[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
+            # calculate dM/dT and smooth generously
+            dmdT = np.convolve(
+                np.gradient(cM) / np.gradient(cT), np.ones(20) / 20, "same"
+            )
+            ax2.plot(cT, dmdT, **kwargs)
+            ax2.set_ylabel("$\\frac{dM}{dT}$")
+            ax2.set_xlabel(f"Temperature in {self.T.unit}")
 
         if filepath is not None:
             fig.savefig(filepath, dpi=300)
+        if filepath is None:
+            if derivative:
+                return fig, ax1, ax2
+            else:
+                return fig, ax1
 
 
 def plot_multiple_MH_major(
