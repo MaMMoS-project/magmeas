@@ -328,7 +328,8 @@ class MH(VSM):
         ----------
         filepath: STR | PATH, optional
             Filepath for saving the figure. Default is None, in that case no
-            file is saved.
+            file is saved and the generated figure as well as all axes objects
+            are returned.
         label: STR, optional
             Optional label of M(H)-measurement that can be displayed as title.
             Default is None, in that case no legend is displayed.
@@ -401,7 +402,7 @@ class _Property_Container:
 
     def to_csv(self, filename):
         """
-        Write measurement data and calculated properties to two seperate
+        Write measurement data and calculated properties to two separate
         CSV-files.
 
         Parameters
@@ -704,7 +705,8 @@ class MH_major(_Property_Container, MH):
         ----------
         filepath: STR | PATH, optional
             Filepath for saving the figure. Default is None, in that case no
-            file is saved.
+            file is saved and the generated figure as well as all axes objects
+            are returned.
         demag: BOOL, optional
             Boolean that determines if demagnetization curve is plotted as an
             inset next to hysteresis loop. Default is True.
