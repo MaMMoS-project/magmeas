@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from mammos_analysis.hysteresis import extrinsic_properties
+from matplotlib import colormaps
+from matplotlib.colors import Colormap, ListedColormap
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 from scipy.stats import linregress
@@ -318,7 +320,7 @@ class MH(VSM):
         Save contents of .DAT-file to hdf5 file.
     """
 
-    def plot(self, filepath=None, label=None, unit="T"):
+    def plot(self, filepath=None, label=None, unit="T", **kwargs):
         """
         Plot M(H) measurement and save figure if a filepath is given.
 
@@ -334,6 +336,9 @@ class MH(VSM):
             Unit H and M are going to be plotted in. If string is given then
             both will have the same unit. Otherwise specify respective units
             as tuple (H_unit, M_unit)
+        kwargs:
+            Keyword arguments to change the appearance of plots.
+            See documentation of matplotlib.pyplot.plot for more information.
 
         Returns
         -------
@@ -376,7 +381,7 @@ class MH(VSM):
             )
 
         fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
-        ax1.plot(self.H.q.to(H_unit), self.M.q.to(M_unit))
+        ax1.plot(self.H.q.to(H_unit), self.M.q.to(M_unit), **kwargs)
 
         # format plot
         ax1.set_xlabel(f"{H_label} in {H_unit}")
@@ -690,7 +695,7 @@ class MH_major(_Property_Container, MH):
             s = s[: -len(s[s > ((1 - edge) * len(t))])]
         return s
 
-    def plot(self, filepath=None, demag=True, label=None, unit="T"):
+    def plot(self, filepath=None, demag=True, label=None, unit="T", **kwargs):
         """
         Plot major hysteresis loop, optionally with inset of demagnetization
         curve and save figure if a filepath is given.
@@ -706,12 +711,15 @@ class MH_major(_Property_Container, MH):
         label: STR, optional
             Optional label of hysteresis loop that can be displayed as title.
             Default is None, in that case no legend is displayed.
+        kwargs:
+            Keyword arguments to change the appearance of plots.
+            See documentation of matplotlib.pyplot.plot for more information.
 
         Returns
         -------
         None
         """
-        fig, ax1 = super().plot(filepath=None, label=label, unit=unit)
+        fig, ax1 = super().plot(filepath=None, label=label, unit=unit, **kwargs)
 
         # plot inset of demagnetization curve
         if demag:
@@ -722,6 +730,7 @@ class MH_major(_Property_Container, MH):
             ax2.plot(
                 self.H.q.to(H_unit)[start_idx:end_idx],
                 self.M.q.to(M_unit)[start_idx:end_idx],
+                **kwargs,
             )
 
             # format inset
@@ -1267,7 +1276,7 @@ class MT(_Property_Container, VSM):
             s = s[: -len(s[s > ((1 - edge) * len(t))])]
         return s
 
-    def plot(self, filepath=None):
+    def plot(self, filepath=None, **kwargs):
         """
         Plot cooling curve of M(T) measurement. Save to file if path is given.
 
@@ -1276,6 +1285,9 @@ class MT(_Property_Container, VSM):
         filepath : STR | PATH, optional
             Filepath for saving the figure. Default is None, in that case no
             file is saved.
+        kwargs:
+            Keyword arguments to change the appearance of plots.
+            See documentation of matplotlib.pyplot.plot for more information.
 
         Returns
         -------
@@ -1293,7 +1305,7 @@ class MT(_Property_Container, VSM):
         cT = T[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
         # calculate dM/dT and smooth generously
         dmdT = np.convolve(np.gradient(cM) / np.gradient(cT), np.ones(20) / 20, "same")
-        ax2.plot(cT, dmdT)
+        ax2.plot(cT, dmdT, **kwargs)
         ax2.set_ylabel("$\\frac{dM}{dT}$")
         ax2.set_xlabel(f"Temperature in {self.T.unit}")
 
@@ -1301,7 +1313,9 @@ class MT(_Property_Container, VSM):
             fig.savefig(filepath, dpi=300)
 
 
-def plot_multiple_MH_major(data, filepath=None, labels=None, demag=True):
+def plot_multiple_MH_major(
+    data, filepath=None, labels=None, demag=True, cmap="viridis", **kwargs
+):
     """
     Plot hysteresis loops and optionally demagnetization curves of
     several major hysteresis loop measurements.
@@ -1321,19 +1335,52 @@ def plot_multiple_MH_major(data, filepath=None, labels=None, demag=True):
     demag: BOOL, optional
         Boolean that determines if demagnetization curve is plotted as an
         inset next to hysteresis loop. Default is True.
+    cmap: STR | matplotlib.colors.Colormap | matplotlib.colors.ListedColormap
+        Colormap that will be used to generate the colours of all lines. Each
+        colormap will be fully filled with np.linspace . Please keep the
+        visibility of ALL lines in mind! Colormaps such as 'gray' or 'hot'
+        will definitely lead to invisible/barely visible lines.
+        Default is 'viridis'.
+    kwargs:
+        Keyword arguments to change the appearance of lines. All arguments are
+        applied to every line. The arguments 'color' and 'c' are not allowed,
+        as they would lead to all lines having the same colour.
+        See documentation of matplotlib.pyplot.plot for more information.
 
     Returns
     -------
     None
     """
+    if "color" in kwargs or "c" in kwargs:
+        raise AttributeError(
+            "Please do not pass 'color' or 'c' as a keyword"
+            + " argument. This would overwrite the colour of all lines, making"
+            + " them indistinguishable. Use the functionality of cmap instead."
+        )
+
+    if isinstance(cmap, str):
+        cmap = colormaps.get_cmap(cmap)
+    elif not isinstance(cmap, Colormap | ListedColormap):
+        raise TypeError(
+            f"cmap has type {type(cmap)}, which is not supported.\n"
+            + "Please only pass a valid str or a Colormap from matplotlib to cmap."
+        )
+    colors = cmap(np.linspace(0, 1, len(data)))
+
     if labels is None:
-        labels = [vsm.path.stem for vsm in data]
+        labels = [vsm._path.stem for vsm in data]
 
     fig, ax1 = plt.subplots()
 
     # plot hysteresis loops
     for i in range(len(data)):
-        ax1.plot(data[i].H.q.to("T"), data[i].M.q.to("T"), label=labels[i])
+        ax1.plot(
+            data[i].H.q.to("T"),
+            data[i].M.q.to("T"),
+            label=labels[i],
+            color=colors[i],
+            **kwargs,
+        )
 
     # format plot
     ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
@@ -1349,6 +1396,8 @@ def plot_multiple_MH_major(data, filepath=None, labels=None, demag=True):
                 data[i].H.q.to("T")[start_idx:end_idx],
                 data[i].M.q.to("T")[start_idx:end_idx],
                 label=labels[i],
+                color=colors[i],
+                **kwargs,
             )
 
         # format plot
