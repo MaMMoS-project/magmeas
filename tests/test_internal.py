@@ -46,8 +46,22 @@ def test_calc_Ms():
     assert isinstance(mh.saturation, me.Entity)
 
 
+def test_MH_major_segments():
+    """Test MT.segments."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
+    assert len(mh.segments()) == 5
+
+
 def test_MT():
     """Test initialisation of M(T) measurement as magmeas.VSM object."""
     file_path = cwd.joinpath("VSM_MT.DAT")
     mt = magmeas.MT(file_path)
     assert isinstance(mt, magmeas.MT)
+
+
+def test_MT_segments():
+    """Test MT.segments."""
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
+    assert len(mt.segments()) == 1
