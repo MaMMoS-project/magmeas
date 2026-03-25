@@ -14,8 +14,10 @@ from magmeas.base import (
     VSM,
     MH_major,
     MH_recoil,
-    mult_properties_to_file,
     plot_batch,
+    to_batch,
+    to_hdf5,
+    to_yaml,
 )
 
 __all__ = [
@@ -25,6 +27,8 @@ __all__ = [
     MH_recoil,
     FORC,
     MT,
-    mult_properties_to_file,
     plot_batch,
+    to_batch,
+    to_yaml,
+    to_hdf5,
 ]

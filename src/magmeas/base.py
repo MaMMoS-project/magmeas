@@ -366,7 +366,7 @@ class MH(VSM):
             return fig, ax1
 
 
-class _Property_Container:
+class _PropertyContainer:
     """Abstract parent class that introduces handling of properties."""
 
     def to_csv(self, filename):
@@ -389,7 +389,7 @@ class _Property_Container:
         self.properties.to_csv(path.with_stem(path.stem + "_properties"))
 
 
-class MH_major(_Property_Container, MH):
+class MH_major(_PropertyContainer, MH):
     """
     Class for importing, storing and using of VSM-data from major loop M(H)
     measurements aswell as derived properties.
@@ -1141,7 +1141,7 @@ class FORC(MH):
         return H_c, H_i, rho
 
 
-class MT(_Property_Container, VSM):
+class MT(_PropertyContainer, VSM):
     """
     Class for importing, storing and using of VSM-data from M(T)-measurement
     aswell as derived properties.
@@ -1507,76 +1507,108 @@ def plot_batch(
         return fig, ax1
 
 
-def mult_properties_to_file(data, filepath, labels=None):
-    """
-    Save all properties derived from list of VSM-measurements to CSV-file
-    or to YAML file, using the mammos-entity io functionality.
+def to_batch(data, labels=None, prop_only=False):
+    """Generate batch of VSM-derived objects as mammos_entity.EntityCollection.
 
     Parameters
     ----------
     data: LIST[MH_major | MT]
-        List of VSM objects that will have their properties exported.
-    filepath: STR | PATH
-        Filepath to save the file to. Ending also determines type of file.
+        List of VSM objects that will be exported.
     labels: LIST[STR], optional
         List of strings to identify the VSM objects more easily.
         If not given, the filenames of each VSM-object are used instead.
+    prop_only: BOOL, optional
+        Whether to only export the the properties and no measurement data. Will
+        lead to an AttributeError if this is True but the objects in data only
+        contain measurement data and no properties.
+        Default is False.
 
     Returns
     -------
     None
     """
-    # check if all objects in data are of the same type
-    ref_type = type(data[0])
-    if not all([type(vsm) is ref_type for vsm in data]):
-        raise Exception(
-            "Objects in data are not all of the same type.\n"
-            + "Please only export the properties from objects of\n"
-            + "the same type together."
+    if (
+        not all([issubclass(type(vsm), _PropertyContainer) for vsm in data])
+        and prop_only
+    ):
+        err_idx = np.where(
+            [not issubclass(type(vsm), _PropertyContainer) for vsm in data]
+        )[0].tolist()
+        raise AttributeError(
+            f"""The entries in data with the index {err_idx} do not seem to 
+            contain any properties. Please only pass objects containing 
+            properties to this function if you set 'prop_only=True'."""
         )
 
     description = (
         f"mammos-entity version = {version('mammos-entity')}\n"
-        + f"magmeas       version = {version('magmeas')}"
+        + f"magmeas version = {version('magmeas')}"
     )
 
     if labels is None:
-        labels = [vsm.path.stem for vsm in data]
+        labels = [vsm._path.stem for vsm in data]
 
-    if all([isinstance(vsm, MH_major) for vsm in data]) and all(
-        [hasattr(vsm, "saturation") for vsm in data]
-    ):
-        me.io.entities_to_file(
-            filepath,
-            description,
-            labels=labels,
-            Ms=me.concat_flat([vsm.saturation for vsm in data]),
-            Mr=me.concat_flat([vsm.remanence for vsm in data]),
-            Hc=me.concat_flat([vsm.coercivity for vsm in data]),
-            BHmax=me.concat_flat([vsm.BHmax for vsm in data]),
-            Hk=me.concat_flat([vsm.kneefield for vsm in data]),
-        )
+    if prop_only:
+        data = [vsm.properties for vsm in data]
 
-    elif all([isinstance(vsm, MH_major) for vsm in data]) and any(
-        [not hasattr(vsm, "saturation") for vsm in data]
-    ):
-        me.io.entities_to_file(
-            filepath,
-            description,
-            labels=labels,
-            Mr=me.concat_flat([vsm.remanence for vsm in data]),
-            Hc=me.concat_flat([vsm.coercivity for vsm in data]),
-            BHmax=me.concat_flat([vsm.BHmax for vsm in data]),
-            Hk=me.concat_flat([vsm.kneefield for vsm in data]),
-        )
+    batch = me.EntityCollection(
+        description, **{label: vsm for label, vsm in zip(labels, data, strict=False)}
+    )
+    return batch
 
-    elif all([isinstance(vsm, MT) for vsm in data]):
-        me.io.entities_to_file(
-            filepath,
-            description,
-            labels=labels,
-            Tc=me.concat_flat([vsm.Tc for vsm in data]),
-        )
+
+def to_yaml(data, filepath, labels=None, prop_only=False):
+    """
+    Save all properties derived from list of VSM-measurements to YAML file.
+
+    Parameters
+    ----------
+    data: LIST[MH_major | MT]
+        List of VSM objects that will be exported.
+    filepath: STR | PATH
+        Filepath to save the file to.
+    labels: LIST[STR], optional
+        List of strings to identify the VSM objects more easily.
+        If not given, the filenames of each VSM-object are used instead.
+    prop_only: BOOL, optional
+        Whether to only export the the properties and no measurement data. Will
+        lead to an AttributeError if this is True but the objects in data only
+        contain measurement data and no properties.
+        Default is False.
+
+    Returns
+    -------
+    None
+    """
+    batch = to_batch(data=data, labels=labels, prop_only=prop_only)
+    batch.to_yaml(filepath)
+
+
+def to_hdf5(data, filepath, labels=None, prop_only=False):
+    """
+    Save all properties derived from list of VSM-measurements to HDF5 file.
+
+    Parameters
+    ----------
+    data: LIST[MH_major | MT]
+        List of VSM objects that will be exported.
+    filepath: STR | PATH
+        Filepath to save the file to.
+    labels: LIST[STR], optional
+        List of strings to identify the VSM objects more easily.
+        If not given, the filenames of each VSM-object are used instead.
+    prop_only: BOOL, optional
+        Whether to only export the the properties and no measurement data. Will
+        lead to an AttributeError if this is True but the objects in data only
+        contain measurement data and no properties.
+        Default is False.
+
+    Returns
+    -------
+    None
+    """
+    batch = to_batch(data=data, labels=labels, prop_only=prop_only)
+    batch.to_hdf5(filepath)
 
 
 def _MH_unit_processing(unit):
