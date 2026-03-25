@@ -13,7 +13,7 @@ cwd = Path(__file__).parent.resolve()
 
 
 def test_MH_io():
-    """Test export of M(H) measurement to PNG."""
+    """Test export of MH-object to PNG."""
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH(file_path)
     output_path = cwd.joinpath("VSM_MH.png")
@@ -27,7 +27,7 @@ def test_MH_io():
 
 
 def test_MH_return():
-    """Test export of M(H) measurement to PNG."""
+    """Test return of matplotlib Figure and Axes objects from MH.plot."""
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH(file_path)
     try:
@@ -39,12 +39,13 @@ def test_MH_return():
     matplotlib.pyplot.close()
 
 
-def test_MH_label():
-    """Test export of M(H) measurement to PNG."""
+def test_MH_figax():
+    """Test MH.plot with previously generated input Figure and Axes objects."""
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH(file_path)
+    input_fig, input_ax = matplotlib.pyplot.subplots()
     try:
-        fig, ax = mh.plot(label="Test_label")
+        fig, ax = mh.plot(fig_ax=(input_fig, input_ax))
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
     assert isinstance(fig, matplotlib.figure.Figure)
@@ -53,7 +54,7 @@ def test_MH_label():
 
 
 def test_MH_unit_str():
-    """Test export of M(H) measurement to PNG."""
+    """Test MH.plot with argument unit as string."""
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH(file_path)
     try:
@@ -66,7 +67,7 @@ def test_MH_unit_str():
 
 
 def test_MH_unit_mu():
-    """Test export of M(H) measurement to PNG."""
+    """Test MH.plot with argument unit as mammos_units.CompositeUnit."""
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH(file_path)
     try:
@@ -79,7 +80,9 @@ def test_MH_unit_mu():
 
 
 def test_MH_unit_tuple2():
-    """Test export of M(H) measurement to PNG."""
+    """Test MH.plot with argument unit as tuple of string and
+    mammos_units.CompositeUnit.
+    """
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH(file_path)
     try:
@@ -92,7 +95,7 @@ def test_MH_unit_tuple2():
 
 
 def test_MH_unit_tuple1():
-    """Test export of M(H) measurement to PNG."""
+    """Test MH.plot with argument unit as tuple of length 1."""
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH(file_path)
     try:
@@ -105,7 +108,7 @@ def test_MH_unit_tuple1():
 
 
 def test_MH_kwargs():
-    """Test export of M(H) measurement to PNG."""
+    """Test MH.plot with keyword arguments passed to matplotlibs plot."""
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH(file_path)
     try:
@@ -118,7 +121,9 @@ def test_MH_kwargs():
 
 
 def test_MH_ValueError_compatible_unit():
-    """Test export of M(H) measurement to PNG."""
+    """Test occurence of ValueError when an incompatible unit is passed as the
+    unit argument.
+    """
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH(file_path)
     with pytest.raises(ValueError):
@@ -127,7 +132,9 @@ def test_MH_ValueError_compatible_unit():
 
 
 def test_MH_ValueError_unit_tuple_len():
-    """Test export of M(H) measurement to PNG."""
+    """Test occurence of ValueError when the length of unit exceeds 2 if it is
+    a tuple or similar.
+    """
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH(file_path)
     with pytest.raises(ValueError):
@@ -136,7 +143,7 @@ def test_MH_ValueError_unit_tuple_len():
 
 
 def test_MH_major_io():
-    """Test export of M(H) measurement to PNG."""
+    """Test export of MH_major-object to PNG."""
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH_major(file_path)
     output_path = cwd.joinpath("VSM_MH.png")
@@ -150,7 +157,9 @@ def test_MH_major_io():
 
 
 def test_MH_major_return2():
-    """Test export of M(H) measurement to PNG."""
+    """Test return of matplotlib Figure and Axes objects from MH_major.plot if
+    demag==False.
+    """
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH_major(file_path)
     try:
@@ -163,7 +172,9 @@ def test_MH_major_return2():
 
 
 def test_MH_major_return3():
-    """Test export of M(H) measurement to PNG."""
+    """Test return of matplotlib Figure and Axes objects from MH_major.plot if
+    demag==True.
+    """
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH_major(file_path)
     try:
@@ -176,12 +187,15 @@ def test_MH_major_return3():
     matplotlib.pyplot.close()
 
 
-def test_MH_major_kwargs():
-    """Test export of M(H) measurement to PNG."""
+def test_MH_major_figax():
+    """Test MH_major.plot with previously generated input Figure and Axes
+    objects.
+    """
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH_major(file_path)
+    input_fig, (input_ax1, input_ax2) = matplotlib.pyplot.subplots(1, 2)
     try:
-        fig, ax, ax1 = mh.plot(color="tab:green", linestyle=":", marker="o")
+        fig, ax, ax1 = mh.plot(fig_ax=(input_fig, input_ax1, input_ax2))
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
     assert isinstance(fig, matplotlib.figure.Figure)
@@ -191,7 +205,7 @@ def test_MH_major_kwargs():
 
 
 def test_MH_major_unit():
-    """Test export of M(H) measurement to PNG."""
+    """Test handling of argument unit in MH_major.plot without Error."""
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH_major(file_path)
     try:
@@ -204,8 +218,22 @@ def test_MH_major_unit():
     matplotlib.pyplot.close()
 
 
+def test_MH_major_kwargs():
+    """Test MH_major.plot with keyword arguments passed to matplotlibs plot."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
+    try:
+        fig, ax, ax1 = mh.plot(color="tab:green", linestyle=":", marker="o")
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert isinstance(ax1, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
 def test_MT_io():
-    """Test export of M(T) measurement to PNG."""
+    """Test export of MT-object to PNG."""
     file_path = cwd.joinpath("VSM_MT.DAT")
     mt = magmeas.MT(file_path)
     output_path = cwd.joinpath("VSM_MT.png")
@@ -218,8 +246,25 @@ def test_MT_io():
     matplotlib.pyplot.close()
 
 
+def test_MT_return2():
+    """Test return of matplotlib Figure and Axes objects from MH_major.plot if
+    derivative==False.
+    """
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
+    try:
+        fig, ax = mt.plot(derivative=False)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
 def test_MT_return3():
-    """Test export of M(T) measurement to PNG."""
+    """Test return of matplotlib Figure and Axes objects from MH_major.plot if
+    derivative==True.
+    """
     file_path = cwd.joinpath("VSM_MT.DAT")
     mt = magmeas.MT(file_path)
     try:
@@ -232,28 +277,13 @@ def test_MT_return3():
     matplotlib.pyplot.close()
 
 
-def test_MT_return2():
-    """Test export of M(T) measurement to PNG."""
-    file_path = cwd.joinpath("VSM_MT.DAT")
-    mt = magmeas.MT(file_path)
-    try:
-        fig, ax = mt.plot(derivative=False)
-    except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=}")
-    assert isinstance(fig, matplotlib.figure.Figure)
-    assert isinstance(ax, matplotlib.axes.Axes)
-    matplotlib.pyplot.close()
-
-
-def test_plot_mult_MH_major_io():
-    """Test export of multiple M(H) measurement to YAML."""
+def test_batch_io():
+    """Test plot_batch with MH_major objects and saving to PNG."""
     file_path = cwd.joinpath("VSM_MH.DAT")
-    mh1 = magmeas.MH_major(file_path)
-    mh2 = magmeas.MH_major(file_path)
-
+    mh = magmeas.MH_major(file_path)
     output_path = cwd.joinpath(file_path.stem + "_plot.png")
     try:
-        magmeas.plot_multiple_MH_major([mh1, mh2], output_path)
+        magmeas.plot_batch([mh] * 3, output_path)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
     assert output_path.is_file()
@@ -261,13 +291,14 @@ def test_plot_mult_MH_major_io():
     matplotlib.pyplot.close()
 
 
-def test_plot_mult_MH_major_return3():
-    """Test export of multiple M(H) measurement to YAML."""
+def test_batch_MH_major_return3():
+    """Test return of matplotlib Figure and Axes objects from plot_batch of
+    several MH_major if demag==True.
+    """
     file_path = cwd.joinpath("VSM_MH.DAT")
-    mh1 = magmeas.MH_major(file_path)
-    mh2 = magmeas.MH_major(file_path)
+    mh = magmeas.MH_major(file_path)
     try:
-        fig, ax, ax1 = magmeas.plot_multiple_MH_major([mh1, mh2])
+        fig, ax, ax1 = magmeas.plot_batch([mh] * 3)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
     assert isinstance(fig, matplotlib.figure.Figure)
@@ -276,13 +307,14 @@ def test_plot_mult_MH_major_return3():
     matplotlib.pyplot.close()
 
 
-def test_plot_mult_MH_major_return2():
-    """Test export of multiple M(H) measurement to YAML."""
+def test_batch_MH_major_return2():
+    """Test return of matplotlib Figure and Axes objects from plot_batch of
+    several MH_major if demag==False.
+    """
     file_path = cwd.joinpath("VSM_MH.DAT")
-    mh1 = magmeas.MH_major(file_path)
-    mh2 = magmeas.MH_major(file_path)
+    mh = magmeas.MH_major(file_path)
     try:
-        fig, ax = magmeas.plot_multiple_MH_major([mh1, mh2], demag=False)
+        fig, ax = magmeas.plot_batch([mh] * 3, demag=False)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
     assert isinstance(fig, matplotlib.figure.Figure)
@@ -290,14 +322,99 @@ def test_plot_mult_MH_major_return2():
     matplotlib.pyplot.close()
 
 
-def test_plot_mult_MH_major_labels():
-    """Test export of multiple M(H) measurement to YAML."""
+def test_batch_MH():
+    """Test plot_batch with several MH-objects."""
     file_path = cwd.joinpath("VSM_MH.DAT")
-    mh1 = magmeas.MH_major(file_path)
-    mh2 = magmeas.MH_major(file_path)
+    mh = magmeas.MH(file_path)
     try:
-        fig, ax, ax1 = magmeas.plot_multiple_MH_major(
-            [mh1, mh2], labels=["label1", "label2"]
+        fig, ax = magmeas.plot_batch([mh] * 3)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
+def test_batch_MT_return2():
+    """Test return of matplotlib Figure and Axes objects from plot_batch of
+    several MT if derivative==False.
+    """
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
+    try:
+        fig, ax = magmeas.plot_batch([mt] * 3, derivative=False)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
+def test_batch_MT_return3():
+    """Test return of matplotlib Figure and Axes objects from plot_batch of
+    several MT if derivative==True.
+    """
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
+    try:
+        fig, ax, ax1 = magmeas.plot_batch([mt] * 3)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert isinstance(ax1, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
+def test_batch_labels():
+    """Test plot_batch with several MH_major objects and specified labels."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
+    try:
+        fig, ax, ax1 = magmeas.plot_batch([mh] * 3, labels=["label"] * 3)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert isinstance(ax1, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
+def test_batch_kwargs():
+    """Test plot_major with keyword arguments passed to matplotlibs plot."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
+    try:
+        fig, ax, ax1 = magmeas.plot_batch([mh] * 3, linestyle=":", marker="o")
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert isinstance(ax1, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
+def test_batch_cmap_str():
+    """Test plot_batch with manually specified cmap as string."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
+    try:
+        fig, ax, ax1 = magmeas.plot_batch([mh] * 3, cmap="inferno")
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert isinstance(ax1, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
+def test_batch_cmap_mpl():
+    """Test plot_batch with manually specified cmap as matplotlib.ColorMap."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
+    try:
+        fig, ax, ax1 = magmeas.plot_batch(
+            [mh] * 3, cmap=matplotlib.colormaps.get_cmap("plasma")
         )
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
@@ -307,70 +424,31 @@ def test_plot_mult_MH_major_labels():
     matplotlib.pyplot.close()
 
 
-def test_plot_mult_MH_major_kwargs():
-    """Test export of multiple M(H) measurement to YAML."""
+def test_batch_AttributeError_color():
+    """Test occurence of AttributeError when passing keyword argument 'color'
+    to plot_batch.
+    """
     file_path = cwd.joinpath("VSM_MH.DAT")
-    mh1 = magmeas.MH_major(file_path)
-    mh2 = magmeas.MH_major(file_path)
-    try:
-        fig, ax, ax1 = magmeas.plot_multiple_MH_major(
-            [mh1, mh2], linestyle=":", marker="o"
-        )
-    except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=}")
-    assert isinstance(fig, matplotlib.figure.Figure)
-    assert isinstance(ax, matplotlib.axes.Axes)
-    assert isinstance(ax1, matplotlib.axes.Axes)
-    matplotlib.pyplot.close()
-
-
-def test_plot_mult_MH_major_cmap_str():
-    """Test export of multiple M(H) measurement to YAML."""
-    file_path = cwd.joinpath("VSM_MH.DAT")
-    mh1 = magmeas.MH_major(file_path)
-    mh2 = magmeas.MH_major(file_path)
-    try:
-        fig, ax, ax1 = magmeas.plot_multiple_MH_major([mh1, mh2], cmap="inferno")
-    except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=}")
-    assert isinstance(fig, matplotlib.figure.Figure)
-    assert isinstance(ax, matplotlib.axes.Axes)
-    assert isinstance(ax1, matplotlib.axes.Axes)
-    matplotlib.pyplot.close()
-
-
-def test_plot_mult_MH_major_cmap_mpl():
-    """Test export of multiple M(H) measurement to YAML."""
-    file_path = cwd.joinpath("VSM_MH.DAT")
-    mh1 = magmeas.MH_major(file_path)
-    mh2 = magmeas.MH_major(file_path)
-    try:
-        fig, ax, ax1 = magmeas.plot_multiple_MH_major(
-            [mh1, mh2], cmap=matplotlib.colormaps.get_cmap("plasma")
-        )
-    except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=}")
-    assert isinstance(fig, matplotlib.figure.Figure)
-    assert isinstance(ax, matplotlib.axes.Axes)
-    assert isinstance(ax1, matplotlib.axes.Axes)
-    matplotlib.pyplot.close()
-
-
-def test_plot_mult_MH_major_AttributeError_color():
-    """Test export of multiple M(H) measurement to YAML."""
-    file_path = cwd.joinpath("VSM_MH.DAT")
-    mh1 = magmeas.MH_major(file_path)
-    mh2 = magmeas.MH_major(file_path)
+    mh = magmeas.MH_major(file_path)
     with pytest.raises(AttributeError):
-        magmeas.plot_multiple_MH_major([mh1, mh2], color="tab:orange")
+        magmeas.plot_batch([mh] * 3, color="tab:orange")
     matplotlib.pyplot.close()
 
 
-def test_plot_mult_MH_major_AttributeError_cmap():
-    """Test export of multiple M(H) measurement to YAML."""
+def test_batch_TypeError_cmap():
+    """Test Occurence of TypeError when incorrect type is passed as cmap."""
     file_path = cwd.joinpath("VSM_MH.DAT")
-    mh1 = magmeas.MH_major(file_path)
-    mh2 = magmeas.MH_major(file_path)
+    mh = magmeas.MH_major(file_path)
     with pytest.raises(TypeError):
-        magmeas.plot_multiple_MH_major([mh1, mh2], cmap=123)
+        magmeas.plot_batch([mh] * 3, cmap=123)
+    matplotlib.pyplot.close()
+
+
+def test_batch_TypeError_reftype():
+    """Test Occurence of TypeError when data in plot_batch contains objects of
+    several different types.
+    """
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    with pytest.raises(TypeError):
+        magmeas.plot_batch([magmeas.MH(file_path), magmeas.MH_major(file_path)])
     matplotlib.pyplot.close()

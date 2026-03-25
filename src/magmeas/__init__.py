@@ -15,7 +15,7 @@ from magmeas.base import (
     MH_major,
     MH_recoil,
     mult_properties_to_file,
-    plot_multiple_MH_major,
+    plot_batch,
 )
 
 __all__ = [
@@ -26,5 +26,5 @@ __all__ = [
     FORC,
     MT,
     mult_properties_to_file,
-    plot_multiple_MH_major,
+    plot_batch,
 ]

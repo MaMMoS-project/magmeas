@@ -320,7 +320,7 @@ class MH(VSM):
         Save contents of .DAT-file to hdf5 file.
     """
 
-    def plot(self, filepath=None, label=None, unit="T", **kwargs):
+    def plot(self, filepath=None, unit="T", fig_ax=None, **kwargs):
         """
         Plot M(H) measurement and save figure if a filepath is given.
 
@@ -330,13 +330,13 @@ class MH(VSM):
             Filepath for saving the figure. Default is None, in that case no
             file is saved and the generated figure as well as all axes objects
             are returned.
-        label: STR, optional
-            Optional label of M(H)-measurement that can be displayed as title.
-            Default is None, in that case no legend is displayed.
-        unit: STR | mu.unit | TUPLE(STR | mu.unit)
+        unit: STR | mu.unit | TUPLE(STR | mu.unit), optional
             Unit H and M are going to be plotted in. If string is given then
             both will have the same unit. Otherwise specify respective units
-            as tuple (H_unit, M_unit)
+            as tuple (H_unit, M_unit). Default is 'T'.
+        fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
+            Tuple of figure and axes the data should be plotted to. If None is
+            given they will be generated dynamically. Default is None.
         kwargs:
             Keyword arguments to change the appearance of plots.
             See documentation of matplotlib.pyplot.plot for more information.
@@ -346,49 +346,18 @@ class MH(VSM):
         None | (matplotlib.Figure, matplotlib.Axes)
             Return figure and axes object if filepath is not specified.
         """
-        if isinstance(unit, str | mu.Unit | mu.CompositeUnit):
-            H_unit = mu.Unit(unit)
-            M_unit = mu.Unit(unit)
-        else:
-            if len(unit) > 2:
-                raise ValueError(
-                    "Length of unit surpasses maximum of two.\n"
-                    + "Please only pass two values: (H_unit, M_unit)."
-                )
-            elif len(unit) == 2:
-                H_unit = mu.Unit(unit[0])
-                M_unit = mu.Unit(unit[1])
-            else:
-                H_unit = mu.Unit(unit[0])
-                M_unit = mu.Unit(unit[0])
+        H_unit, M_unit, H_label, M_label = _MH_unit_processing(unit)
 
-        if H_unit.is_equivalent(mu.T, equivalencies=None):
-            H_label = "$\\mu_0 H_{int}$"
-        elif H_unit.is_equivalent(mu.A / mu.m, equivalencies=None):
-            H_label = "$H_{int}$"
+        if fig_ax is None:
+            fig, ax1 = plt.subplots()
         else:
-            raise ValueError(
-                f"Unit {H_unit} is incompatible with magnetic "
-                + "field or magnetic flux density units."
-            )
-        if M_unit.is_equivalent(mu.T, equivalencies=None):
-            M_label = "J$"
-        elif M_unit.is_equivalent(mu.A / mu.m, equivalencies=None):
-            M_label = "M"
-        else:
-            raise ValueError(
-                f"Unit {M_unit} is incompatible with magnetisation"
-                + " or magnetic polarisation units."
-            )
+            fig, ax1 = fig_ax
 
-        fig, ax1 = plt.subplots(1, 1, figsize=(16 / 2.54, 12 / 2.54))
         ax1.plot(self.H.q.to(H_unit), self.M.q.to(M_unit), **kwargs)
 
         # format plot
         ax1.set_xlabel(f"{H_label} in {H_unit}")
         ax1.set_ylabel(f"{M_label} in {M_unit}")
-        if label is not None:
-            ax1.set_title(label)
 
         # save figure if filepath is given
         if filepath is not None:
@@ -696,7 +665,7 @@ class MH_major(_Property_Container, MH):
             s = s[: -len(s[s > ((1 - edge) * len(t))])]
         return s
 
-    def plot(self, filepath=None, demag=True, label=None, unit="T", **kwargs):
+    def plot(self, filepath=None, demag=True, unit="T", fig_ax=None, **kwargs):
         """
         Plot major hysteresis loop, optionally with inset of demagnetization
         curve and save figure if a filepath is given.
@@ -710,9 +679,13 @@ class MH_major(_Property_Container, MH):
         demag: BOOL, optional
             Boolean that determines if demagnetization curve is plotted as an
             inset next to hysteresis loop. Default is True.
-        label: STR, optional
-            Optional label of hysteresis loop that can be displayed as title.
-            Default is None, in that case no legend is displayed.
+        unit: STR | mu.unit | TUPLE(STR | mu.unit), optional
+            Unit H and M are going to be plotted in. If string is given then
+            both will have the same unit. Otherwise specify respective units
+            as tuple (H_unit, M_unit). Default is 'T'.
+        fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
+            Tuple of figure and axes the data should be plotted to. If None is
+            given they will be generated dynamically. Default is None.
         kwargs:
             Keyword arguments to change the appearance of plots.
             See documentation of matplotlib.pyplot.plot for more information.
@@ -722,14 +695,21 @@ class MH_major(_Property_Container, MH):
         None | (matplotlib.Figure, matplotlib.Axes)
             Return figure and axes object if filepath is not specified.
         """
-        fig, ax1 = super().plot(filepath=None, label=label, unit=unit, **kwargs)
+        if fig_ax is None:
+            fig, ax1 = plt.subplots()
+        elif len(fig_ax) == 3:
+            fig, ax1, ax2 = fig_ax
+        else:
+            fig, ax1 = fig_ax
+
+        super().plot(filepath=None, unit=unit, fig_ax=(fig, ax1), **kwargs)
 
         # plot inset of demagnetization curve
         if demag:
-            H_unit = mu.Unit(ax1.get_xlabel().split("in ")[-1])
-            M_unit = mu.Unit(ax1.get_ylabel().split("in ")[-1])
+            H_unit, M_unit, _, _ = _MH_unit_processing(unit)
             start_idx, end_idx = self.segments()[:2]
-            ax2 = ax1.inset_axes([0.625, 0.15, 0.3, 0.5])
+            if "ax2" not in locals():
+                ax2 = ax1.inset_axes([0.625, 0.15, 0.3, 0.5])
             ax2.plot(
                 self.H.q.to(H_unit)[start_idx:end_idx],
                 self.M.q.to(M_unit)[start_idx:end_idx],
@@ -1279,7 +1259,7 @@ class MT(_Property_Container, VSM):
             s = s[: -len(s[s > ((1 - edge) * len(t))])]
         return s
 
-    def plot(self, filepath=None, derivative=True, **kwargs):
+    def plot(self, filepath=None, derivative=True, fig_ax=None, **kwargs):
         """
         Plot cooling curve of M(T) measurement. Save to file if path is given.
 
@@ -1291,6 +1271,9 @@ class MT(_Property_Container, VSM):
         derivative: BOOL, optional
             Whether to plot the first derivative dM/dT on a second axes.
             Default is True.
+        fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
+            Tuple of figure and axes the data should be plotted to. If None is
+            given they will be generated dynamically. Default is None.
         kwargs:
             Keyword arguments to change the appearance of plots.
             See documentation of matplotlib.pyplot.plot for more information.
@@ -1300,13 +1283,18 @@ class MT(_Property_Container, VSM):
         None | (matplotlib.Figure, matplotlib.Axes)
             Return figure and axes object if filepath is not specified.
         """
-        if derivative:
+        if derivative and fig_ax is None:
             fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
-        else:
+        elif derivative and fig_ax is not None:
+            fig, ax1, ax2 = fig_ax
+        elif not derivative and fig_ax is None:
             fig, ax1 = plt.subplots(1, 1)
             ax1.set_xlabel(f"Temperature in {self.T.unit}")
+        elif not derivative and fig_ax is not None:
+            fig, ax1 = fig_ax
+            ax1.set_xlabel(f"Temperature in {self.T.unit}")
 
-        ax1.plot(self.T.q, self.M.q)
+        ax1.plot(self.T.q, self.M.q, **kwargs)
         ax1.set_ylabel(f"Magnetization in {self.M.unit}")
 
         if derivative:
@@ -1315,10 +1303,11 @@ class MT(_Property_Container, VSM):
             # crop off measurement edges, where extreme noise usually occurs
             cM = M[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
             cT = T[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
-            # calculate dM/dT and smooth generously
-            dmdT = np.convolve(
-                np.gradient(cM) / np.gradient(cT), np.ones(20) / 20, "same"
-            )
+            # smooth generously and calculate dM/dT
+            kernel = np.ones(20) / 20
+            sM = np.convolve(cM, kernel, "same")
+            sT = np.convolve(cT, kernel, "same")
+            dmdT = np.gradient(sM) / np.gradient(sT)
             ax2.plot(cT, dmdT, **kwargs)
             ax2.set_ylabel("$\\frac{dM}{dT}$")
             ax2.set_xlabel(f"Temperature in {self.T.unit}")
@@ -1332,38 +1321,57 @@ class MT(_Property_Container, VSM):
                 return fig, ax1
 
 
-def plot_multiple_MH_major(
-    data, filepath=None, labels=None, demag=True, cmap="viridis", **kwargs
+def plot_batch(
+    data,
+    filepath=None,
+    labels=None,
+    unit="T",
+    cmap="viridis",
+    demag=True,
+    derivative=True,
+    fig_ax=None,
+    **kwargs,
 ):
     """
-    Plot hysteresis loops and optionally demagnetization curves of
-    several major hysteresis loop measurements.
-    Saves figure if filepath is given.
+    Plot several VSM-derived objects together. Must be of the same type.
 
     Parameters
     ----------
-    data: LIST[MH_major]
-        List of several objects which have to be of the MH_major class.
+    data: LIST[MH | MH_major | MT]
+        List of several objects which have to be of magmeas classes that have a
+        plotting method. All contained objects need to be of the same class.
     filepath: STR | PATH, optional
-        Filepath for saving the figure. Default is None, in that case no file
-        is saved.
+        Filepath for saving the figure. If None is given, then instead the
+        generated figure and axes objects will be returned. Default is None.
     labels: LIST, optional
         List of labels that are going to be used in the legend of the plot.
         Has to have the same length as data. If none is given then the names
         of the .DAT files each VSM object was calculated from will be used.
-    demag: BOOL, optional
-        Boolean that determines if demagnetization curve is plotted as an
-        inset next to hysteresis loop. Default is True.
+    unit: STR | mu.unit | TUPLE(STR | mu.unit)
+        Only supported for MH-derived measurements. Unit H and M are going to
+        be plotted in. If string is given then both will have the same unit.
+        Otherwise specify respective units as tuple (H_unit, M_unit)
     cmap: STR | matplotlib.colors.Colormap | matplotlib.colors.ListedColormap
         Colormap that will be used to generate the colours of all lines. Each
-        colormap will be fully filled with np.linspace . Please keep the
-        visibility of ALL lines in mind! Colormaps such as 'gray' or 'hot'
-        will definitely lead to invisible/barely visible lines.
-        Default is 'viridis'.
+        colormap will be fully filled with np.linspace. Please keep the
+        visibility of ALL lines in mind! Colormaps such as 'gray' or 'hot' will
+        definitely lead to invisible/barely visible lines. Default is 'viridis'.
+    demag: BOOL, optional
+        Determines, whether demagnetization curve is plotted as an inset next
+        to hysteresis loop if MH_major objects are in data. Will not do
+        anything otherwise. Default is True.
+    derivative: BOOL, optional
+        Determines, whether derivative dM/dT is plotted as another subplot
+        below the M(T) plot if MT objects are in data. Will not do anything
+        otherwise. Default is True.
+    fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
+        Tuple of figure and axes the data should be plotted to. If None is
+        given they will be generated dynamically. Default is None.
     kwargs:
         Keyword arguments to change the appearance of lines. All arguments are
-        applied to every line. The arguments 'color' and 'c' are not allowed,
-        as they would lead to all lines having the same colour.
+        applied to every line. The arguments 'color' and 'c' are not allowed as
+        they would lead to all lines having the same colour, making them
+        indistinguishable.
         See documentation of matplotlib.pyplot.plot for more information.
 
     Returns
@@ -1373,10 +1381,19 @@ def plot_multiple_MH_major(
     """
     if "color" in kwargs or "c" in kwargs:
         raise AttributeError(
-            "Please do not pass 'color' or 'c' as a keyword"
-            + " argument. This would overwrite the colour of all lines, making"
-            + " them indistinguishable. Use the functionality of cmap instead."
+            """Please do not pass 'color' or 'c' as a keyword argument. This
+            would overwrite the colour of all lines, making them
+            indistinguishable. Use the functionality of cmap instead."""
         )
+
+    ref_type = type(data[0])
+    if len(set([type(vsm) for vsm in data])) != 1:
+        wrong_type = np.where([type(vsm) is not ref_type for vsm in data])[0].tolist()
+        raise TypeError(f"""
+            The objects with the index {wrong_type} in data do not appear to be
+            of the type {ref_type}, which was determined to be the reference
+            type based on the first object in data. Please make sure that all
+            objects in data are of the same type.""")
 
     if isinstance(cmap, str):
         cmap = colormaps.get_cmap(cmap)
@@ -1390,51 +1407,103 @@ def plot_multiple_MH_major(
     if labels is None:
         labels = [vsm._path.stem for vsm in data]
 
-    fig, ax1 = plt.subplots()
-
-    # plot hysteresis loops
-    for i in range(len(data)):
-        ax1.plot(
-            data[i].H.q.to("T"),
-            data[i].M.q.to("T"),
-            label=labels[i],
-            color=colors[i],
+    if ref_type == MH:
+        fig, ax1 = data[0].plot(
+            filepath=None,
+            label=labels[0],
+            color=colors[0],
+            unit=unit,
+            fig_ax=fig_ax,
             **kwargs,
         )
+        for i in range(1, len(data)):
+            data[i].plot(
+                label=labels[i], color=colors[i], unit=unit, fig_ax=(fig, ax1), **kwargs
+            )
 
-    # format plot
-    ax1.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
-    ax1.set_ylabel(r"$J$ in $T$")
-    ax1.legend()
-
-    # plot inset of demagnetization curves
-    if demag:
-        ax2 = ax1.inset_axes([0.58, 0.15, 0.3, 0.5])
-        for i in range(len(data)):
-            start_idx, end_idx = data[i].segments()[:2]
-            ax2.plot(
-                data[i].H.q.to("T")[start_idx:end_idx],
-                data[i].M.q.to("T")[start_idx:end_idx],
+    if ref_type == MH_major and not demag:
+        fig, ax1 = data[0].plot(
+            filepath=None,
+            label=labels[0],
+            color=colors[0],
+            unit=unit,
+            demag=demag,
+            fig_ax=fig_ax,
+            **kwargs,
+        )
+        for i in range(1, len(data)):
+            data[i].plot(
                 label=labels[i],
                 color=colors[i],
+                unit=unit,
+                demag=demag,
+                fig_ax=(fig, ax1),
                 **kwargs,
             )
 
-        # format plot
-        Hmin = max([i.coercivity.q.to("T") for i in data]).value * -1.1
-        Jmax = max([i.remanence.q.to("T") for i in data]).value * 1.1
-        ax2.axis([Hmin, 0, 0, Jmax])
-        ax2.yaxis.set_label_position("right")
-        ax2.yaxis.tick_right()
-        ax2.set_xlabel(r"$\mu_0 H_{int}$ in $T$")
-        ax2.set_ylabel(r"$J$ in $T$")
+    if ref_type == MH_major and demag:
+        fig, ax1, ax2 = data[0].plot(
+            filepath=None,
+            label=labels[0],
+            color=colors[0],
+            unit=unit,
+            demag=demag,
+            fig_ax=fig_ax,
+            **kwargs,
+        )
+        for i in range(1, len(data)):
+            data[i].plot(
+                label=labels[i],
+                color=colors[i],
+                unit=unit,
+                demag=demag,
+                fig_ax=(fig, ax1, ax2),
+                **kwargs,
+            )
 
-    # save figure if filepath is given
+    if ref_type == MT and not derivative:
+        fig, ax1 = data[0].plot(
+            filepath=None,
+            label=labels[0],
+            color=colors[0],
+            derivative=derivative,
+            fig_ax=fig_ax,
+            **kwargs,
+        )
+        for i in range(1, len(data)):
+            data[i].plot(
+                label=labels[i],
+                color=colors[i],
+                derivative=derivative,
+                fig_ax=(fig, ax1),
+                **kwargs,
+            )
+
+    if ref_type == MT and derivative:
+        fig, ax1, ax2 = data[0].plot(
+            filepath=None,
+            label=labels[0],
+            color=colors[0],
+            derivative=derivative,
+            fig_ax=fig_ax,
+            **kwargs,
+        )
+        for i in range(1, len(data)):
+            data[i].plot(
+                label=labels[i],
+                color=colors[i],
+                derivative=derivative,
+                fig_ax=(fig, ax1, ax2),
+                **kwargs,
+            )
+
+    ax1.legend()
+
     if filepath is not None:
         fig.savefig(filepath, dpi=300)
-    elif filepath is None and demag:
+    elif filepath is None and "ax2" in locals():
         return fig, ax1, ax2
-    elif filepath is None and not demag:
+    elif filepath is None and "ax2" not in locals():
         return fig, ax1
 
 
@@ -1508,3 +1577,42 @@ def mult_properties_to_file(data, filepath, labels=None):
             labels=labels,
             Tc=me.concat_flat([vsm.Tc for vsm in data]),
         )
+
+
+def _MH_unit_processing(unit):
+    """Return units and labels used for plotting of MH-derived objects."""
+    if isinstance(unit, str | mu.Unit | mu.CompositeUnit):
+        H_unit = mu.Unit(unit)
+        M_unit = mu.Unit(unit)
+    else:
+        if len(unit) > 2:
+            raise ValueError(
+                "Length of unit surpasses maximum of two.\n"
+                + "Please only pass two values: (H_unit, M_unit)."
+            )
+        elif len(unit) == 2:
+            H_unit = mu.Unit(unit[0])
+            M_unit = mu.Unit(unit[1])
+        else:
+            H_unit = mu.Unit(unit[0])
+            M_unit = mu.Unit(unit[0])
+
+    if H_unit.is_equivalent(mu.T, equivalencies=None):
+        H_label = "$\\mu_0 H_{int}$"
+    elif H_unit.is_equivalent(mu.A / mu.m, equivalencies=None):
+        H_label = "$H_{int}$"
+    else:
+        raise ValueError(
+            f"Unit {H_unit} is incompatible with magnetic "
+            + "field or magnetic flux density units."
+        )
+    if M_unit.is_equivalent(mu.T, equivalencies=None):
+        M_label = "J"
+    elif M_unit.is_equivalent(mu.A / mu.m, equivalencies=None):
+        M_label = "M"
+    else:
+        raise ValueError(
+            f"Unit {M_unit} is incompatible with magnetisation"
+            + " or magnetic polarisation units."
+        )
+    return H_unit, M_unit, H_label, M_label
