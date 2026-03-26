@@ -1,9 +1,6 @@
 # magmeas
 
-Python module enabling the import and handling of VSM-data acquired on a Quantum Design PPMS measurement system.
-Extrinsic permanent magnet properties can be automatically calculated from M(H) hysteresis loops and exported to YAML- or CSV-files. Basic plotting and export to HDF5 files is also available.
-The same functionality is available for M(T) measurements, although greater care should be taken.
-Manual inspection of the derived properties ist always encouraged.
+Python module enabling the import and handling of VSM-data acquired on a Quantum Design PPMS/DynaCool/Versalab measurement system.
 
 
 | Description   | Badge |
@@ -15,7 +12,7 @@ Manual inspection of the derived properties ist always encouraged.
 
 ## Installation
 
-Just install with pip:
+Just install from PyPI:
 
 ```bash
 pip install magmeas
@@ -32,48 +29,32 @@ INFO,m,SAMPLE_MASS
 INFO,(a, b, c),SAMPLE_SIZE
 ```
 
-With m being the sample mass in mg, a and b being the sample dimensions perpendicular to the magnetization axis and
-c being the sample dimension parallel to the magnetization axis. So far only cuboid samples are supported and the density
+With `m` being the sample mass in mg, `a` and `b` being the sample dimensions perpendicular to the magnetization axis and
+`c` being the sample dimension parallel to the magnetization axis. So far only cuboid samples are supported and the density
 is assumed to be m / (a * b * c)
 
 ### Python
 
-As of right now there are four distinct classes that conveniently handle specific types of measurement data:
+There are four distinct classes that conveniently handle specific types of measurement data:
 * VSM: general for all types of VSM measurements
 * MH: for all M(H) measurements, still quite unspecific
 * MH_major: for major hysteresis loop measurements
 * MT: for M(T) measurements
-  
+
 Here is what each of them do at initialisation or automatically with a method:
 
 |  | VSM | MH | MH_major | MT |
 |--|-----|----|----------|----|
 | import measurement data from Quantum Design .DAT file | ✅ | ✅ | ✅ | ✅ |
-| export to HDF5 | ✅ | ✅ | ✅ | ✅ |
+|export measurement data to csv/yml/hdf5 | ✅ | ✅ | ✅ | ✅ |
 | plotting | ❌ | ✅ | ✅ | ✅ |
 | calculate properties | ❌ | ❌ | ✅ $H_c$, $M_r$, $BH_{max}$, $H_k$, S, $M_s$ (optional) | ✅ $T_c$ |
-|export properties to csv/yml | ❌ | ❌ | ✅ | ✅ |
+|export properties to csv/yml/hdf5 | ❌ | ❌ | ✅ | ✅ |
 
-Additionally, exporting the properties of several MT or MH_major objects together is possible with `magmeas.mult_properties_to_file`. Plotting of several MH_major objects together in one graph is conveniently done with `magmeas.plot_mult_MH_major`.
-Documentation is mainly available in the form of detailed docstrings. Just use `help(magmeas.VSM)` or similar to get more information.
+Experimental support for Recoil-loop- and FORC-measurements is also provided in their respective classes.
+All classes inherit from the `EntityCollection` class in [`mammos-entity`](https://github.com/MaMMoS-project/mammos-entity), using its io functionality. In doing so, they can conveniently be added to a new `EntityCollection` with `magmeas.to_batch`, benefitting from the nested structure in these objects even for data export.
+Plotting of the above highlighted classes is very flexible. Common keyword arguments used in matplotlibs functions can be used. VSM-derived objects can either be plotted to pre-existing matplotlib figures and axes, or they dynamically generate new ones and return them for subsequent formatting.
 
-
-### Command line
-
-Some basic functionality is also available in the form of a command line interface. Get more information with:
-
-```bash
-magmeas -h
-```
-
-
-### Dependencies
-* [NumPy](https://numpy.org/)
-* [Pandas](https://pandas.pydata.org/)
-* [Matplotlib](https://matplotlib.org/)
-* [SciPy](https://scipy.org/)
-* [h5py](https://www.h5py.org/)
-* [mammos-entity](https://mammos-project.github.io/mammos/index.html)
-* [mammos-analysis](https://mammos-project.github.io/mammos/index.html)
+Documentation is mainly available in the form of detailed docstrings. Just use `dir(magmeas)` and `help(magmeas.VSM)` or similar to get more information.
 
 Requires Python >= 3.11 due to dependencies
