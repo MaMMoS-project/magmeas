@@ -36,14 +36,14 @@ is assumed to be m / (a * b * c)
 ### Python
 
 There are four distinct classes that conveniently handle specific types of measurement data:
-* VSM: general for all types of VSM measurements
-* MH: for all M(H) measurements, still quite unspecific
-* MH_major: for major hysteresis loop measurements
-* MT: for M(T) measurements
+* `VSM`: general for all types of VSM measurements
+* `MH`: for all M(H) measurements, still quite unspecific
+* `MH_major`: for major hysteresis loop measurements
+* `MT`: for M(T) measurements
 
 Here is what each of them do at initialisation or automatically with a method:
 
-|  | VSM | MH | MH_major | MT |
+|  | `VSM` | `MH` | `MH_major` | `MT` |
 |--|-----|----|----------|----|
 | import measurement data from Quantum Design .DAT file | ✅ | ✅ | ✅ | ✅ |
 |export measurement data to csv/yml/hdf5 | ✅ | ✅ | ✅ | ✅ |
