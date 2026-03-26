@@ -1326,7 +1326,8 @@ def plot_batch(
     filepath=None,
     labels=None,
     unit="T",
-    cmap="viridis",
+    cmap="inferno",
+    color_range=(0, 0.9),
     demag=True,
     derivative=True,
     fig_ax=None,
@@ -1350,12 +1351,22 @@ def plot_batch(
     unit: STR | mu.unit | TUPLE(STR | mu.unit)
         Only supported for MH-derived measurements. Unit H and M are going to
         be plotted in. If string is given then both will have the same unit.
-        Otherwise specify respective units as tuple (H_unit, M_unit)
+        Otherwise specify respective units as tuple (H_unit, M_unit).
+        Default is 'T'.
     cmap: STR | matplotlib.colors.Colormap | matplotlib.colors.ListedColormap
         Colormap that will be used to generate the colours of all lines. Each
         colormap will be fully filled with np.linspace. Please keep the
         visibility of ALL lines in mind! Colormaps such as 'gray' or 'hot' will
-        definitely lead to invisible/barely visible lines. Default is 'viridis'.
+        definitely lead to invisible/barely visible lines.
+        Default is 'inferno'.
+    color_range: TUPLE(FLOAT | INT), optional
+        Color range to control from which range of the colormap gradient the
+        colors will be picked. Full range would be (0, 1). Often it makes sense
+        to restrict the range towards smaller maximum values as many colormaps
+        have very bright colors at values getting closer to 1, which will lead
+        to poorly visible lines. This can also be used to reverse the color
+        gradient when switching maximum and minimum, as in (1, 0).
+        Default is (0, 0.9).
     demag: BOOL, optional
         Determines, whether demagnetization curve is plotted as an inset next
         to hysteresis loop if MH_major objects are in data. Will not do
@@ -1402,7 +1413,7 @@ def plot_batch(
             f"cmap has type {type(cmap)}, which is not supported.\n"
             + "Please only pass a valid str or a Colormap from matplotlib to cmap."
         )
-    colors = cmap(np.linspace(0, 1, len(data)))
+    colors = cmap(np.linspace(color_range[0], color_range[1], len(data)))
 
     if labels is None:
         labels = [vsm._path.stem for vsm in data]
