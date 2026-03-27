@@ -325,7 +325,7 @@ class MH(VSM):
         Save contents of .DAT-file to hdf5 file.
     """
 
-    def plot(self, filepath=None, unit="T", fig_ax=None, **kwargs):
+    def plot(self, filepath=None, unit="T", bounds=(None, None), fig_ax=None, **kwargs):
         """
         Plot M(H) measurement and save figure if a filepath is given.
 
@@ -339,6 +339,10 @@ class MH(VSM):
             Unit H and M are going to be plotted in. If string is given then
             both will have the same unit. Otherwise specify respective units
             as tuple (H_unit, M_unit). Default is 'T'.
+        bounds: TUPLE(NONE | INT), optional
+            Indices (start, end) at which the data to be plotted will be cut
+            off. Use None to plot until the respective start or end.
+            Default is (None, None).
         fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
             Tuple of figure and axes the data should be plotted to. If None is
             given they will be generated dynamically. Default is None.
@@ -353,12 +357,16 @@ class MH(VSM):
         """
         H_unit, M_unit, H_label, M_label = _MH_unit_processing(unit)
 
+        start, end = bounds
+
         if fig_ax is None:
             fig, ax1 = plt.subplots()
         else:
             fig, ax1 = fig_ax
 
-        ax1.plot(self.H.q.to(H_unit), self.M.q.to(M_unit), **kwargs)
+        ax1.plot(
+            self.H.q.to(H_unit)[start:end], self.M.q.to(M_unit)[start:end], **kwargs
+        )
 
         # format plot
         ax1.set_xlabel(f"{H_label} in {H_unit}")
@@ -670,7 +678,15 @@ class MH_major(_PropertyContainer, MH):
             s = s[: -len(s[s > ((1 - edge) * len(t))])]
         return s
 
-    def plot(self, filepath=None, demag=True, unit="T", fig_ax=None, **kwargs):
+    def plot(
+        self,
+        filepath=None,
+        demag=True,
+        unit="T",
+        segments=(None, None),
+        fig_ax=None,
+        **kwargs,
+    ):
         """
         Plot major hysteresis loop, optionally with inset of demagnetization
         curve and save figure if a filepath is given.
@@ -688,6 +704,15 @@ class MH_major(_PropertyContainer, MH):
             Unit H and M are going to be plotted in. If string is given then
             both will have the same unit. Otherwise specify respective units
             as tuple (H_unit, M_unit). Default is 'T'.
+        segments: TUPLE(NONE | INT), optional
+            Segmentation points (start, end) at which the data to be plotted
+            will be cut off. See the method 'segments' for more information.
+            Note that valid input here are only the indices FOR the output from
+            the segments method and NOT the indices of the actual measurement
+            points. Use None to plot until the respective start or end. The
+            demagnetisation curve will not be affected by this, it is always
+            plotted in the same way between the same bounds.
+            Default is (None, None).
         fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
             Tuple of figure and axes the data should be plotted to. If None is
             given they will be generated dynamically. Default is None.
@@ -707,11 +732,20 @@ class MH_major(_PropertyContainer, MH):
         else:
             fig, ax1 = fig_ax
 
-        super().plot(filepath=None, unit=unit, fig_ax=(fig, ax1), **kwargs)
+        start, end = segments
+        if start is not None:
+            start = self.segments()[start]
+        if end is not None:
+            end = self.segments()[end]
+
+        super().plot(
+            filepath=None, unit=unit, bounds=(start, end), fig_ax=(fig, ax1), **kwargs
+        )
 
         # plot inset of demagnetization curve
         if demag:
             H_unit, M_unit, _, _ = _MH_unit_processing(unit)
+            # The demagnetisation curve will always be plotted in the same way
             start_idx, end_idx = self.segments()[:2]
             if "ax2" not in locals():
                 ax2 = ax1.inset_axes([0.625, 0.15, 0.3, 0.5])
@@ -1264,7 +1298,14 @@ class MT(_PropertyContainer, VSM):
             s = s[: -len(s[s > ((1 - edge) * len(t))])]
         return s
 
-    def plot(self, filepath=None, derivative=True, fig_ax=None, **kwargs):
+    def plot(
+        self,
+        filepath=None,
+        derivative=True,
+        segments=(None, None),
+        fig_ax=None,
+        **kwargs,
+    ):
         """
         Plot cooling curve of M(T) measurement. Save to file if path is given.
 
@@ -1276,6 +1317,13 @@ class MT(_PropertyContainer, VSM):
         derivative: BOOL, optional
             Whether to plot the first derivative dM/dT on a second axes.
             Default is True.
+        segments: TUPLE(NONE | INT), optional
+            Segmentation points (start, end) at which the data to be plotted
+            will be cut off. See the method 'segments' for more information.
+            Note that valid input here are only the indices FOR the output from
+            the segments method and NOT the indices of the actual measurement
+            points. Use None to plot until the respective start or end.
+            Default is (None, None).
         fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
             Tuple of figure and axes the data should be plotted to. If None is
             given they will be generated dynamically. Default is None.
@@ -1299,7 +1347,13 @@ class MT(_PropertyContainer, VSM):
             fig, ax1 = fig_ax
             ax1.set_xlabel(f"Temperature in {self.T.unit}")
 
-        ax1.plot(self.T.q, self.M.q, **kwargs)
+        start, end = segments
+        if start is not None:
+            start = self.segments()[start]
+        if end is not None:
+            end = self.segments()[end]
+
+        ax1.plot(self.T.q[start:end], self.M.q[start:end], **kwargs)
         ax1.set_ylabel(f"Magnetization in {self.M.unit}")
 
         if derivative:
@@ -1313,7 +1367,7 @@ class MT(_PropertyContainer, VSM):
             sM = np.convolve(cM, kernel, "same")
             sT = np.convolve(cT, kernel, "same")
             dmdT = np.gradient(sM) / np.gradient(sT)
-            ax2.plot(cT, dmdT, **kwargs)
+            ax2.plot(cT[start:end], dmdT[start:end], **kwargs)
             ax2.set_ylabel("$\\frac{dM}{dT}$")
             ax2.set_xlabel(f"Temperature in {self.T.unit}")
 
@@ -1331,6 +1385,7 @@ def plot_batch(
     filepath=None,
     labels=None,
     unit="T",
+    segments=(None, None),
     cmap="inferno",
     color_range=(0, 0.9),
     demag=True,
@@ -1359,6 +1414,15 @@ def plot_batch(
         be plotted in. If string is given then both will have the same unit.
         Otherwise specify respective units as tuple (H_unit, M_unit).
         Default is 'T'.
+    segments: TUPLE(NONE | INT), optional
+        Segmentation points (start, end) at which the data to be plotted
+        will be cut off. See the method 'segments' for more information.
+        Note that valid input here are only the indices FOR the output from
+        the segments method and NOT the indices of the actual measurement
+        points. Use None to plot until the respective start or end. The
+        demagnetisation curve will not be affected by this, it is always
+        plotted in the same way between the same bounds.
+        Default is (None, None).
     cmap: STR | matplotlib.colors.Colormap | matplotlib.colors.ListedColormap
         Colormap that will be used to generate the colours of all lines. Each
         colormap will be fully filled with np.linspace. Please keep the
@@ -1447,6 +1511,7 @@ def plot_batch(
             label=labels[0],
             color=colors[0],
             unit=unit,
+            segments=segments,
             demag=demag,
             fig_ax=fig_ax,
             **kwargs,
@@ -1456,6 +1521,7 @@ def plot_batch(
                 label=labels[i],
                 color=colors[i],
                 unit=unit,
+                segments=segments,
                 demag=demag,
                 fig_ax=(fig, ax1),
                 **kwargs,
@@ -1467,6 +1533,7 @@ def plot_batch(
             label=labels[0],
             color=colors[0],
             unit=unit,
+            segments=segments,
             demag=demag,
             fig_ax=fig_ax,
             **kwargs,
@@ -1476,6 +1543,7 @@ def plot_batch(
                 label=labels[i],
                 color=colors[i],
                 unit=unit,
+                segments=segments,
                 demag=demag,
                 fig_ax=(fig, ax1, ax2),
                 **kwargs,
@@ -1492,6 +1560,7 @@ def plot_batch(
             label=labels[0],
             color=colors[0],
             derivative=derivative,
+            segments=segments,
             fig_ax=fig_ax,
             **kwargs,
         )
@@ -1500,6 +1569,7 @@ def plot_batch(
                 label=labels[i],
                 color=colors[i],
                 derivative=derivative,
+                segments=segments,
                 fig_ax=(fig, ax1),
                 **kwargs,
             )
@@ -1510,6 +1580,7 @@ def plot_batch(
             label=labels[0],
             color=colors[0],
             derivative=derivative,
+            segments=segments,
             fig_ax=fig_ax,
             **kwargs,
         )
@@ -1518,6 +1589,7 @@ def plot_batch(
                 label=labels[i],
                 color=colors[i],
                 derivative=derivative,
+                segments=segments,
                 fig_ax=(fig, ax1, ax2),
                 **kwargs,
             )

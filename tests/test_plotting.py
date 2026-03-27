@@ -54,6 +54,19 @@ def test_MH_figax():
     matplotlib.pyplot.close()
 
 
+def test_MH_bounds():
+    """Test MH.plot with specified bounds."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH(file_path)
+    try:
+        fig, ax = mh.plot(bounds=(123, -456))
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
 def test_MH_unit_str():
     """Test MH.plot with argument unit as string."""
     file_path = cwd.joinpath("VSM_MH.DAT")
@@ -188,6 +201,20 @@ def test_MH_major_return3():
     matplotlib.pyplot.close()
 
 
+def test_MH_major_segments():
+    """Test MH_major.plot with specified segmends."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
+    try:
+        fig, ax, ax1 = mh.plot(segments=(1, -2))
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert isinstance(ax1, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
 def test_MH_major_figax():
     """Test MH_major.plot with previously generated input Figure and Axes
     objects.
@@ -270,6 +297,20 @@ def test_MT_return3():
     mt = magmeas.MT(file_path)
     try:
         fig, ax, ax1 = mt.plot()
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert isinstance(ax1, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
+def test_MT_segments():
+    """Test MT.plot with specified segments."""
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
+    try:
+        fig, ax, ax1 = mt.plot(segments=(0, None))
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
     assert isinstance(fig, matplotlib.figure.Figure)
@@ -367,6 +408,20 @@ def test_batch_MT_return3():
     matplotlib.pyplot.close()
 
 
+def test_batch_MT_segments():
+    """Test plot_batch with several MT objects and specified segments."""
+    file_path = cwd.joinpath("VSM_MT.DAT")
+    mt = magmeas.MT(file_path)
+    try:
+        fig, ax, ax1 = magmeas.plot_batch([mt] * 3, segments=(0, None))
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert isinstance(ax1, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
 def test_batch_labels():
     """Test plot_batch with several MH_major objects and specified labels."""
     file_path = cwd.joinpath("VSM_MH.DAT")
@@ -426,7 +481,7 @@ def test_batch_cmap_mpl():
 
 
 def test_batch_EntityCollection():
-    """Test plot_batch with manually specified cmap as matplotlib.ColorMap."""
+    """Test plot_batch with EntityCollection as data input."""
     file_path = cwd.joinpath("VSM_MH.DAT")
     mh = magmeas.MH_major(file_path)
     collection = me.EntityCollection(mh1=mh, mh2=mh, mh3=mh)
