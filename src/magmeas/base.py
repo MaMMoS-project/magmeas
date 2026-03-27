@@ -234,6 +234,11 @@ class VSM(me.EntityCollection):
         )
 
     @property
+    def path(self):
+        """Return the path to the file which was used in the object generation."""
+        return self._path
+
+    @property
     def H(self):
         """
         Return the internal magnetic field directly without needing to access
