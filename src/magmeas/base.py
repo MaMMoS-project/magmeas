@@ -1475,6 +1475,11 @@ def plot_batch(
                 fig_ax=(fig, ax1, ax2),
                 **kwargs,
             )
+        H_unit, M_unit, _, _ = _MH_unit_processing(unit)
+        Hmin = np.max([mh.coercivity.q.to(H_unit).value for mh in data]) * -1.1
+        Jmax = np.max([mh.remanence.q.to(M_unit).value for mh in data]) * 1.1
+        ax2.set_xlim([Hmin, 0])
+        ax2.set_ylim([0, Jmax])
 
     if ref_type == MT and not derivative:
         fig, ax1 = data[0].plot(
