@@ -41,11 +41,17 @@ class VSM(me.EntityCollection):
         Time as mammos_entity.Entity
     D: ENTITY
         Demagnetizing factor as mammos_entity.Entity
+    path: PATH
+        Path to measurement file as pathlib.Path
 
     Methods
     -------
     to_hdf5()
-        Save contents of .DAT-file and calculated properties in hdf5 file.
+        Save contents to HDF5-file.
+    to_yaml()
+        Save contents to YAML-file.
+    to_csv()
+        Save contents to CSV-file.
     """
 
     def __init__(self, datfile, read_method="auto"):
@@ -316,13 +322,19 @@ class MH(VSM):
         Time as mammos_entity.Entity
     D: ENTITY
         Demagnetizing factor as mammos_entity.Entity
+    path: PATH
+        Path to measurement file as pathlib.Path
 
     Methods
     -------
     plot()
-        Plot data according to measurement type, optionally saves as png.
+        Plot data, optionally saves as image.
     to_hdf5()
-        Save contents of .DAT-file to hdf5 file.
+        Save contents to HDF5-file.
+    to_yaml()
+        Save contents to YAML-file.
+    to_csv()
+        Save contents to CSV-file.
     """
 
     def plot(self, filepath=None, unit="T", bounds=(None, None), fig_ax=None, **kwargs):
@@ -432,7 +444,9 @@ class MH_major(_PropertyContainer, MH):
     kneefield: ENTITY
         Knee field as mammos_entity.Entity, see ontology
     squareness: FLOAT
-        Squareness as kneefield / coercivity
+        Squareness factor as kneefield / coercivity
+    path: PATH
+        Path to measurement file as pathlib.Path
 
     Methods
     -------
@@ -444,12 +458,13 @@ class MH_major(_PropertyContainer, MH):
         simultaneously assign it to the VSM object. A possible high field
         susceptibility can optionally be corrected for.
     plot()
-        Plot data according to measurement type, optionally saves as png.
-    properties_to_file()
-        Save all properties derived from the VSM-measurement to CSV-file or to
-        YAML file, using the mammos-entity io functionality.
+        Plot data, optionally saves as image.
     to_hdf5()
-        Save contents of .DAT-file and calculated properties in hdf5 file.
+        Save contents to HDF5-file.
+    to_yaml()
+        Save contents to YAML-file.
+    to_csv()
+        Save contents to CSV-files.
     """
 
     def __init__(self, datfile, read_method="auto"):
@@ -800,16 +815,28 @@ class MH_recoil(MH):
         Time as mammos_entity.Entity
     D: ENTITY
         Demagnetizing factor as mammos_entity.Entity
+    path: PATH
+        Path to measurement file as pathlib.Path
 
     Methods
     -------
     segments()
         Find indices of segmentation points which can be used to extract each
         recoil loop.
+    recoil_susceptibility()
+        Calculate recoil susceptibility.
+    external_comp_field()
+        Calculate external compensation fields that would be needed in a new
+        measurement to enable each recoil loop to end at an internal magnetic
+        field close to zero.
     plot()
-        Plot data according to measurement type, optionally saves as png.
+        Plot data, optionally saves as image.
     to_hdf5()
-        Save contents of .DAT-file and calculated properties in hdf5 file.
+        Save contents to HDF5-file.
+    to_yaml()
+        Save contents to YAML-file.
+    to_csv()
+        Save contents to CSV-files.
     """
 
     def segments(self, prominence=5e3):
@@ -973,11 +1000,11 @@ class FORC(MH):
         Time as mammos_entity.Entity
     D: ENTITY
         Demagnetizing factor as mammos_entity.Entity
+    path: PATH
+        Path to measurement file as pathlib.Path
 
     Methods
     -------
-    to_hdf5()
-        Save contents of .DAT-file and calculated properties in hdf5 file.
     segments()
         Find indices of segmentation points which can be used to extract each
         FORC from the measurement.
@@ -987,6 +1014,12 @@ class FORC(MH):
     forc_dist()
         Calculate the transformed coordinates H_c and H_i as well as the
         FORC distribution.
+    to_hdf5()
+        Save contents to HDF5-file.
+    to_yaml()
+        Save contents to YAML-file.
+    to_csv()
+        Save contents to CSV-file.
     """
 
     def __init__(self, datfile, read_method="auto"):
@@ -1203,6 +1236,8 @@ class MT(_PropertyContainer, VSM):
         Demagnetizing factor as mammos_entity.Entity
     Tc: ENTITY
         Curie-temperature as mammos_entity.Entity
+    path: PATH
+        Path to measurement file as pathlib.Path
 
     Methods
     -------
@@ -1210,12 +1245,13 @@ class MT(_PropertyContainer, VSM):
         Find indices of segmentation points which can be used to seperate each
         measurement segment from each other.
     plot()
-        Plot data according to measurement type, optionally saves as png.
-    properties_to_file()
-        Save all properties derived from the VSM-measurement to CSV-file or to
-        YAML file, using the mammos-entity io functionality.
+        Plot data, optionally saves as image.
     to_hdf5()
-        Save contents of .DAT-file and calculated properties in hdf5 file.
+        Save contents to HDF5-file.
+    to_yaml()
+        Save contents to YAML-file.
+    to_csv()
+        Save contents to CSV-files.
     """
 
     def __init__(self, datfile, read_method="auto"):
