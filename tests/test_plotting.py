@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import mammos_entity as me
 import mammos_units as mu
 import matplotlib
 import pytest
@@ -416,6 +417,21 @@ def test_batch_cmap_mpl():
         fig, ax, ax1 = magmeas.plot_batch(
             [mh] * 3, cmap=matplotlib.colormaps.get_cmap("plasma")
         )
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+    assert isinstance(fig, matplotlib.figure.Figure)
+    assert isinstance(ax, matplotlib.axes.Axes)
+    assert isinstance(ax1, matplotlib.axes.Axes)
+    matplotlib.pyplot.close()
+
+
+def test_batch_EntityCollection():
+    """Test plot_batch with manually specified cmap as matplotlib.ColorMap."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    mh = magmeas.MH_major(file_path)
+    collection = me.EntityCollection(mh1=mh, mh2=mh, mh3=mh)
+    try:
+        fig, ax, ax1 = magmeas.plot_batch(collection)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
     assert isinstance(fig, matplotlib.figure.Figure)

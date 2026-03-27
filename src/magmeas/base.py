@@ -1338,9 +1338,10 @@ def plot_batch(
 
     Parameters
     ----------
-    data: LIST[MH | MH_major | MT]
-        List of several objects which have to be of magmeas classes that have a
-        plotting method. All contained objects need to be of the same class.
+    data: LIST[MH | MH_major | MT] | mammos_entity.EntityCollection
+        List or EntityCollection of several objects which have to be of magmeas
+        classes that have a plotting method. All contained objects need to be
+        of the same class.
     filepath: STR | PATH, optional
         Filepath for saving the figure. If None is given, then instead the
         generated figure and axes objects will be returned. Default is None.
@@ -1396,6 +1397,9 @@ def plot_batch(
             would overwrite the colour of all lines, making them
             indistinguishable. Use the functionality of cmap instead."""
         )
+
+    if isinstance(data, me.EntityCollection):
+        data = [entry[1] for entry in data]
 
     ref_type = type(data[0])
     if len(set([type(vsm) for vsm in data])) != 1:
