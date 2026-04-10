@@ -5,7 +5,7 @@ Python module enabling the import and handling of VSM-data acquired on a Quantum
 
 | Description   | Badge |
 |---------------|-------|
-| Documentation | [![Documentation](https://img.shields.io/badge/Docs-mammos--project.github.io%2Fmagmeas-blue)](https://mammos-project.github.io/mammos/index.html) |
+| Documentation | [![Documentation](https://img.shields.io/badge/Docs-mammos--project.github.io%2Fmagmeas-blue)](https://mammos-project.github.io/magmeas/) |
 | Tests         | [![Test package](https://github.com/MaMMoS-project/magmeas/actions/workflows/test.yml/badge.svg)](https://github.com/MaMMoS-project/magmeas/actions/workflows/test.yml) |
 | Releases      | [![PyPI version](https://badge.fury.io/py/magmeas.svg)](https://badge.fury.io/py/magmeas) |
 | License       | [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) |
