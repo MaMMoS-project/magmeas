@@ -22,4 +22,5 @@ Contents
 .. toctree::
     :maxdepth: 2
 
-    magmeas
+    notebooks/getting_started
+    api_ref

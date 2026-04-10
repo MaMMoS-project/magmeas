@@ -39,6 +39,8 @@ docs/_build/
 .spyderproject
 .spyproject
 
+.ipynb_checkpoints
+
 # PyBuilder
 target/
 

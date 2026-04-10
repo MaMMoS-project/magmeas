@@ -1,4 +1,4 @@
-magmeas module
+API Reference
 ==============
 
 .. automodule:: magmeas.base
