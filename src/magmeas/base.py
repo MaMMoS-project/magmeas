@@ -1,4 +1,4 @@
-"""VSM class and functions using it."""
+"""VSM-like classes and functions using them."""
 
 from importlib.metadata import version
 from pathlib import Path
@@ -24,40 +24,12 @@ class VSM(me.EntityCollection):
     """
     Class for importing, storing and using of VSM-data aswell as derived
     parameters.
-
-    Attributes
-    ----------
-    H: ENTITY
-        Internal magnetic field as mammos_entity.Entity
-    H_ext: ENTITY
-        External magnetic field as mammos_entity.Entity
-    M: ENTITY
-        Magnetization as mammos_entity.Entity
-    m: Quantity
-        Magnetic Moment as mammos_units.Quantity
-    T: ENTITY
-        Absolute temperature as mammos_entity.Entity
-    t: ENTITY
-        Time as mammos_entity.Entity
-    D: ENTITY
-        Demagnetizing factor as mammos_entity.Entity
-    path: PATH
-        Path to measurement file as pathlib.Path
-
-    Methods
-    -------
-    to_hdf5()
-        Save contents to HDF5-file.
-    to_yaml()
-        Save contents to YAML-file.
-    to_csv()
-        Save contents to CSV-file.
     """
 
     def __init__(self, datfile, read_method="auto"):
         super().__init__()
         # import data
-        self.load_qd(datfile, read_method=read_method)
+        self.reload_qd(datfile, read_method=read_method)
 
     def _demag_prism(self, dim):
         r"""
@@ -115,7 +87,7 @@ class VSM(me.EntityCollection):
         D = pi_Dz / np.pi
         return me.Entity("DemagnetizingFactor", D.value)
 
-    def load_qd(self, datfile, read_method):
+    def reload_qd(self, datfile, read_method):
         """
         Load VSM-data from a quantum systems .DAT file.
 
@@ -240,61 +212,53 @@ class VSM(me.EntityCollection):
         )
 
     @property
-    def path(self):
-        """Return the path to the file which was used in the object generation."""
+    def path(self) -> Path:
+        """Path to the file which was used in the object generation."""
         return self._path
 
     @property
-    def H(self):
+    def H(self) -> me.Entity:
         """
-        Return the internal magnetic field directly without needing to access
-        it from within the measurement_data collection.
+        The internal magnetic field calculated from the measurement data.
+        Calculated according to:
+            .. math:: H_{int} = H_{ext} - D \\cdot M
         """
         return self.measurement_data.H
 
     @property
-    def H_ext(self):
-        """
-        Return the external magnetic field directly without needing to access it
-        from within the measurement_data collection.
-        """
+    def H_ext(self) -> me.Entity:
+        """The external magnetic field as read from the measurement file."""
         return self.measurement_data.H_ext
 
     @property
-    def M(self):
+    def M(self) -> me.Entity:
         """
-        Return the magnetisation directly without needing to access it
-        from within the measurement_data collection.
+        The magnetisation calculated from the measurement data. Calculated
+        according to:
+            .. math:: M = \\frac{m}{V}
+        with m being the magnetic moment and V being the volume.
         """
         return self.measurement_data.M
 
     @property
-    def m(self):
-        """
-        Return the magnetic moment directly without needing to access it
-        from within the measurement_data collection.
-        """
+    def m(self) -> mu.Quantity:
+        """The magnetic moment as read from the measurement file."""
         return self.measurement_data.m
 
     @property
-    def T(self):
-        """
-        Return the thermodynamic temperature directly without needing to access it
-        from within the measurement_data collection.
-        """
+    def T(self) -> me.Entity:
+        """The thermodynamic temperature as read from the measurement file."""
         return self.measurement_data.T
 
     @property
-    def t(self):
-        """
-        Return the time directly without needing to access it
-        from within the measurement_data collection.
-        """
+    def t(self) -> me.Entity:
+        """The time since the start of the measurement."""
         return self.measurement_data.t
 
     def to_csv(self, filename):
         """
-        Write measurement data to CSV-file.
+        Write measurement data to CSV-file. See `mammos_entity.EntityCollection.to_csv`
+        for more details.
 
         filename: STR | PATH
             Name of the generated file.
@@ -303,39 +267,7 @@ class VSM(me.EntityCollection):
 
 
 class MH(VSM):
-    """
-    Class for importing, storing and using of VSM-data from M(H) measurements.
-
-    Attributes
-    ----------
-    H: ENTITY
-        Internal magnetic field as mammos_entity.Entity
-    H_ext: ENTITY
-        External magnetic field as mammos_entity.Entity
-    M: ENTITY
-        Magnetization as mammos_entity.Entity
-    m: Quantity
-        Magnetic Moment as mammos_units.Quantity
-    T: ENTITY
-        Absolute temperature as mammos_entity.Entity
-    t: ENTITY
-        Time as mammos_entity.Entity
-    D: ENTITY
-        Demagnetizing factor as mammos_entity.Entity
-    path: PATH
-        Path to measurement file as pathlib.Path
-
-    Methods
-    -------
-    plot()
-        Plot data, optionally saves as image.
-    to_hdf5()
-        Save contents to HDF5-file.
-    to_yaml()
-        Save contents to YAML-file.
-    to_csv()
-        Save contents to CSV-file.
-    """
+    """Class for importing, storing and using of VSM-data from M(H) measurements."""
 
     def plot(self, filepath=None, unit="T", bounds=(None, None), fig_ax=None, **kwargs):
         """
@@ -418,53 +350,6 @@ class MH_major(_PropertyContainer, MH):
     """
     Class for importing, storing and using of VSM-data from major loop M(H)
     measurements aswell as derived properties.
-
-    Attributes
-    ----------
-    H: ENTITY
-        Internal magnetic field as mammos_entity.Entity
-    H_ext: ENTITY
-        External magnetic field as mammos_entity.Entity
-    M: ENTITY
-        Magnetization as mammos_entity.Entity
-    m: Quantity
-        Magnetic Moment as mammos_units.Quantity
-    T: ENTITY
-        Absolute temperature as mammos_entity.Entity
-    t: ENTITY
-        Time as mammos_entity.Entity
-    D: ENTITY
-        Demagnetizing factor as mammos_entity.Entity
-    remanence: ENTITY
-        Remanent magnetization as mammos_entity.Entity
-    coercivity: ENTITY
-        Internal coercive field as mammos_entity.Entity
-    BHmax: ENTITY
-        Maximum energy product as mammos_entity.Entity
-    kneefield: ENTITY
-        Knee field as mammos_entity.Entity, see ontology
-    squareness: FLOAT
-        Squareness factor as kneefield / coercivity
-    path: PATH
-        Path to measurement file as pathlib.Path
-
-    Methods
-    -------
-    segments()
-        Find indices of segmentation points which can be used to seperate each
-        measurement segment from each other.
-    estimate_saturation()
-        Calculate an estimation of the saturation magnetisation, return it and
-        simultaneously assign it to the VSM object. A possible high field
-        susceptibility can optionally be corrected for.
-    plot()
-        Plot data, optionally saves as image.
-    to_hdf5()
-        Save contents to HDF5-file.
-    to_yaml()
-        Save contents to YAML-file.
-    to_csv()
-        Save contents to CSV-files.
     """
 
     def __init__(self, datfile, read_method="auto"):
@@ -488,50 +373,53 @@ class MH_major(_PropertyContainer, MH):
         self.properties.squareness = self._calc_squareness()
 
     @property
-    def remanence(self):
+    def remanence(self) -> me.Entity:
         """
-        Return the remanence directly without needing to access it from within
-        the property collection.
+        The remanence calculated from the measurement data.
+        See mammos_analysis.hysteresis.extrinsic_properties for more details.
         """
         return self.properties.remanence
 
     @property
-    def coercivity(self):
+    def coercivity(self) -> me.Entity:
         """
-        Return the coercivity directly without needing to access it from within
-        the property collection.
+        The coercivity calculated from the measurement data.
+        See mammos_analysis.hysteresis.extrinsic_properties for more details.
         """
         return self.properties.coercivity
 
     @property
-    def BHmax(self):
+    def BHmax(self) -> me.Entity:
         """
-        Return the remanence directly without needing to access it from within
-        the property collection.
+        The maximum energy product calculated from the measurement data.
+        See mammos_analysis.hysteresis.extrinsic_properties for more details.
         """
         return self.properties.BHmax
 
     @property
-    def kneefield(self):
+    def kneefield(self) -> me.Entity:
         """
-        Return the kneefield strength directly without needing to access it
-        from within the property collection.
+        The kneefield calculated from the measurement data. This is the internal
+        magnetic field at which a magnetisation of 90 % of the remanence is
+        reached.
         """
         return self.properties.kneefield
 
     @property
-    def squareness(self):
+    def squareness(self) -> float:
         """
-        Return the hysteresis loop squareness factor directly without needing
-        to access it from within the property collection.
+        The hysteresis loop squareness factor calculated from the measurement
+        data. It is calculated according to:
+            .. math:: S = \\frac{H_k}{H_c}
+        with Hk being the kneefield and Hc being the coercivity.
         """
         return self.properties.squareness
 
     @property
-    def saturation(self):
+    def saturation(self) -> me.Entity:
         """
-        Return the saturation magnetisation directly without needing to access
-        it from within the property collection.
+        The saturation magnetisation if it has been calculated. See the method
+        `estimate_saturation` for more details.
         """
         return self.properties.saturation
 
@@ -646,25 +534,12 @@ class MH_major(_PropertyContainer, MH):
         and right at the peak.
         Segmentation points with even indices (including 0) are peaks while
         segmentation points with uneven indices are roots.
-        When plotting H over t, the cut-off points s are:
-        This is an ASCII sketch and will probably not render correctly. Look
-        at this method in the source code for illustration in that case.
-
-                /|\             /|\
-               / | \           / | \
-              /  |  \         /  |  \
-        H=0  ----|---|-------|---|---|-----> t
-                 |   |\     /|   |   |\
-                 |   | \   / |   |   | \
-                 |   |  \|/  |   |   |
-                 |   |   |   |   |   |
-        s:       0   1   2   3   4   5    and so on ...
 
         Parameters
         ----------
         edge: FLOAT, optional
             Percentage of measurement to be treated as edge. Default is 0.05,
-            which means that segmentation points closer than 1 % of the total
+            which means that segmentation points closer than 5 % of the total
             measurement width to the edges will be discarded.
         prominence : FLOAT, optional
             The prominence which is used to find all peaks in H_ext(t). See the
@@ -798,45 +673,6 @@ class MH_recoil(MH):
     negative value (which often includes fields that do not fully demagnetise
     the sample) and is then increased to an external field of 0 or to a
     positive external field which increases the internal field to 0.
-
-    Attributes
-    ----------
-    H: ENTITY
-        Internal magnetic field as mammos_entity.Entity
-    H_ext: ENTITY
-        External magnetic field as mammos_entity.Entity
-    M: ENTITY
-        Magnetization as mammos_entity.Entity
-    m: Quantity
-        Magnetic Moment as mammos_units.Quantity
-    T: ENTITY
-        Absolute temperature as mammos_entity.Entity
-    t: ENTITY
-        Time as mammos_entity.Entity
-    D: ENTITY
-        Demagnetizing factor as mammos_entity.Entity
-    path: PATH
-        Path to measurement file as pathlib.Path
-
-    Methods
-    -------
-    segments()
-        Find indices of segmentation points which can be used to extract each
-        recoil loop.
-    recoil_susceptibility()
-        Calculate recoil susceptibility.
-    external_comp_field()
-        Calculate external compensation fields that would be needed in a new
-        measurement to enable each recoil loop to end at an internal magnetic
-        field close to zero.
-    plot()
-        Plot data, optionally saves as image.
-    to_hdf5()
-        Save contents to HDF5-file.
-    to_yaml()
-        Save contents to YAML-file.
-    to_csv()
-        Save contents to CSV-files.
     """
 
     def segments(self, prominence=5e3):
@@ -931,7 +767,6 @@ class MH_recoil(MH):
         external_compensation_field: ARRAY
             External compensation fields, that would lead to an internal field
             close to zero at the end of each recoil loop.
-
         """
         # get demagnetising factor
         D = self.D.value
@@ -1015,46 +850,7 @@ class MH_recoil(MH):
 
 
 class FORC(MH):
-    """
-    Class for importing, storing and using VSM data of FORC measurements.
-
-    Attributes
-    ----------
-    H: ENTITY
-        Internal magnetic field as mammos_entity.Entity
-    H_ext: ENTITY
-        External magnetic field as mammos_entity.Entity
-    M: ENTITY
-        Magnetization as mammos_entity.Entity
-    m: Quantity
-        Magnetic Moment as mammos_units.Quantity
-    T: ENTITY
-        Absolute temperature as mammos_entity.Entity
-    t: ENTITY
-        Time as mammos_entity.Entity
-    D: ENTITY
-        Demagnetizing factor as mammos_entity.Entity
-    path: PATH
-        Path to measurement file as pathlib.Path
-
-    Methods
-    -------
-    segments()
-        Find indices of segmentation points which can be used to extract each
-        FORC from the measurement.
-    forc_grid()
-        Extract grid of magnetic fields, reversal fields and magnetisations
-        from the FORC-measurement.
-    forc_dist()
-        Calculate the transformed coordinates H_c and H_i as well as the
-        FORC distribution.
-    to_hdf5()
-        Save contents to HDF5-file.
-    to_yaml()
-        Save contents to YAML-file.
-    to_csv()
-        Save contents to CSV-file.
-    """
+    """Class for importing, storing and using VSM data of FORC measurements."""
 
     def __init__(self, datfile, read_method="auto"):
         super().__init__(datfile, read_method="auto")
@@ -1251,41 +1047,6 @@ class MT(_PropertyContainer, VSM):
     """
     Class for importing, storing and using of VSM-data from M(T)-measurement
     aswell as derived properties.
-
-    Attributes
-    ----------
-    H: ENTITY
-        Internal magnetic field as mammos_entity.Entity
-    H_ext: ENTITY
-        External magnetic field as mammos_entity.Entity
-    M: ENTITY
-        Magnetization as mammos_entity.Entity
-    m: Quantity
-        Magnetic Moment as mammos_units.Quantity
-    T: ENTITY
-        Absolute temperature as mammos_entity.Entity
-    t: ENTITY
-        Time as mammos_entity.Entity
-    D: ENTITY
-        Demagnetizing factor as mammos_entity.Entity
-    Tc: ENTITY
-        Curie-temperature as mammos_entity.Entity
-    path: PATH
-        Path to measurement file as pathlib.Path
-
-    Methods
-    -------
-    segments()
-        Find indices of segmentation points which can be used to seperate each
-        measurement segment from each other.
-    plot()
-        Plot data, optionally saves as image.
-    to_hdf5()
-        Save contents to HDF5-file.
-    to_yaml()
-        Save contents to YAML-file.
-    to_csv()
-        Save contents to CSV-files.
     """
 
     def __init__(self, datfile, read_method="auto"):
@@ -1300,11 +1061,8 @@ class MT(_PropertyContainer, VSM):
         self.properties.Tc = self._calc_Tc()
 
     @property
-    def Tc(self):
-        """
-        Return the Curie-temperature directly without needing to access it
-        from within the property collection.
-        """
+    def Tc(self) -> me.Entity:
+        """The Curie-temperature(s) calculated from the measurement data."""
         return self.properties.Tc
 
     def _calc_Tc(self):
@@ -1348,7 +1106,7 @@ class MT(_PropertyContainer, VSM):
         ----------
         edge: FLOAT, optional
             Percentage of measurement to be treated as edge. Default is 0.05,
-            which means that segmentation points closer than 1 % of the total
+            which means that segmentation points closer than 5 % of the total
             measurement width to the edges will be discarded.
 
         Returns
@@ -1495,9 +1253,9 @@ def plot_batch(
         Default is (None, None).
     cmap: STR | matplotlib.colors.Colormap | matplotlib.colors.ListedColormap
         Colormap that will be used to generate the colours of all lines. Each
-        colormap will be fully filled with np.linspace. Please keep the
-        visibility of ALL lines in mind! Colormaps such as 'gray' or 'hot' will
-        definitely lead to invisible/barely visible lines.
+        colormap will be filled with np.linspace according to color_range.
+        Please keep the visibility of ALL lines in mind! Colormaps such as
+        'gray' or 'hot' will definitely lead to invisible/barely visible lines.
         Default is 'inferno'.
     color_range: TUPLE(FLOAT | INT), optional
         Color range to control from which range of the colormap gradient the
