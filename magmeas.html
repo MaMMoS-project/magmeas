@@ -1,0 +1,1169 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>magmeas module &#8212; magmeas 0.5.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+
+    <script src="_static/documentation_options.js?v=b9afe91b"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'magmeas';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="magmeas documentation" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">magmeas 0.5.1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    magmeas module
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    magmeas module
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">magmeas module</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-magmeas.base">
+<span id="magmeas-module"></span><h1>magmeas module<a class="headerlink" href="#module-magmeas.base" title="Link to this heading">#</a></h1>
+<p>VSM-like classes and functions using them.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="magmeas.base.VSM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">magmeas.base.</span></span><span class="sig-name descname"><span class="pre">VSM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#VSM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.VSM" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">EntityCollection</span></code></p>
+<p>Class for importing, storing and using of VSM-data aswell as derived
+parameters.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.VSM.reload_qd">
+<span class="sig-name descname"><span class="pre">reload_qd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_method</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#VSM.reload_qd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.VSM.reload_qd" title="Link to this definition">#</a></dt>
+<dd><p>Load VSM-data from a quantum systems .DAT file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>datfile</strong> (<em>STR</em><em> | </em><em>PATH</em>) – Path to quantum systems .DAT file that data is supposed to be
+imported from</p></li>
+<li><p><strong>read_method</strong> (<em>STR</em>) – Determines whether magmeas will attempt to automatically read the
+sample parameters necessary for the following calculations or not.
+Can be “auto” or “manual”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.VSM.path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#magmeas.base.VSM.path" title="Link to this definition">#</a></dt>
+<dd><p>Path to the file which was used in the object generation.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.VSM.H">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">H</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.VSM.H" title="Link to this definition">#</a></dt>
+<dd><p>The internal magnetic field calculated from the measurement data.
+Calculated according to:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[H_{int} = H_{ext} - D \cdot M\]</div>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.VSM.H_ext">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">H_ext</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.VSM.H_ext" title="Link to this definition">#</a></dt>
+<dd><p>The external magnetic field as read from the measurement file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.VSM.M">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">M</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.VSM.M" title="Link to this definition">#</a></dt>
+<dd><p>The magnetisation calculated from the measurement data. Calculated
+according to:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[M = \frac{m}{V}\]</div>
+</div></blockquote>
+<p>with m being the magnetic moment and V being the volume.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.VSM.m">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">m</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Quantity</span></em><a class="headerlink" href="#magmeas.base.VSM.m" title="Link to this definition">#</a></dt>
+<dd><p>The magnetic moment as read from the measurement file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.VSM.T">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">T</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.VSM.T" title="Link to this definition">#</a></dt>
+<dd><p>The thermodynamic temperature as read from the measurement file.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.VSM.t">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.VSM.t" title="Link to this definition">#</a></dt>
+<dd><p>The time since the start of the measurement.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.VSM.to_csv">
+<span class="sig-name descname"><span class="pre">to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#VSM.to_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.VSM.to_csv" title="Link to this definition">#</a></dt>
+<dd><p>Write measurement data to CSV-file. See <cite>mammos_entity.EntityCollection.to_csv</cite>
+for more details.</p>
+<dl class="simple">
+<dt>filename: STR | PATH</dt><dd><p>Name of the generated file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="magmeas.base.MH">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">magmeas.base.</span></span><span class="sig-name descname"><span class="pre">MH</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#magmeas.base.VSM" title="magmeas.base.VSM"><code class="xref py py-class docutils literal notranslate"><span class="pre">VSM</span></code></a></p>
+<p>Class for importing, storing and using of VSM-data from M(H) measurements.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.MH.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot M(H) measurement and save figure if a filepath is given.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>STR</em><em> | </em><em>PATH</em><em>, </em><em>optional</em>) – Filepath for saving the figure. Default is None, in that case no
+file is saved and the generated figure as well as all axes objects
+are returned.</p></li>
+<li><p><strong>unit</strong> (<em>STR</em><em> | </em><em>mu.unit</em><em> | </em><em>TUPLE</em><em>(</em><em>STR</em><em> | </em><em>mu.unit</em><em>)</em><em>, </em><em>optional</em>) – Unit H and M are going to be plotted in. If string is given then
+both will have the same unit. Otherwise specify respective units
+as tuple (H_unit, M_unit). Default is ‘T’.</p></li>
+<li><p><strong>bounds</strong> (<em>TUPLE</em><em>(</em><em>NONE</em><em> | </em><em>INT</em><em>)</em><em>, </em><em>optional</em>) – Indices (start, end) at which the data to be plotted will be cut
+off. Use None to plot until the respective start or end.
+Default is (None, None).</p></li>
+<li><p><strong>fig_ax</strong> (<em>TUPLE</em><em>(</em><em>matplotlib.figure.Figure</em><em>, </em><em>matplotlib.axes.Axes</em><em>)</em><em>, </em><em>optional</em>) – Tuple of figure and axes the data should be plotted to. If None is
+given they will be generated dynamically. Default is None.</p></li>
+<li><p><strong>kwargs</strong> – Keyword arguments to change the appearance of plots.
+See documentation of matplotlib.pyplot.plot for more information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return figure and axes object if filepath is not specified.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None | (matplotlib.Figure, matplotlib.Axes)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="magmeas.base.MH_major">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">magmeas.base.</span></span><span class="sig-name descname"><span class="pre">MH_major</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH_major"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH_major" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_PropertyContainer</span></code>, <a class="reference internal" href="#magmeas.base.MH" title="magmeas.base.MH"><code class="xref py py-class docutils literal notranslate"><span class="pre">MH</span></code></a></p>
+<p>Class for importing, storing and using of VSM-data from major loop M(H)
+measurements aswell as derived properties.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.MH_major.remanence">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">remanence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.MH_major.remanence" title="Link to this definition">#</a></dt>
+<dd><p>The remanence calculated from the measurement data.
+See mammos_analysis.hysteresis.extrinsic_properties for more details.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.MH_major.coercivity">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coercivity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.MH_major.coercivity" title="Link to this definition">#</a></dt>
+<dd><p>The coercivity calculated from the measurement data.
+See mammos_analysis.hysteresis.extrinsic_properties for more details.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.MH_major.BHmax">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BHmax</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.MH_major.BHmax" title="Link to this definition">#</a></dt>
+<dd><p>The maximum energy product calculated from the measurement data.
+See mammos_analysis.hysteresis.extrinsic_properties for more details.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.MH_major.kneefield">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kneefield</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.MH_major.kneefield" title="Link to this definition">#</a></dt>
+<dd><p>The kneefield calculated from the measurement data. This is the internal
+magnetic field at which a magnetisation of 90 % of the remanence is
+reached.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.MH_major.squareness">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">squareness</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#magmeas.base.MH_major.squareness" title="Link to this definition">#</a></dt>
+<dd><p>The hysteresis loop squareness factor calculated from the measurement
+data. It is calculated according to:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[S = \frac{H_k}{H_c}\]</div>
+</div></blockquote>
+<p>with Hk being the kneefield and Hc being the coercivity.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.MH_major.saturation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">saturation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.MH_major.saturation" title="Link to this definition">#</a></dt>
+<dd><p>The saturation magnetisation if it has been calculated. See the method
+<cite>estimate_saturation</cite> for more details.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.MH_major.estimate_saturation">
+<span class="sig-name descname"><span class="pre">estimate_saturation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH_major.estimate_saturation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH_major.estimate_saturation" title="Link to this definition">#</a></dt>
+<dd><p>Calculate an estimation of the saturation magnetisation, return it and
+simultaneously assign it to the VSM object. A possible high field
+susceptibility can optionally be corrected for.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>threshold</strong> (<em>NONE</em><em> | </em><em>FLOAT</em><em>, </em><em>optional</em>) – If a float instead of None is given, the saturation value will be
+corrected for a high field susceptibility by substracting any
+inclination at magnetisation values above the maximum field times
+the threshold factor. The saturation magnetisation is then the
+y-intersection from extrapolating M over 1/H to 0.
+Default value is None.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Ms</strong> – Saturation magnetisation as SpontaneousMagnetization.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ENTITY</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.MH_major.segments">
+<span class="sig-name descname"><span class="pre">segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prominence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH_major.segments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH_major.segments" title="Link to this definition">#</a></dt>
+<dd><p>Find indices of segmentation points which can be used to seperate each
+measurement segment from each other. The segments are seperated by a
+changing sign of M (root) or a changing sign of dH/dt (peak).
+The segmentation points are chosen to be the index right after the root
+and right at the peak.
+Segmentation points with even indices (including 0) are peaks while
+segmentation points with uneven indices are roots.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edge</strong> (<em>FLOAT</em><em>, </em><em>optional</em>) – Percentage of measurement to be treated as edge. Default is 0.05,
+which means that segmentation points closer than 5 % of the total
+measurement width to the edges will be discarded.</p></li>
+<li><p><strong>prominence</strong> (<em>FLOAT</em><em>, </em><em>optional</em>) – The prominence which is used to find all peaks in H_ext(t). See the
+documentation of scipy.signal.find_peaks for more details.
+The default is 1e6.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>s</strong> – Array of segmentation points that can be used to segmentise the
+measurement.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ARRAY[INT]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.MH_major.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH_major.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH_major.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot major hysteresis loop, optionally with inset of demagnetization
+curve and save figure if a filepath is given.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>STR</em><em> | </em><em>PATH</em><em>, </em><em>optional</em>) – Filepath for saving the figure. Default is None, in that case no
+file is saved and the generated figure as well as all axes objects
+are returned.</p></li>
+<li><p><strong>demag</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Boolean that determines if demagnetization curve is plotted as an
+inset next to hysteresis loop. Default is True.</p></li>
+<li><p><strong>unit</strong> (<em>STR</em><em> | </em><em>mu.unit</em><em> | </em><em>TUPLE</em><em>(</em><em>STR</em><em> | </em><em>mu.unit</em><em>)</em><em>, </em><em>optional</em>) – Unit H and M are going to be plotted in. If string is given then
+both will have the same unit. Otherwise specify respective units
+as tuple (H_unit, M_unit). Default is ‘T’.</p></li>
+<li><p><strong>segments</strong> (<em>TUPLE</em><em>(</em><em>NONE</em><em> | </em><em>INT</em><em>)</em><em>, </em><em>optional</em>) – Segmentation points (start, end) at which the data to be plotted
+will be cut off. See the method ‘segments’ for more information.
+Note that valid input here are only the indices FOR the output from
+the segments method and NOT the indices of the actual measurement
+points. Use None to plot until the respective start or end. The
+demagnetisation curve will not be affected by this, it is always
+plotted in the same way between the same bounds.
+Default is (None, None).</p></li>
+<li><p><strong>fig_ax</strong> (<em>TUPLE</em><em>(</em><em>matplotlib.figure.Figure</em><em>, </em><em>matplotlib.axes.Axes</em><em>)</em><em>, </em><em>optional</em>) – Tuple of figure and axes the data should be plotted to. If None is
+given they will be generated dynamically. Default is None.</p></li>
+<li><p><strong>kwargs</strong> – Keyword arguments to change the appearance of plots.
+See documentation of matplotlib.pyplot.plot for more information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return figure and axes object if filepath is not specified.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None | (matplotlib.Figure, matplotlib.Axes)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="magmeas.base.MH_recoil">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">magmeas.base.</span></span><span class="sig-name descname"><span class="pre">MH_recoil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH_recoil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH_recoil" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#magmeas.base.MH" title="magmeas.base.MH"><code class="xref py py-class docutils literal notranslate"><span class="pre">MH</span></code></a></p>
+<p>Class for importing, storing and using of VSM-data from recoil loop M(H)
+measurements.
+Recoil loop measurements are assumed to be measurements where
+the sample is first saturated at some positive field. After this, a number
+of recoil loops are performed, where the magnetic field is reduced to some
+negative value (which often includes fields that do not fully demagnetise
+the sample) and is then increased to an external field of 0 or to a
+positive external field which increases the internal field to 0.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.MH_recoil.segments">
+<span class="sig-name descname"><span class="pre">segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prominence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH_recoil.segments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH_recoil.segments" title="Link to this definition">#</a></dt>
+<dd><p>Get indices of segmentation points. Segmentation point 0 occurs
+at H = H_max. All uneven segmentation points are the start of a recoil
+loop (only section with positive change in H) while all subsequent even
+segmentation points are the respective ends of each recoil loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>prominence</strong> (<em>FLOAT</em><em>, </em><em>optional</em>) – The prominence which is used to find all peaks in H_ext(t). See the
+documentation of scipy.signal.find_peaks for more details.
+The default is 5e3.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>segments</strong> – Segmentation points used to extract each recoil loop.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ARRAY</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.MH_recoil.recoil_susceptibility">
+<span class="sig-name descname"><span class="pre">recoil_susceptibility</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prominence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH_recoil.recoil_susceptibility"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH_recoil.recoil_susceptibility" title="Link to this definition">#</a></dt>
+<dd><p>Calculate recoil susceptibility from recoil loop measurement as slope
+of a linear regression of each recoil loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prominence</strong> (<em>FLOAT</em><em>, </em><em>optional</em>) – Prominence used to find segmentation points, see MH_recoil.segments
+The default is 5e3.</p></li>
+<li><p><strong>take_mean</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Wether to take the mean of all recoil susceptibilities instead of
+returning an individual one for each loop. Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>recoil_susceptibility</strong> – Recoil susceptibility calculated from recoil loop measurement.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>FLOAT | ARRAY</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.MH_recoil.external_comp_field">
+<span class="sig-name descname"><span class="pre">external_comp_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prominence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH_recoil.external_comp_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH_recoil.external_comp_field" title="Link to this definition">#</a></dt>
+<dd><p>Return external compensation fields, that will lead to an endpoint
+close to an internal magnetic field of zero for each recoil loop. This
+only makes sense to be calculated from recoil loop measurements, where
+the endpoint for each recoil loop was an external magnetic field of 0,
+which will lead to the respective internal magnetic field being
+non-zero. The external compensation fields can then be used in a new
+measurement which will then enable a recoil loop measurement corrected
+for demagnetisation.</p>
+<p>External compensation field is calculated from the internal recoil
+fields (at the end of each recoil loop) and the recoil susceptibility
+according to:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[H^e_{comp} = \frac{- H^i_{recoil}}{1 - D * \chi_{recoil}}\]</div>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>prominence</strong> (<em>FLOAT</em><em>, </em><em>optional</em>) – Prominence used to find segmentation points, see MH_recoil.segments
+The default is 5e3.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>external_compensation_field</strong> – External compensation fields, that would lead to an internal field
+close to zero at the end of each recoil loop.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ARRAY</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.MH_recoil.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MH_recoil.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MH_recoil.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot recoil loop measurement and save figure if a filepath is given.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>STR</em><em> | </em><em>PATH</em><em>, </em><em>optional</em>) – Filepath for saving the figure. Default is None, in that case no
+file is saved and the generated figure as well as all axes objects
+are returned.</p></li>
+<li><p><strong>demag</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Plot the recoil loop measurement only in the second quadrant.
+Default is True.</p></li>
+<li><p><strong>unit</strong> (<em>STR</em><em> | </em><em>mu.unit</em><em> | </em><em>TUPLE</em><em>(</em><em>STR</em><em> | </em><em>mu.unit</em><em>)</em><em>, </em><em>optional</em>) – Unit H and M are going to be plotted in. If string is given then
+both will have the same unit. Otherwise specify respective units
+as tuple (H_unit, M_unit). Default is ‘T’.</p></li>
+<li><p><strong>segments</strong> (<em>TUPLE</em><em>(</em><em>NONE</em><em> | </em><em>INT</em><em>)</em><em>, </em><em>optional</em>) – Segmentation points (start, end) at which the data to be plotted
+will be cut off. See the method ‘segments’ for more information.
+Note that valid input here are only the indices FOR the output from
+the segments method and NOT the indices of the actual measurement
+points. Use None to plot until the respective start or end.
+Default is (0, None).</p></li>
+<li><p><strong>fig_ax</strong> (<em>TUPLE</em><em>(</em><em>matplotlib.figure.Figure</em><em>, </em><em>matplotlib.axes.Axes</em><em>)</em><em>, </em><em>optional</em>) – Tuple of figure and axes the data should be plotted to. If None is
+given they will be generated dynamically. Default is None.</p></li>
+<li><p><strong>kwargs</strong> – Keyword arguments to change the appearance of plots.
+See documentation of matplotlib.pyplot.plot for more information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return figure and axes object if filepath is not specified.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None | (matplotlib.Figure, matplotlib.Axes)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="magmeas.base.FORC">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">magmeas.base.</span></span><span class="sig-name descname"><span class="pre">FORC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#FORC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.FORC" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#magmeas.base.MH" title="magmeas.base.MH"><code class="xref py py-class docutils literal notranslate"><span class="pre">MH</span></code></a></p>
+<p>Class for importing, storing and using VSM data of FORC measurements.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.FORC.segments">
+<span class="sig-name descname"><span class="pre">segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prominence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#FORC.segments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.FORC.segments" title="Link to this definition">#</a></dt>
+<dd><p>Get indices of segmentation points. Segmentation point 0 occurs
+at H = H_max. All uneven segmentation points are the start of a FORC
+(only section with positive change in H) while all subsequent even
+segmentation points are the respective ends of each FORC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>prominence</strong> (<em>FLOAT</em><em>, </em><em>optional</em>) – The prominence which is used to find all peaks in H_ext(t). See the
+documentation of scipy.signal.find_peaks for more details.
+The default is 5e3.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>segments</strong> – Segmentation points used to extract each recoil loop.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ARRAY</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.FORC.forc_grid">
+<span class="sig-name descname"><span class="pre">forc_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demag_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prominence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#FORC.forc_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.FORC.forc_grid" title="Link to this definition">#</a></dt>
+<dd><p>Extract grid of magnetic fields, reversal fields and magnetisations
+from the FORC-measurement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>demag_correction</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Whether to correct the magnetic field for Demagnetisation.
+The default is True.</p></li>
+<li><p><strong>prominence</strong> (<em>FLOAT</em><em>, </em><em>optional</em>) – Prominence used to find segmentation points, see FORC.segments
+The default is 5e3.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>h_grid</strong> (<em>QUANTITY</em>) – Magnetic field at each grid point of the FORC-measurement.
+If demag_correction was True, this is the internal magnetic field.
+Otherwise it’s the external magnetic field.</p></li>
+<li><p><strong>h_r_grid</strong> (<em>QUANTITY</em>) – Magnetic reversal field of each FORC. Has the same shape as h_grid.
+If demag_correction was True, this is the internal magnetic field.
+Otherwise it’s the external magnetic field.</p></li>
+<li><p><strong>m_grid</strong> (<em>QUANTITY</em>) – Magnetisation at each grid point of the FORC-measurement.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.FORC.forc_dist">
+<span class="sig-name descname"><span class="pre">forc_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">SF</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demag_correction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prominence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#FORC.forc_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.FORC.forc_dist" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the transformed coordinates H_c and H_i as well as the
+FORC distribution. Takes a grid of (2*SF+1)**2 measurement points from
+the grid of M(H_r, H) points and fits a quadratic function. The
+FORC distribution is then the mixed partial derivative of this fitted
+polynomial.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>SF</strong> (<em>INT</em>) – Smoothing factor to be used in the calculation of the FORC
+distribution. The number of points contributing to a point in the
+FORC distribution is a square grid with a side length of (2*SF+1)
+measurement points.</p></li>
+<li><p><strong>demag_correction</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Whether to correct the magnetic field for Demagnetisation.
+The default is True.</p></li>
+<li><p><strong>prominence</strong> (<em>FLOAT</em><em>, </em><em>optional</em>) – Prominence used to find segmentation points, see FORC.segments
+The default is 5e3.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>H_c</strong> (<em>QUANTITY</em>) – Local coercive field H_c = (H_r - H) / 2 defined for H &gt; 0</p></li>
+<li><p><strong>H_i</strong> (<em>QUANTITY</em>) – Local interaction field H_i = (H_r + H) / 2</p></li>
+<li><p><strong>rho</strong> (<em>ARRAY</em>) – FORC distribution at each point of the FORC measurement grid.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="magmeas.base.MT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">magmeas.base.</span></span><span class="sig-name descname"><span class="pre">MT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MT" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_PropertyContainer</span></code>, <a class="reference internal" href="#magmeas.base.VSM" title="magmeas.base.VSM"><code class="xref py py-class docutils literal notranslate"><span class="pre">VSM</span></code></a></p>
+<p>Class for importing, storing and using of VSM-data from M(T)-measurement
+aswell as derived properties.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="magmeas.base.MT.Tc">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Tc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Entity</span></em><a class="headerlink" href="#magmeas.base.MT.Tc" title="Link to this definition">#</a></dt>
+<dd><p>The Curie-temperature(s) calculated from the measurement data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.MT.segments">
+<span class="sig-name descname"><span class="pre">segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MT.segments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MT.segments" title="Link to this definition">#</a></dt>
+<dd><p>Find indices of segmentation points which can be used to seperate each
+measurement segment from each other. The segments are seperated by a
+changing sign of dT/dt.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>edge</strong> (<em>FLOAT</em><em>, </em><em>optional</em>) – Percentage of measurement to be treated as edge. Default is 0.05,
+which means that segmentation points closer than 5 % of the total
+measurement width to the edges will be discarded.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>s</strong> – Array of segmentation points that can be used to segmentise the
+measurement.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ARRAY[INT]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="magmeas.base.MT.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#MT.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.MT.plot" title="Link to this definition">#</a></dt>
+<dd><p>Plot cooling curve of M(T) measurement. Save to file if path is given.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>STR</em><em> | </em><em>PATH</em><em>, </em><em>optional</em>) – Filepath for saving the figure. Default is None, in that case no
+file is saved.</p></li>
+<li><p><strong>derivative</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Whether to plot the first derivative dM/dT on a second axes.
+Default is True.</p></li>
+<li><p><strong>segments</strong> (<em>TUPLE</em><em>(</em><em>NONE</em><em> | </em><em>INT</em><em>)</em><em>, </em><em>optional</em>) – Segmentation points (start, end) at which the data to be plotted
+will be cut off. See the method ‘segments’ for more information.
+Note that valid input here are only the indices FOR the output from
+the segments method and NOT the indices of the actual measurement
+points. Use None to plot until the respective start or end.
+Default is (None, None).</p></li>
+<li><p><strong>fig_ax</strong> (<em>TUPLE</em><em>(</em><em>matplotlib.figure.Figure</em><em>, </em><em>matplotlib.axes.Axes</em><em>)</em><em>, </em><em>optional</em>) – Tuple of figure and axes the data should be plotted to. If None is
+given they will be generated dynamically. Default is None.</p></li>
+<li><p><strong>kwargs</strong> – Keyword arguments to change the appearance of plots.
+See documentation of matplotlib.pyplot.plot for more information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return figure and axes object if filepath is not specified.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None | (matplotlib.Figure, matplotlib.Axes)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="magmeas.base.plot_batch">
+<span class="sig-prename descclassname"><span class="pre">magmeas.base.</span></span><span class="sig-name descname"><span class="pre">plot_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inferno'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0.9)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">derivative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#plot_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.plot_batch" title="Link to this definition">#</a></dt>
+<dd><p>Plot several VSM-derived objects together. Must be of the same type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>LIST</em><em>[</em><a class="reference internal" href="#magmeas.base.MH" title="magmeas.base.MH"><em>MH</em></a><em> | </em><a class="reference internal" href="#magmeas.base.MH_major" title="magmeas.base.MH_major"><em>MH_major</em></a><em> | </em><a class="reference internal" href="#magmeas.base.MT" title="magmeas.base.MT"><em>MT</em></a><em>] </em><em>| </em><em>mammos_entity.EntityCollection</em>) – List or EntityCollection of several objects which have to be of magmeas
+classes that have a plotting method. All contained objects need to be
+of the same class.</p></li>
+<li><p><strong>filepath</strong> (<em>STR</em><em> | </em><em>PATH</em><em>, </em><em>optional</em>) – Filepath for saving the figure. If None is given, then instead the
+generated figure and axes objects will be returned. Default is None.</p></li>
+<li><p><strong>labels</strong> (<em>LIST</em><em>, </em><em>optional</em>) – List of labels that are going to be used in the legend of the plot.
+Has to have the same length as data. If none is given then the names
+of the .DAT files each VSM object was calculated from will be used.</p></li>
+<li><p><strong>unit</strong> (<em>STR</em><em> | </em><em>mu.unit</em><em> | </em><em>TUPLE</em><em>(</em><em>STR</em><em> | </em><em>mu.unit</em><em>)</em>) – Only supported for MH-derived measurements. Unit H and M are going to
+be plotted in. If string is given then both will have the same unit.
+Otherwise specify respective units as tuple (H_unit, M_unit).
+Default is ‘T’.</p></li>
+<li><p><strong>segments</strong> (<em>TUPLE</em><em>(</em><em>NONE</em><em> | </em><em>INT</em><em>)</em><em>, </em><em>optional</em>) – Segmentation points (start, end) at which the data to be plotted
+will be cut off. See the method ‘segments’ for more information.
+Note that valid input here are only the indices FOR the output from
+the segments method and NOT the indices of the actual measurement
+points. Use None to plot until the respective start or end. The
+demagnetisation curve will not be affected by this, it is always
+plotted in the same way between the same bounds.
+Default is (None, None).</p></li>
+<li><p><strong>cmap</strong> (<em>STR</em><em> | </em><em>matplotlib.colors.Colormap</em><em> | </em><em>matplotlib.colors.ListedColormap</em>) – Colormap that will be used to generate the colours of all lines. Each
+colormap will be filled with np.linspace according to color_range.
+Please keep the visibility of ALL lines in mind! Colormaps such as
+‘gray’ or ‘hot’ will definitely lead to invisible/barely visible lines.
+Default is ‘inferno’.</p></li>
+<li><p><strong>color_range</strong> (<em>TUPLE</em><em>(</em><em>FLOAT</em><em> | </em><em>INT</em><em>)</em><em>, </em><em>optional</em>) – Color range to control from which range of the colormap gradient the
+colors will be picked. Full range would be (0, 1). Often it makes sense
+to restrict the range towards smaller maximum values as many colormaps
+have very bright colors at values getting closer to 1, which will lead
+to poorly visible lines. This can also be used to reverse the color
+gradient when switching maximum and minimum, as in (1, 0).
+Default is (0, 0.9).</p></li>
+<li><p><strong>demag</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Determines, whether demagnetization curve is plotted as an inset next
+to hysteresis loop if MH_major objects are in data. Will not do
+anything otherwise. Default is True.</p></li>
+<li><p><strong>derivative</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Determines, whether derivative dM/dT is plotted as another subplot
+below the M(T) plot if MT objects are in data. Will not do anything
+otherwise. Default is True.</p></li>
+<li><p><strong>fig_ax</strong> (<em>TUPLE</em><em>(</em><em>matplotlib.figure.Figure</em><em>, </em><em>matplotlib.axes.Axes</em><em>)</em><em>, </em><em>optional</em>) – Tuple of figure and axes the data should be plotted to. If None is
+given they will be generated dynamically. Default is None.</p></li>
+<li><p><strong>kwargs</strong> – Keyword arguments to change the appearance of lines. All arguments are
+applied to every line. The arguments ‘color’ and ‘c’ are not allowed as
+they would lead to all lines having the same colour, making them
+indistinguishable.
+See documentation of matplotlib.pyplot.plot for more information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return figure and axes object if filepath is not specified.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None | (matplotlib.Figure, matplotlib.Axes)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="magmeas.base.to_batch">
+<span class="sig-prename descclassname"><span class="pre">magmeas.base.</span></span><span class="sig-name descname"><span class="pre">to_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#to_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.to_batch" title="Link to this definition">#</a></dt>
+<dd><p>Generate batch of VSM-derived objects as mammos_entity.EntityCollection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>LIST</em><em>[</em><a class="reference internal" href="#magmeas.base.MH_major" title="magmeas.base.MH_major"><em>MH_major</em></a><em> | </em><a class="reference internal" href="#magmeas.base.MT" title="magmeas.base.MT"><em>MT</em></a><em>]</em>) – List of VSM objects that will be exported.</p></li>
+<li><p><strong>labels</strong> (<em>LIST</em><em>[</em><em>STR</em><em>]</em><em>, </em><em>optional</em>) – List of strings to identify the VSM objects more easily.
+If not given, the filenames of each VSM-object are used instead.</p></li>
+<li><p><strong>prop_only</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Whether to only export the the properties and no measurement data. Will
+lead to an AttributeError if this is True but the objects in data only
+contain measurement data and no properties.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="magmeas.base.to_yaml">
+<span class="sig-prename descclassname"><span class="pre">magmeas.base.</span></span><span class="sig-name descname"><span class="pre">to_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#to_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.to_yaml" title="Link to this definition">#</a></dt>
+<dd><p>Save all properties derived from list of VSM-measurements to YAML file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>LIST</em><em>[</em><a class="reference internal" href="#magmeas.base.MH_major" title="magmeas.base.MH_major"><em>MH_major</em></a><em> | </em><a class="reference internal" href="#magmeas.base.MT" title="magmeas.base.MT"><em>MT</em></a><em>]</em>) – List of VSM objects that will be exported.</p></li>
+<li><p><strong>filepath</strong> (<em>STR</em><em> | </em><em>PATH</em>) – Filepath to save the file to.</p></li>
+<li><p><strong>labels</strong> (<em>LIST</em><em>[</em><em>STR</em><em>]</em><em>, </em><em>optional</em>) – List of strings to identify the VSM objects more easily.
+If not given, the filenames of each VSM-object are used instead.</p></li>
+<li><p><strong>prop_only</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Whether to only export the the properties and no measurement data. Will
+lead to an AttributeError if this is True but the objects in data only
+contain measurement data and no properties.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="magmeas.base.to_hdf5">
+<span class="sig-prename descclassname"><span class="pre">magmeas.base.</span></span><span class="sig-name descname"><span class="pre">to_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/magmeas/base.html#to_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#magmeas.base.to_hdf5" title="Link to this definition">#</a></dt>
+<dd><p>Save all properties derived from list of VSM-measurements to HDF5 file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>LIST</em><em>[</em><a class="reference internal" href="#magmeas.base.MH_major" title="magmeas.base.MH_major"><em>MH_major</em></a><em> | </em><a class="reference internal" href="#magmeas.base.MT" title="magmeas.base.MT"><em>MT</em></a><em>]</em>) – List of VSM objects that will be exported.</p></li>
+<li><p><strong>filepath</strong> (<em>STR</em><em> | </em><em>PATH</em>) – Filepath to save the file to.</p></li>
+<li><p><strong>labels</strong> (<em>LIST</em><em>[</em><em>STR</em><em>]</em><em>, </em><em>optional</em>) – List of strings to identify the VSM objects more easily.
+If not given, the filenames of each VSM-object are used instead.</p></li>
+<li><p><strong>prop_only</strong> (<em>BOOL</em><em>, </em><em>optional</em>) – Whether to only export the the properties and no measurement data. Will
+lead to an AttributeError if this is True but the objects in data only
+contain measurement data and no properties.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">magmeas documentation</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.VSM"><code class="docutils literal notranslate"><span class="pre">VSM</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.VSM.reload_qd"><code class="docutils literal notranslate"><span class="pre">VSM.reload_qd()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.VSM.path"><code class="docutils literal notranslate"><span class="pre">VSM.path</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.VSM.H"><code class="docutils literal notranslate"><span class="pre">VSM.H</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.VSM.H_ext"><code class="docutils literal notranslate"><span class="pre">VSM.H_ext</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.VSM.M"><code class="docutils literal notranslate"><span class="pre">VSM.M</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.VSM.m"><code class="docutils literal notranslate"><span class="pre">VSM.m</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.VSM.T"><code class="docutils literal notranslate"><span class="pre">VSM.T</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.VSM.t"><code class="docutils literal notranslate"><span class="pre">VSM.t</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.VSM.to_csv"><code class="docutils literal notranslate"><span class="pre">VSM.to_csv()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH"><code class="docutils literal notranslate"><span class="pre">MH</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH.plot"><code class="docutils literal notranslate"><span class="pre">MH.plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_major"><code class="docutils literal notranslate"><span class="pre">MH_major</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_major.remanence"><code class="docutils literal notranslate"><span class="pre">MH_major.remanence</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_major.coercivity"><code class="docutils literal notranslate"><span class="pre">MH_major.coercivity</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_major.BHmax"><code class="docutils literal notranslate"><span class="pre">MH_major.BHmax</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_major.kneefield"><code class="docutils literal notranslate"><span class="pre">MH_major.kneefield</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_major.squareness"><code class="docutils literal notranslate"><span class="pre">MH_major.squareness</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_major.saturation"><code class="docutils literal notranslate"><span class="pre">MH_major.saturation</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_major.estimate_saturation"><code class="docutils literal notranslate"><span class="pre">MH_major.estimate_saturation()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_major.segments"><code class="docutils literal notranslate"><span class="pre">MH_major.segments()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_major.plot"><code class="docutils literal notranslate"><span class="pre">MH_major.plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_recoil"><code class="docutils literal notranslate"><span class="pre">MH_recoil</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_recoil.segments"><code class="docutils literal notranslate"><span class="pre">MH_recoil.segments()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_recoil.recoil_susceptibility"><code class="docutils literal notranslate"><span class="pre">MH_recoil.recoil_susceptibility()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_recoil.external_comp_field"><code class="docutils literal notranslate"><span class="pre">MH_recoil.external_comp_field()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MH_recoil.plot"><code class="docutils literal notranslate"><span class="pre">MH_recoil.plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.FORC"><code class="docutils literal notranslate"><span class="pre">FORC</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.FORC.segments"><code class="docutils literal notranslate"><span class="pre">FORC.segments()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.FORC.forc_grid"><code class="docutils literal notranslate"><span class="pre">FORC.forc_grid()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.FORC.forc_dist"><code class="docutils literal notranslate"><span class="pre">FORC.forc_dist()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MT"><code class="docutils literal notranslate"><span class="pre">MT</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MT.Tc"><code class="docutils literal notranslate"><span class="pre">MT.Tc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MT.segments"><code class="docutils literal notranslate"><span class="pre">MT.segments()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.MT.plot"><code class="docutils literal notranslate"><span class="pre">MT.plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.plot_batch"><code class="docutils literal notranslate"><span class="pre">plot_batch()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.to_batch"><code class="docutils literal notranslate"><span class="pre">to_batch()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.to_yaml"><code class="docutils literal notranslate"><span class="pre">to_yaml()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#magmeas.base.to_hdf5"><code class="docutils literal notranslate"><span class="pre">to_hdf5()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/magmeas.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Jonas Winkler.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
