@@ -25,8 +25,15 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
     "nbsphinx",
 ]
+
+intersphinx_mapping = {
+    "mammos_entity": ("https://mammos-project.github.io/mammos", None)
+    }
+
+autodoc_default_options = {'inherited-members': True}
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
