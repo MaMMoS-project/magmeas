@@ -8,6 +8,7 @@ import mammos_units as mu
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from mammos_analysis.demag import demag_cuboid
 from mammos_analysis.hysteresis import extrinsic_properties
 from matplotlib import colormaps
 from matplotlib.colors import Colormap, ListedColormap
@@ -30,62 +31,6 @@ class VSM(me.EntityCollection):
         super().__init__()
         # import data
         self.reload_qd(datfile, read_method=read_method)
-
-    def _demag_prism(self, dim):
-        r"""
-        Calculate demagnetization factor Dz for a rectangular prism.
-        Dimensions are a, b, and c. c is assumed to be the axis along which
-        the prism was magnetized.
-        Copied from
-        https://rmlmcfadden.github.io/bnmr/technical-information/calculators/
-        Equation from A. Aharoni, J. Appl. Phys. 83, 3422 (1998).
-        https://doi.org/10.1063/1.367113
-        Eq. (1) - see Fig. 1 for_abc coordinate system.
-
-        Parameters
-        ----------
-        dim: LIST | ARRAY
-            List of sample dimensions as mammos_units.Quantity values
-
-        Returns
-        -------
-        D: ENTITY
-            Demagnetization factor along axis of magnetization (c-axis) as
-            mammos_entity.Entity
-        """
-        # the expression takes input as half of the semi-axes
-        a = 0.5 * dim[0]
-        b = 0.5 * dim[1]
-        c = 0.5 * dim[2]  # c is || axis along which the prism was magnetized
-        # define some convenience terms
-        a2 = a * a
-        b2 = b * b
-        c2 = c * c
-        abc = a * b * c
-        ab = a * b
-        ac = a * c
-        bc = b * c
-        r_abc = np.sqrt(a2 + b2 + c2)
-        r_ab = np.sqrt(a2 + b2)
-        r_bc = np.sqrt(b2 + c2)
-        r_ac = np.sqrt(a2 + c2)
-        # compute the factor
-        pi_Dz = (
-            ((b2 - c2) / (2 * bc)) * np.log((r_abc - a) / (r_abc + a))
-            + ((a2 - c2) / (2 * ac)) * np.log((r_abc - b) / (r_abc + b))
-            + (b / (2 * c)) * np.log((r_ab + a) / (r_ab - a))
-            + (a / (2 * c)) * np.log((r_ab + b) / (r_ab - b))
-            + (c / (2 * a)) * np.log((r_bc - b) / (r_bc + b))
-            + (c / (2 * b)) * np.log((r_ac - a) / (r_ac + a))
-            + 2 * np.arctan2(ab, c * r_abc) / mu.rad
-            + (a2 * a + b2 * b - 2 * c2 * c) / (3 * abc)
-            + ((a2 + b2 - 2 * c2) / (3 * abc)) * r_abc
-            + (c / ab) * (r_ac + r_bc)
-            - (r_ab * r_ab * r_ab + r_bc * r_bc * r_bc + r_ac * r_ac * r_ac) / (3 * abc)
-        )
-        # divide out the factor of pi
-        D = pi_Dz / np.pi
-        return me.Entity("DemagnetizingFactor", D.value)
 
     def reload_qd(self, datfile, read_method):
         """
@@ -151,7 +96,9 @@ class VSM(me.EntityCollection):
         # calculate density from sample mass and dimensions
         density = mass / (np.prod(dim.value) * dim.unit**3)
         # calculate demagnetisation factor
-        self.D = self._demag_prism(dim)
+        self.D = demag_cuboid(*dim)
+        # extract only demag factor needed for the calculations done here
+        self.D = me.Entity("DemagnetizingFactor", self.D.q[-1])
         # import measurement data
         df = pd.read_csv(self._path, skiprows=head_length, encoding="cp1252")
         # extract magnetic moment
