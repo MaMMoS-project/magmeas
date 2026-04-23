@@ -688,7 +688,7 @@ class MH_recoil(MH):
 
         return recoil_suscep
 
-    def external_comp_field(self, prominence=5e3):
+    def external_comp_field(self, demag_fields=None, prominence=5e3):
         """
         Return external compensation fields, that will lead to an endpoint
         close to an internal magnetic field of zero for each recoil loop. This
@@ -705,6 +705,13 @@ class MH_recoil(MH):
 
         Parameters
         ----------
+        demag_fields: NONE | QUANTITY | ARRAY, optional
+            If None, then the external compensation fields will be calculated
+            for each recoil loop of the given MH_recoil object. Otherwise an
+            array of external demagnetising fields can be given, which will
+            be the start of each recoil loop for which the external compensation
+            field is calculated. Must be given as a Quantity, otherwise its
+            unit is assumed to be A/m. Default is None.
         prominence: FLOAT, optional
             Prominence used to find segmentation points, see MH_recoil.segments
             The default is 5e3.
@@ -720,7 +727,16 @@ class MH_recoil(MH):
         # get internal recoil fields as end points of each recoil loop
         i_r_f = self.H.q[self.segments(prominence=prominence)[2::2]]
         # get recoil susceptibilities individually for each recoil loop
-        r_chi = self.recoil_susceptibility(prominence=prominence, take_mean=False)
+        r_chi = self.recoil_susceptibility(
+            prominence=prominence, take_mean=demag_fields is not None
+        )
+
+        if demag_fields is not None:
+            e_d_f = self.H_ext.q[self.segments(prominence=prominence)[1::2]]
+            fit = np.polynomial.Polynomial.fit(e_d_f.value, i_r_f.value, 3)
+            if isinstance(demag_fields, mu.Quantity):
+                demag_fields = demag_fields.to("A/m").value
+            i_r_f = fit(demag_fields)
 
         # calculate external compensation fields
         e_c_f = -i_r_f / (1 - D * r_chi)
