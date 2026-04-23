@@ -41,6 +41,7 @@ dev = [
 ]
 
 doc = [
+    "jupyterlab",
     "nbsphinx",
     "pydata-sphinx-theme",
     "sphinx",
