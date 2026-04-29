@@ -733,7 +733,7 @@ class MH_recoil(MH):
 
         if demag_fields is not None:
             e_d_f = self.H_ext.q[self.segments(prominence=prominence)[1::2]]
-            fit = np.polynomial.Polynomial.fit(e_d_f.value, i_r_f.value, 3)
+            fit = np.polynomial.Polynomial.fit(e_d_f.value, i_r_f.value, 2)
             if isinstance(demag_fields, mu.Quantity):
                 demag_fields = demag_fields.to("A/m").value
             i_r_f = fit(demag_fields)
