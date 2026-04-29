@@ -440,7 +440,7 @@ class MH_major(_PropertyContainer, MH):
         Returns
         -------
         Ms: ENTITY
-            Saturation magnetisation as SpontaneousMagnetization.
+            Saturation magnetisation.
         """
         if threshold is None:
             Ms = []
@@ -468,7 +468,7 @@ class MH_major(_PropertyContainer, MH):
                 linreg2 = linregress(1 / H[filt], M[filt] - H[filt] * linreg1.slope)
                 Ms.append(linreg2.intercept * mu.A / mu.m)
 
-        Ms = me.Entity("SpontaneousMagnetization", max(Ms))
+        Ms = me.Entity("SaturationMagnetization", max(Ms), "MA / m")
         self.properties.saturation = Ms
         return Ms
 
