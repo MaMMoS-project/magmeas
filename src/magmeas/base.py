@@ -1028,6 +1028,57 @@ class MT(_PropertyContainer, VSM):
         """The Curie-temperature(s) calculated from the measurement data."""
         return self.properties.Tc
 
+    def _dMdT(self, kernel_width, edge_frac):
+        """
+        Return first derivative of magnetisation over temperature. Includes
+        smoothing and masking functionality.
+
+        Parameters
+        ----------
+        kernel_width: INT
+            Width of kernel to be used for smoothing. Should be even value.
+        edge_frac: FLOAT
+            Fraction of the array to be masked off at the edges.
+
+        Returns
+        -------
+        dmdT: QUANTITY
+            First derivative of magnetisation over temperature.
+        """
+        if kernel_width % 2 != 0:
+            raise ValueError(
+                """Kernel width was detected to be uneven! Please only use even
+                integer kernel widths."""
+            )
+        if not isinstance(kernel_width, int):
+            raise TypeError(
+                f"""Kernel width is expected to be of type int, but type
+                {type(kernel_width)} was used."""
+            )
+        if edge_frac is not None and not (0 <= edge_frac <= 1):
+            raise ValueError(
+                f"""Please only use values of edge_frac between 0 and 1.
+                edge_frac was {edge_frac}."""
+            )
+        T = self.T.q
+        M = self.M.q
+        kernel = np.ones(kernel_width) / kernel_width
+        sT = np.convolve(T, kernel, mode="same")
+        sM = np.convolve(M, kernel, mode="same")
+
+        dT = np.gradient(sT)
+        dM = np.gradient(sM)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            dMdT = dM / dT
+        dMdT = np.where(np.isfinite(dMdT), dMdT, np.nan)
+
+        if edge_frac:
+            n_edge = int(round(edge_frac * len(T)))
+            dMdT[:n_edge] = np.nan
+            dMdT[-n_edge:] = np.nan
+
+        return dMdT
+
     def _calc_Tc(self):
         """
         Calculate Curie-temperature from M(T) measurement.
@@ -1095,6 +1146,8 @@ class MT(_PropertyContainer, VSM):
         derivative=True,
         segments=(None, None),
         fig_ax=None,
+        kernel_width=20,
+        edge_frac=0.05,
         **kwargs,
     ):
         """
@@ -1118,6 +1171,11 @@ class MT(_PropertyContainer, VSM):
         fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
             Tuple of figure and axes the data should be plotted to. If None is
             given they will be generated dynamically. Default is None.
+        kernel_width: INT
+            Kernel width to be used for smoothing of derivative.
+        edge_frac: FLOAT
+            Fraction of measurement range to be masked at the edges, since those
+            regions are usually very noisy.
         kwargs:
             Keyword arguments to change the appearance of plots.
             See documentation of matplotlib.pyplot.plot for more information.
@@ -1133,10 +1191,8 @@ class MT(_PropertyContainer, VSM):
             fig, ax1, ax2 = fig_ax
         elif not derivative and fig_ax is None:
             fig, ax1 = plt.subplots(1, 1)
-            ax1.set_xlabel(f"Temperature in {self.T.unit}")
         elif not derivative and fig_ax is not None:
             fig, ax1 = fig_ax
-            ax1.set_xlabel(f"Temperature in {self.T.unit}")
 
         start, end = segments
         if start is not None:
@@ -1145,20 +1201,12 @@ class MT(_PropertyContainer, VSM):
             end = self.segments()[end]
 
         ax1.plot(self.T.q[start:end], self.M.q[start:end], **kwargs)
+        ax1.set_xlabel(f"Temperature in {self.T.unit}")
         ax1.set_ylabel(f"Magnetization in {self.M.unit}")
 
         if derivative:
-            M = self.M.q
-            T = self.T.q
-            # crop off measurement edges, where extreme noise usually occurs
-            cM = M[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
-            cT = T[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
-            # smooth generously and calculate dM/dT
-            kernel = np.ones(20) / 20
-            sM = np.convolve(cM, kernel, "same")
-            sT = np.convolve(cT, kernel, "same")
-            dmdT = np.gradient(sM) / np.gradient(sT)
-            ax2.plot(cT[start:end], dmdT[start:end], **kwargs)
+            dMdT = self._dMdT(kernel_width, edge_frac)
+            ax2.plot(self.T.q[start:end], dMdT[start:end], **kwargs)
             ax2.set_ylabel("$\\frac{dM}{dT}$")
             ax2.set_xlabel(f"Temperature in {self.T.unit}")
 
