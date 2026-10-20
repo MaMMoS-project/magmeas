@@ -1028,13 +1028,17 @@ class MT(_PropertyContainer, VSM):
         """The Curie-temperature(s) calculated from the measurement data."""
         return self.properties.Tc
 
-    def _dMdT(self, kernel_width, edge_frac):
+    def _dMdT(self, T, M, kernel_width, edge_frac):
         """
         Return first derivative of magnetisation over temperature. Includes
         smoothing and masking functionality.
 
         Parameters
         ----------
+        T: ARRAY | QUANTITY
+            Thermodynamic temperature.
+        M: ARRAY | QUANTITY
+            Magnetisation or magnetic polarisation.
         kernel_width: INT
             Width of kernel to be used for smoothing. Should be even value.
         edge_frac: FLOAT
@@ -1060,8 +1064,6 @@ class MT(_PropertyContainer, VSM):
                 f"""Please only use values of edge_frac between 0 and 1.
                 edge_frac was {edge_frac}."""
             )
-        T = self.T.q
-        M = self.M.q
         kernel = np.ones(kernel_width) / kernel_width
         sT = np.convolve(T, kernel, mode="same")
         sM = np.convolve(M, kernel, mode="same")
@@ -1073,10 +1075,8 @@ class MT(_PropertyContainer, VSM):
         dMdT = np.where(np.isfinite(dMdT), dMdT, np.nan)
 
         if edge_frac:
-            n_edge = int(round(edge_frac * len(T)))
-            dMdT[:n_edge] = np.nan
-            dMdT[-n_edge:] = np.nan
-
+            dMdT[np.min(T) * (1 + edge_frac) > T] = np.nan
+            dMdT[np.max(T) * (1 - edge_frac) < T] = np.nan
         return dMdT
 
     def _calc_Tc(self):
@@ -1146,7 +1146,7 @@ class MT(_PropertyContainer, VSM):
         derivative=True,
         segments=(None, None),
         fig_ax=None,
-        kernel_width=20,
+        kernel_width=40,
         edge_frac=0.05,
         **kwargs,
     ):
@@ -1200,13 +1200,16 @@ class MT(_PropertyContainer, VSM):
         if end is not None:
             end = self.segments()[end]
 
-        ax1.plot(self.T.q[start:end], self.M.q[start:end], **kwargs)
+        T = self.T.q[start:end]
+        M = self.M.q[start:end]
+
+        ax1.plot(T, M, **kwargs)
         ax1.set_xlabel(f"Temperature in {self.T.unit}")
         ax1.set_ylabel(f"Magnetization in {self.M.unit}")
 
         if derivative:
-            dMdT = self._dMdT(kernel_width, edge_frac)
-            ax2.plot(self.T.q[start:end], dMdT[start:end], **kwargs)
+            dMdT = self._dMdT(T, M, kernel_width, edge_frac)
+            ax2.plot(T, dMdT, **kwargs)
             ax2.set_ylabel("$\\frac{dM}{dT}$")
             ax2.set_xlabel(f"Temperature in {self.T.unit}")
 
