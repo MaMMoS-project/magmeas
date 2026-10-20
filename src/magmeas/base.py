@@ -472,7 +472,7 @@ class MH_major(_PropertyContainer, MH):
         self.properties.saturation = Ms
         return Ms
 
-    def segments(self, edge=0.05, prominence=1e6):
+    def segments(self, edge_frac=0.05, prominence=1e6):
         r"""
         Find indices of segmentation points which can be used to seperate each
         measurement segment from each other. The segments are seperated by a
@@ -484,7 +484,7 @@ class MH_major(_PropertyContainer, MH):
 
         Parameters
         ----------
-        edge: FLOAT, optional
+        edge_frac: FLOAT, optional
             Percentage of measurement to be treated as edge. Default is 0.05,
             which means that segmentation points closer than 5 % of the total
             measurement width to the edges will be discarded.
@@ -509,10 +509,10 @@ class MH_major(_PropertyContainer, MH):
         # all segmentation points
         s = np.sort(np.append(r, p))
         # discard segmentation points if they're very close to start
-        s = s[len(s[s < (edge * len(t))]) :]
+        s = s[len(s[s < (edge_frac * len(t))]) :]
         # discard segmentation points if they're very close to end
-        if len(s[s > ((1 - edge) * len(t))]) != 0:
-            s = s[: -len(s[s > ((1 - edge) * len(t))])]
+        if len(s[s > ((1 - edge_frac) * len(t))]) != 0:
+            s = s[: -len(s[s > ((1 - edge_frac) * len(t))])]
         return s
 
     def plot(
@@ -1021,7 +1021,7 @@ class MT(_PropertyContainer, VSM):
             "Sample properties derived from the measurement data."
         )
         # calculate properties
-        self.properties.Tc = self._calc_Tc()
+        self.calc_Tc()
 
     @property
     def Tc(self) -> me.Entity:
@@ -1046,7 +1046,7 @@ class MT(_PropertyContainer, VSM):
 
         Returns
         -------
-        dmdT: QUANTITY
+        dMdT: QUANTITY
             First derivative of magnetisation over temperature.
         """
         if kernel_width % 2 != 0:
@@ -1079,38 +1079,79 @@ class MT(_PropertyContainer, VSM):
             dMdT[np.max(T) * (1 - edge_frac) < T] = np.nan
         return dMdT
 
-    def _calc_Tc(self):
+    def calc_Tc(
+        self,
+        save=True,
+        segments=(0, None),
+        kernel_width=40,
+        edge_frac=0.05,
+        prominence=0.2,
+        **kwargs,
+    ):
         """
-        Calculate Curie-temperature from M(T) measurement.
+        Calculate Curie-temperature from M(T) measurement. The results should
+        always be checked for feasability and ideally compared with a plot of
+        M(T) and dM/dT(T) to confirm. Curie-temperatures are assumed to occur
+        at turning points of the M(T) curve.
 
         Parameters
         ----------
-        None
+        save: BOOL, optional
+            Whether to save the calculated Curie-Temperature(s) in the MT object
+            or just return them.
+            Default is True.
+        segments: TUPLE(NONE | INT), optional
+            Segmentation points (start, end) at which the data used for the
+            calculation will be cut off. This is usually yields better results
+            than using the whole dataset. Experience has shown that the cooling
+            curve is often more useful, but this should be checked for each
+            dataset.
+            Default is (0, None).
+        kernel_width: INT, optional
+            Kernel width to be used for smoothing of derivative.
+            Default is 40.
+        edge_frac: FLOAT, optional
+            Fraction of measurement range to be masked at the edges, since those
+            regions are usually very noisy. This is combined with the segments
+            argument with the edges being cut off after the segments have been
+            selected.
+            Default is 0.05.
+        prominence: FLOAT
+            Prominence to be used in the peak finding step.
+            See documentation of scipy.signal.find_peaks for more information.
+            Default is 0.2.
+        kwargs:
+            Keyword arguments to be used for improved peak finding.
+            See documentation of scipy.signal.find_peaks for more information.
 
         Returns
         -------
         Tc: ENTITY
             Curie-Temperature as mammos_entity.Entity
         """
-        M = self.M.q
-        T = self.T.q
-        # crop off measurement edges, where extreme noise usually occurs
-        cM = M[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
-        cT = T[(np.min(T) * 1.05 < T) * (np.max(T) * 0.95 > T)]
-        # calculate dM/dT and smooth generously
-        dmdT = np.convolve(np.gradient(cM) / np.gradient(cT), np.ones(20) / 20, "same")
+        start, end = segments
+        if start is not None:
+            start = self.segments(edge_frac=edge_frac)[start]
+        if end is not None:
+            end = self.segments(edge_frac=edge_frac)[end]
+
+        T = self.T.q[start:end]
+        M = self.M.q[start:end]
+        dMdT = self._dMdT(T, M, kernel_width, edge_frac)
         # norm dM/dT to values between -1 and 1
-        ndmdT = dmdT / np.max(np.abs(dmdT))
-        # find peaks in normed dM/dT
-        p = find_peaks(np.abs(ndmdT), distance=20, width=20, height=0.1)[0]
+        ndMdT = (dMdT - np.nanmin(dMdT)) / (np.nanmax(dMdT) - np.nanmin(dMdT))
+        # find peaks in normalised dM/dT
+        p = find_peaks(ndMdT, prominence=prominence)[0]
         # sort peaks
-        Tc = np.sort(cT[p])
-        # pass all peaks of normed dM/dT to Curie-Temperature
-        # the user should decide themselves, whether heating or cooling is used
+        Tc = np.sort(T[p])
+        # pass all peaks of normalised dM/dT to Curie-Temperature
+        # the user should decide themselves, which of them make sense and recalculate
         Tc = me.Entity("CurieTemperature", Tc)
+        if save:
+            self.properties.Tc = Tc
         return Tc
 
-    def segments(self, edge=0.05):
+    def segments(self, edge_frac=0.05):
         r"""
         Find indices of segmentation points which can be used to seperate each
         measurement segment from each other. The segments are seperated by a
@@ -1118,10 +1159,11 @@ class MT(_PropertyContainer, VSM):
 
         Parameters
         ----------
-        edge: FLOAT, optional
-            Percentage of measurement to be treated as edge. Default is 0.05,
+        edge_frac: FLOAT, optional
+            Fraction of measurement to be treated as edge. Default is 0.05,
             which means that segmentation points closer than 5 % of the total
             measurement width to the edges will be discarded.
+            Default is 0.05.
 
         Returns
         -------
@@ -1134,10 +1176,10 @@ class MT(_PropertyContainer, VSM):
         # find sall segmentation points (peaks of T(t))
         s = find_peaks(np.abs(T), distance=10, prominence=5)[0]
         # discard segmentation points if they're very close to start
-        s = s[len(s[s < (edge * len(t))]) :]
+        s = s[len(s[s < (edge_frac * len(t))]) :]
         # discard segmentation points if they're very close to end
-        if len(s[s > ((1 - edge) * len(t))]) != 0:
-            s = s[: -len(s[s > ((1 - edge) * len(t))])]
+        if len(s[s > ((1 - edge_frac) * len(t))]) != 0:
+            s = s[: -len(s[s > ((1 - edge_frac) * len(t))])]
         return s
 
     def plot(
@@ -1170,12 +1212,15 @@ class MT(_PropertyContainer, VSM):
             Default is (None, None).
         fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
             Tuple of figure and axes the data should be plotted to. If None is
-            given they will be generated dynamically. Default is None.
-        kernel_width: INT
+            given they will be generated dynamically.
+            Default is None.
+        kernel_width: INT, optional
             Kernel width to be used for smoothing of derivative.
-        edge_frac: FLOAT
+            Default is 40.
+        edge_frac: FLOAT, optional
             Fraction of measurement range to be masked at the edges, since those
             regions are usually very noisy.
+            Default is 0.05.
         kwargs:
             Keyword arguments to change the appearance of plots.
             See documentation of matplotlib.pyplot.plot for more information.
@@ -1196,9 +1241,9 @@ class MT(_PropertyContainer, VSM):
 
         start, end = segments
         if start is not None:
-            start = self.segments()[start]
+            start = self.segments(edge_frac=edge_frac)[start]
         if end is not None:
-            end = self.segments()[end]
+            end = self.segments(edge_frac=edge_frac)[end]
 
         T = self.T.q[start:end]
         M = self.M.q[start:end]
