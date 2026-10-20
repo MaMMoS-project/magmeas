@@ -311,9 +311,9 @@ class MH_major(_PropertyContainer, MH):
         s = self.segments()
         idx = np.argsort(self.H.q[s[0] : s[1]]) + s[0]
         prop = extrinsic_properties(self.H.q[idx], self.M.q[idx], 0)
-        self.properties.remanence = me.Entity("Remanence", prop.Mr, "MA/m")
+        self.properties.remanence = me.Entity("Remanence", prop.Mr.q, "MA/m")
         self.properties.coercivity = me.Entity("CoercivityHc", prop.Hc.q, "MA/m")
-        self.properties.BHmax = me.Entity("MaximumEnergyProduct", prop.BHmax, "kJ/m3")
+        self.properties.BHmax = me.Entity("MaximumEnergyProduct", prop.BHmax.q, "kJ/m3")
         self.properties.kneefield = me.Entity(
             "KneeField", self._calc_kneefield(), "MA/m"
         )
