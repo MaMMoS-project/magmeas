@@ -185,7 +185,7 @@ class MH_major(_PropertyContainer, MH):
                 filt = np.max(H) * threshold < H
                 linreg1 = linregress(H[filt], M[filt])
                 linreg2 = linregress(1 / H[filt], M[filt] - H[filt] * linreg1.slope)
-                Ms.append(linreg2.intercept * mu.A / mu.m)
+                Ms.append(mu.Quantity(linreg2.intercept, "A/m"))
 
         Ms = me.Entity("SaturationMagnetization", max(Ms), "MA / m")
         self.properties.saturation = Ms
