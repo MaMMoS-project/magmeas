@@ -93,7 +93,7 @@ class MT(_PropertyContainer, VSM):
         # norm dM/dT to values between -1 and 1
         ndMdT = (dMdT - np.nanmin(dMdT)) / (np.nanmax(dMdT) - np.nanmin(dMdT))
         # find peaks in normalised dM/dT
-        p = find_peaks(ndMdT, prominence=prominence)[0]
+        p = find_peaks(-ndMdT, prominence=prominence)[0]
         # sort peaks
         Tc = np.sort(T[p])
         # pass all peaks of normalised dM/dT to Curie-Temperature
@@ -103,7 +103,7 @@ class MT(_PropertyContainer, VSM):
             self.properties.Tc = Tc
         return Tc
 
-    def segments(self, edge_frac=0.05):
+    def segments(self, edge_frac=0.05, prominence=5, **kwargs):
         r"""
         Find indices of segmentation points which can be used to seperate each
         measurement segment from each other. The segments are seperated by a
@@ -116,6 +116,14 @@ class MT(_PropertyContainer, VSM):
             which means that segmentation points closer than 5 % of the total
             measurement width to the edges will be discarded.
             Default is 0.05.
+        prominence: INT | FLOAT, optional
+            Prominence of peaks in T(t) or -T(t) which will be used to define
+            segemntation points.
+            Default is 5.
+        kwargs: optional
+            Optional keyword arguments that will be passed to the peak finding
+            function.
+            See scipy.signal.find_peaks for more information.
 
         Returns
         -------
@@ -125,8 +133,13 @@ class MT(_PropertyContainer, VSM):
         """
         t = self.t.q
         T = self.T.q
-        # find sall segmentation points (peaks of T(t))
-        s = find_peaks(np.abs(T), distance=10, prominence=5)[0]
+        # find segmentation points
+        # look for positive peak in T(t) (when measurement heats above RT)
+        pos_peaks = find_peaks(T, prominence=prominence, **kwargs)[0]
+        # look for negative peak in T(t) (when measurement cools below RT)
+        neg_peaks = find_peaks(-T, prominence=prominence, **kwargs)[0]
+        # unify all peaks in one segmentation point array
+        s = np.sort(np.append(pos_peaks, neg_peaks))
         # discard segmentation points if they're very close to start
         s = s[len(s[s < (edge_frac * len(t))]) :]
         # discard segmentation points if they're very close to end
