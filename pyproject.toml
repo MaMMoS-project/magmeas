@@ -30,8 +30,8 @@ dynamic = ["version"]
 'content-type' = "text/markdown"
 
 [project.urls]
-"Source" = "https://github.com/jwinkler29/magmeas.git"
-"Bug Tracker" = "https://github.com/jwinkler29/magmeas.git/issues"
+"Source" = "https://github.com/MaMMoS-project/magmeas.git"
+"Bug Tracker" = "https://github.com/MaMMoS-project/magmeas.git/issues"
 
 [project.optional-dependencies]
 dev = [
