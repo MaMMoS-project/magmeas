@@ -56,6 +56,4 @@ Experimental support for Recoil-loop- and FORC-measurements is also provided in 
 All classes inherit from the `EntityCollection` class in [`mammos-entity`](https://github.com/MaMMoS-project/mammos-entity), using its io functionality. In doing so, they can conveniently be added to a new `EntityCollection` with `magmeas.to_batch`, benefitting from the nested structure in these objects even for data export.
 Plotting of the above highlighted classes is very flexible. Common keyword arguments used in matplotlibs functions can be used. VSM-derived objects can either be plotted to pre-existing matplotlib figures and axes, or they dynamically generate new ones and return them for subsequent formatting.
 
-Documentation is mainly available in the form of detailed docstrings. Just use `dir(magmeas)` and `help(magmeas.VSM)` or similar to get more information.
-
-Requires Python >= 3.11 due to dependencies
+Requires Python >= 3.11, < 3.15 due to dependencies
