@@ -77,6 +77,8 @@ ignore = [
   # personal preference
   "SIM108", # turnary operator instead of if else block
   "D205", # one-blank-line-required-between-summary-line-and-description
+  "D301", # raw strings likely would break math formatting in docstring
+  "D400",
 ]
 
 [tool.ruff.lint.isort]
@@ -84,9 +86,6 @@ known-local-folder = ["src"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
-
-[tool.ruff.lint.per-file-ignores]
-"base.py" = ["D301", "D400"]
 
 [tool.ruff.format]
 docstring-code-format = true

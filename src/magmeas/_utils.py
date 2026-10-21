@@ -1,6 +1,32 @@
-"""Utility functions called within magmas. They will not be used by the user."""
+"""Utility classses and functions called within magmas. Not intended for use."""
 
+from pathlib import Path
+
+import mammos_units as mu
 import numpy as np
+
+
+class _PropertyContainer:
+    """Abstract parent class that introduces handling of properties."""
+
+    def to_csv(self, filename):
+        """
+        Write measurement data and calculated properties to two separate
+        CSV-files.
+
+        Parameters
+        ----------
+        filename: STR | PATH
+            Base of the generated files. Measurement data will have a '_data'
+            attached before the file extension and properties '_properties'.
+
+        Returns
+        -------
+        None
+        """
+        path = Path(filename)
+        self.measurement_data.to_csv(path.with_stem(path.stem + "_data"))
+        self.properties.to_csv(path.with_stem(path.stem + "_properties"))
 
 
 def rextract(superstr, startsub, endsub):
@@ -29,6 +55,45 @@ def rextract(superstr, startsub, endsub):
     endind = superstr.index(endsub)  # starting index
     startind = superstr.rindex(startsub, 0, endind)  # endindex
     return superstr[startind + len(startsub) : endind]
+
+
+def _MH_unit_processing(unit):
+    """Return units and labels used for plotting of MH-derived objects."""
+    if isinstance(unit, str | mu.Unit | mu.CompositeUnit):
+        H_unit = mu.Unit(unit)
+        M_unit = mu.Unit(unit)
+    else:
+        if len(unit) > 2:
+            raise ValueError(
+                "Length of unit surpasses maximum of two.\n"
+                + "Please only pass two values: (H_unit, M_unit)."
+            )
+        elif len(unit) == 2:
+            H_unit = mu.Unit(unit[0])
+            M_unit = mu.Unit(unit[1])
+        else:
+            H_unit = mu.Unit(unit[0])
+            M_unit = mu.Unit(unit[0])
+
+    if H_unit.is_equivalent(mu.T, equivalencies=None):
+        H_label = "$\\mu_0 H_{int}$"
+    elif H_unit.is_equivalent(mu.A / mu.m, equivalencies=None):
+        H_label = "$H_{int}$"
+    else:
+        raise ValueError(
+            f"Unit {H_unit} is incompatible with magnetic "
+            + "field or magnetic flux density units."
+        )
+    if M_unit.is_equivalent(mu.T, equivalencies=None):
+        M_label = "J"
+    elif M_unit.is_equivalent(mu.A / mu.m, equivalencies=None):
+        M_label = "M"
+    else:
+        raise ValueError(
+            f"Unit {M_unit} is incompatible with magnetisation"
+            + " or magnetic polarisation units."
+        )
+    return H_unit, M_unit, H_label, M_label
 
 
 def droot(x, y):

@@ -7,28 +7,23 @@ Automatic plotting with matplotlib is also available.
 
 __version__ = "0.5.1"
 
-from magmeas.base import (
-    FORC,
-    MH,
-    MT,
-    VSM,
-    MH_major,
-    MH_recoil,
-    plot_batch,
-    to_batch,
-    to_hdf5,
-    to_yaml,
-)
+from magmeas.batch import plot_batch, to_batch, to_hdf5, to_yaml
+from magmeas.forc import FORC
+from magmeas.mh import MH
+from magmeas.mh_major import MH_major
+from magmeas.mh_recoil import MH_recoil
+from magmeas.mt import MT
+from magmeas.vsm import VSM
 
 __all__ = [
-    VSM,
-    MH,
-    MH_major,
-    MH_recoil,
-    FORC,
-    MT,
-    plot_batch,
-    to_batch,
-    to_yaml,
-    to_hdf5,
+    "VSM",
+    "MH",
+    "MH_major",
+    "MH_recoil",
+    "FORC",
+    "MT",
+    "plot_batch",
+    "to_batch",
+    "to_yaml",
+    "to_hdf5",
 ]
