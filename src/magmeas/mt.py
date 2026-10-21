@@ -266,6 +266,7 @@ def _dMdT(T, M, kernel_width, edge_frac):
     dMdT = np.where(np.isfinite(dMdT), dMdT, np.nan)
 
     if edge_frac:
-        dMdT[np.min(T) * (1 + edge_frac) > T] = np.nan
-        dMdT[np.max(T) * (1 - edge_frac) < T] = np.nan
+        edge_len = (np.max(T) - np.min(T)) * edge_frac
+        dMdT[np.min(T) + edge_len >= T] = np.nan
+        dMdT[np.max(T) - edge_len <= T] = np.nan
     return dMdT
