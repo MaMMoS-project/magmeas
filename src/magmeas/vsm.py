@@ -67,13 +67,13 @@ class VSM(me.EntityCollection):
 
         # check if sample mass can be read from .DAT file
         try:
-            mass = float(rextract(s, "INFO,", ",SAMPLE_MASS")) * mu.mg
+            mass = mu.Quantity(float(rextract(s, "INFO,", ",SAMPLE_MASS")), "mg")
         except ValueError:
             raise Exception(err) from None
         # check if sample dimensions can be read from .DAT file
         try:
             dim = rextract(s, "INFO,(", "),SAMPLE_SIZE").split(",")
-            dim = np.array([float(f) for f in dim]) * mu.mm
+            dim = mu.Quantity(np.array([float(f) for f in dim]), "mm")
         except ValueError:
             raise Exception(err) from None
 
@@ -96,23 +96,18 @@ class VSM(me.EntityCollection):
         # if the unit is declared as 'emu', we need to specify it explicitly
         # since emu is ambiguous and thus not included in mammos-units
         if m_unit == "emu":
-            m = np.array(df["Moment (emu)"]) * mu.erg / mu.G
+            m = me.Entity("MagneticMoment", df["Moment (emu)"], "erg / G")
         elif m_unit == "Am2":
-            m = np.array(df["Moment (Am2)"]) * mu.A * mu.m**2
-        # So far this is only a Quantity and no Entity because the wrong unit
-        # seems to be defined for the me.Entity('MagneticMoment')
+            m = me.Entity("MagneticMoment", df["Moment (Am2)"], "A m2")
         else:
             raise ValueError(
                 "Unit of magnetic moment seems to be neither emu,"
                 " nor Am2. Other units are not supported."
             )
-
         # extract external magnetic field
-        eH = me.Entity(
-            "ExternalMagneticField", np.array(df["Magnetic Field (Oe)"]) * mu.Oe
-        )
+        eH = me.Entity("ExternalMagneticField", df["Magnetic Field (Oe)"], "Oe")
         # calculate magnetization
-        M = me.Entity("Magnetization", m / mass * density)
+        M = me.Entity("Magnetization", m.q / mass * density)
         # calculate internal magnetic field
         H = me.Entity("InternalMagneticField", eH.q - self.D.q * M.q)
         # extract absolute temperature
@@ -127,7 +122,7 @@ class VSM(me.EntityCollection):
         H = me.Entity(H.ontology_label, H.q.to("A/m")[nanfilter])
         H_ext = me.Entity(eH.ontology_label, eH.q.to("A/m")[nanfilter])
         M = me.Entity(M.ontology_label, M.q.to("A/m")[nanfilter])
-        m = mu.Quantity(m.to("A m2")[nanfilter])
+        m = me.Entity(m.ontology_label, m.q.to("A m2")[nanfilter])
         T = me.Entity(T.ontology_label, T.q[nanfilter])
         # convert time stamp to time since measurement start
         t = me.Entity(t.ontology_label, t.q[nanfilter] - t.q[nanfilter][0])
