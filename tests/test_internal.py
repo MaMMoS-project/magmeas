@@ -19,8 +19,15 @@ def test_version():
 def test_VSM():
     """Test initialisation of M(H) measurement as magmeas.VSM object."""
     file_path = cwd.joinpath("VSM_MH.DAT")
-    mh = magmeas.VSM(file_path)
-    assert isinstance(mh, magmeas.VSM)
+    vsm = magmeas.VSM(file_path)
+    assert isinstance(vsm, magmeas.VSM)
+
+
+def test_VSM_delayed():
+    """Test delayed initialisation of M(H) measurement as magmeas.VSM object."""
+    file_path = cwd.joinpath("VSM_MH.DAT")
+    vsm = magmeas.VSM()
+    vsm.load_qd(file_path)
 
 
 def test_MH():

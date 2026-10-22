@@ -18,16 +18,29 @@ class MH_major(_PropertyContainer, MH):
     measurements aswell as derived properties.
     """
 
-    def __init__(self, datfile, read_method="auto"):
-        super().__init__(datfile, read_method=read_method)
+    def __init__(self, datfile=None):
+        super().__init__(datfile)
+        if datfile is not None:
+            self.calc_properties()
 
-        # initialise property container
+    def calc_properties(self, **kwargs):
+        """
+        Calculate extrinsic magnetic properties from the demagnetisation curve
+
+        Parameters
+        ----------
+        kwargs: optional
+            Keyword arguments used for the segmentation. See MH_major.segments
+            for more details
+
+        Returns
+        -------
+        None
+        """
         self.properties = me.EntityCollection(
             "Sample properties derived from the measurement data."
         )
-
-        # calculate properties
-        s = self.segments()
+        s = self.segments(**kwargs)
         idx = np.argsort(self.H.q[s[0] : s[1]]) + s[0]
         prop = extrinsic_properties(self.H.q[idx], self.M.q[idx], 0)
         self.properties.remanence = me.Entity("Remanence", prop.Mr.q, "MA/m")

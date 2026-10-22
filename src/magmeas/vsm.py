@@ -19,37 +19,42 @@ class VSM(me.EntityCollection):
     parameters.
     """
 
-    def __init__(self, datfile, read_method="auto"):
+    def __init__(self, filepath=None):
         super().__init__()
-        # import data
-        self.reload_qd(datfile, read_method=read_method)
+        if filepath is not None:
+            self._path = Path(filepath)
+            match self._path.suffix.lower():
+                case ".dat":
+                    self.load_qd(self._path)
+                case _:
+                    raise ValueError(
+                        f"""
+                        The given file extension is {self._path.suffix} and was 
+                        not recognised. Please only use files in supported 
+                        formats. See the documentation for more information.
+                        """
+                    )
 
-    def reload_qd(self, datfile, read_method):
+    def load_qd(self, filepath):
         """
         Load VSM-data from a quantum systems .DAT file.
 
         Parameters
         ----------
-        datfile: STR | PATH
-            Path to quantum systems .DAT file that data is supposed to be
+        filepath: STR | PATH
+            Path to Quantum Design .DAT file that data is supposed to be
             imported from
-
-        read_method: STR
-            Determines whether magmeas will attempt to automatically read the
-            sample parameters necessary for the following calculations or not.
-            Can be "auto" or "manual"
 
         Returns
         -------
         None
 
         """
-        self._path = Path(datfile)
+        self._path = Path(filepath)
 
         err = """
               Sample parameters could not be read automatically.
-              Please enter sample parameters manually or enter them
-              correctly in the .DAT file like this:
+              Please enter sample parameters correctly in the .DAT file like so:
               INFO,<mass in mg>,SAMPLE_MASS
               INFO,(<a>, <b>, <c>),SAMPLE_SIZE
               sample dimensions a, b and c in mm, c parallel to field
@@ -60,30 +65,17 @@ class VSM(me.EntityCollection):
         # figure out in which line actual CSV-like data starts for later import
         head_length = s[: s.find("[Data]")].count("\n") + 1
 
-        # Automatically read out sample parameters
-        if read_method == "auto":
-            # check if sample mass can be read from .DAT file
-            try:
-                mass = float(rextract(s, "INFO,", ",SAMPLE_MASS")) * mu.mg
-            except ValueError:
-                raise Exception(err) from None
-            # check if sample dimensions can be read from .DAT file
-            try:
-                dim = rextract(s, "INFO,(", "),SAMPLE_SIZE").split(",")
-                dim = np.array([float(f) for f in dim]) * mu.mm
-            except ValueError:
-                raise Exception(err) from None
-
-        # Input sample parameters manually
-        elif read_method == "manual":
-            print("Manual input method selected")
-            mass = float(input("Sample mass in mg: ")) * mu.mg
-            a = float(input("Sample dimension a (perpendicular to field) in mm: "))
-            b = float(input("Sample dimension b (perpendicular to field) in mm: "))
-            c = float(input("Sample dimension c (parallel to field) in mm: "))
-            dim = np.array([a, b, c]) * mu.mm
-        else:
-            raise Exception(err)
+        # check if sample mass can be read from .DAT file
+        try:
+            mass = float(rextract(s, "INFO,", ",SAMPLE_MASS")) * mu.mg
+        except ValueError:
+            raise Exception(err) from None
+        # check if sample dimensions can be read from .DAT file
+        try:
+            dim = rextract(s, "INFO,(", "),SAMPLE_SIZE").split(",")
+            dim = np.array([float(f) for f in dim]) * mu.mm
+        except ValueError:
+            raise Exception(err) from None
 
         # calculate density from sample mass and dimensions
         density = mass / (np.prod(dim.value) * dim.unit**3)

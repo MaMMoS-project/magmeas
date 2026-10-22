@@ -15,16 +15,17 @@ class MT(_PropertyContainer, VSM):
     aswell as derived properties.
     """
 
-    def __init__(self, datfile, read_method="auto"):
+    def __init__(self, filepath=None):
         # import data
-        super().__init__(datfile, read_method=read_method)
+        super().__init__(filepath)
 
         # Initialise property collection
         self.properties = me.EntityCollection(
             "Sample properties derived from the measurement data."
         )
-        # calculate properties
-        self.calc_Tc()
+        if filepath is not None:
+            # calculate properties
+            self.calc_Tc()
 
     @property
     def Tc(self) -> me.Entity:
