@@ -79,3 +79,34 @@ class VSM(me.EntityCollection):
         # return self, which enables convenient initialisation in one step
         # example: vsm = magmeas.VSM().read_PPMS("path/to/file.DAT")
         return self
+
+    def get_entity_key(self, ontology_label):
+        """Check, whether collection contains entities of the given label and
+        return their respective keys. If no entities of this label can be found,
+        the boolean False is returned.
+
+        Parameters
+        ----------
+        ontology_label: STR
+            Ontology label of the entities for which their keys are supposed to
+            be returned.
+
+        Returns
+        -------
+        STR | LIST[STR] | BOOL
+            False if entities with the given ontology label could not be found,
+            the key of the entity that had the specified label if only one was
+            found or a list of all keys for which the respective entity has the
+            specified ontology label.
+        """
+        entities = {key: entity.ontology_label for key, entity in self}
+        labels = set(entities.values())
+        if ontology_label not in labels:
+            return False
+        results = {label: [] for label in labels}
+        for key, value in entities.items():
+            results[value].append(key)
+        if len(results[ontology_label]) == 1:
+            return results[ontology_label][0]
+        else:
+            return results[ontology_label]
