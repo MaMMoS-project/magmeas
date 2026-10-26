@@ -57,9 +57,9 @@ def read_PPMS(filepath):
     t = me.Entity("Time", df["Time Stamp (sec)"], "s")
 
     # test datapoints for missing values (where value is nan)
-    filter = ~np.isnan(
-        np.column_stack([H_ext.value, mu.value, T.value, t.value])
-    ).any(axis=1)
+    filter = ~np.isnan(np.column_stack([H_ext.value, mu.value, T.value, t.value])).any(
+        axis=1
+    )
     # delete all datapoints where H_ext, m, T or t are nan
     H_ext = me.Entity(H_ext.ontology_label, H_ext, "A/m")[filter]
     mu = me.Entity(mu.ontology_label, mu, "A m2")[filter]
@@ -72,4 +72,3 @@ def read_PPMS(filepath):
     output.T = T
     output.t = t
     return output
-

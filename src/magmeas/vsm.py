@@ -1,6 +1,7 @@
 """VSM-like classes and functions using them."""
 
 import mammos_entity as me
+import mammos_units as u
 
 
 class VSM(me.EntityCollection):
@@ -112,3 +113,112 @@ class VSM(me.EntityCollection):
             return results[ontology_label][0]
         else:
             return results[ontology_label]
+
+    def calc_M(self, **kwargs):
+        r"""
+        Calculate Magnetization and MagneticPolarization and assign them to self
+        with the respective keys 'M' and 'J'.
+        For this, self must contain one (and only one) Entity which has the
+        ontology_label 'MagneticMoment' and one of the following:
+
+        - an Entity with the ontology_label 'Volume'
+        - an Entity with the ontology_label 'Mass' AND one with 'Density'
+        - an Entity with the ontology_label 'Length', containing three values
+          (and only three!) which are assumed to be the side lenghts of a
+          rectangular cuboid
+
+        If more than one variant would be possible, only one will be chosen. The
+        choice will fall on the option higher in the list above. If the thus
+        chosen option is satisfied by more than one Entity contained in self,
+        the calculation will be canceled as the ambiguity cannot be fixed
+        automatically (e.g. two Entities have the ontology_label 'Volume').
+        Optionally, the needed Entities from the list above can be given as
+        keyword arguments of this function to provide them for this calculation.
+        They will then be assigned to self and the same logic as before is
+        followed. Assignments to self will happen whether the given Entities
+        are used in the calculation or not. Already assigned Entities will be
+        overwritten if the same key is used, which also applies to entities with
+        the keys 'M' and 'J'.
+
+        The following equations are used:
+        .. math::
+            M &= \frac{\mu}{V}\\
+            J &= \mu _0 \cdot M\\
+            V &= m \cdot \rho\\
+            V &= l_1 \cdot l_2 \cdot l_3
+
+        Parameters
+        ----------
+        kwargs: ENTITY, optional
+            Keyword arguments that will be assigned to self and possibly
+            contribute to the calculation of M and J if they are relevant.
+
+        Returns
+        -------
+        None
+        """
+        moment_key = self.get_entity_key("MagneticMoment")
+        if isinstance(moment_key, bool):
+            raise AttributeError(
+                "No entity with the ontology_label 'MagneticMoment' could be "
+                + "found in self. Please provide a MagneticMoment first and try "
+                + "again."
+            )
+        if isinstance(moment_key, list):
+            raise AttributeError(
+                "More than one entity with the ontology_label 'MagneticMoment' "
+                + "could be found in self. Please provide only one. The entities "
+                + f"found were {moment_key}."
+            )
+
+        for key, value in kwargs.items():
+            if isinstance(value, me.Entity):
+                self[key] = value
+            else:
+                raise TypeError(
+                    f"The type of the kwarg ´{key}´ was {type(value)}, which is not "
+                    + "allowed for this method. Please only pass kwargs of type "
+                    + "mammos_entity.Entity to this method."
+                )
+
+        volume_key = self.get_entity_key("Volume")
+        mass_key = self.get_entity_key("Mass")
+        density_key = self.get_entity_key("Density")
+        length_key = self.get_entity_key("Length")
+        # self.get_entity_key only returns a str if the ontology_label was found
+        # exactly once. Therefore, isinstance(key, str) is a sufficient check.
+        if isinstance(volume_key, str):
+            volume = self[volume_key].q
+        elif isinstance(mass_key, str) and isinstance(density_key, str):
+            volume = self[mass_key].q / self[density_key].q
+        elif isinstance(length_key, str):
+            if self[length_key].q.shape != (3,):
+                raise AttributeError(
+                    f"The entity ´{length_key}´ in self does have the ontology_label "
+                    + "'Length', but not the right shape of (3,). The detected "
+                    + f"shape was {self[length_key].q.shape}."
+                )
+            else:
+                volume = (
+                    self[length_key].q[0]
+                    * self[length_key].q[1]
+                    * self[length_key].q[2]
+                )
+        else:
+            raise AttributeError(
+                "No suitable sample information "
+                + "(volume | (mass & density) | length) "
+                + "could be found within self. Please provide sufficient information "
+                + "for the calculation of M, see the docstring and try again."
+            )
+
+        self["M"] = me.Entity(
+            "Magnetization",
+            self[moment_key].q / volume,
+            "A / m",
+        )
+        self["J"] = me.Entity(
+            "MagneticPolarisation",
+            self[moment_key].q / volume * u.constants.mu0,
+            "T",
+        )
