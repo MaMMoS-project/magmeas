@@ -13,10 +13,10 @@ from magmeas.mh import MH
 from magmeas.mh_major import MH_major
 from magmeas.mh_recoil import MH_recoil
 from magmeas.mt import MT
-from magmeas.vsm import VSM
+from magmeas.sweep import Sweep
 
 __all__ = [
-    "VSM",
+    "Sweep",
     "MH",
     "MH_major",
     "MH_recoil",

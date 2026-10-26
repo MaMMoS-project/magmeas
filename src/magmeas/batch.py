@@ -27,7 +27,7 @@ def plot_batch(
     **kwargs,
 ):
     """
-    Plot several VSM-derived objects together. Must be of the same type.
+    Plot several magmeas objects together. Must be of the same type.
 
     Parameters
     ----------
@@ -41,7 +41,7 @@ def plot_batch(
     labels: LIST, optional
         List of labels that are going to be used in the legend of the plot.
         Has to have the same length as data. If none is given then the names
-        of the .DAT files each VSM object was calculated from will be used.
+        of the .DAT files each magmeas object was calculated from will be used.
     unit: STR | mu.unit | TUPLE(STR | mu.unit)
         Only supported for MH-derived measurements. Unit H and M are going to
         be plotted in. If string is given then both will have the same unit.
@@ -238,15 +238,15 @@ def plot_batch(
 
 
 def to_batch(data, labels=None, prop_only=False):
-    """Generate batch of VSM-derived objects as mammos_entity.EntityCollection.
+    """Generate batch of magmeas objects as mammos_entity.EntityCollection.
 
     Parameters
     ----------
     data: LIST[MH_major | MT]
-        List of VSM objects that will be exported.
+        List of magmeas objects that will be exported.
     labels: LIST[STR], optional
-        List of strings to identify the VSM objects more easily.
-        If not given, the filenames of each VSM-object are used instead.
+        List of strings to identify the magmeas objects more easily.
+        If not given, the filenames of each magmeas object are used instead.
     prop_only: BOOL, optional
         Whether to only export the the properties and no measurement data. Will
         lead to an AttributeError if this is True but the objects in data only
@@ -289,17 +289,17 @@ def to_batch(data, labels=None, prop_only=False):
 
 def to_yaml(data, filepath, labels=None, prop_only=False):
     """
-    Save all properties derived from list of VSM-measurements to YAML file.
+    Save all properties derived from list of magmeas objects to YAML file.
 
     Parameters
     ----------
     data: LIST[MH_major | MT]
-        List of VSM objects that will be exported.
+        List of magmeas objects that will be exported.
     filepath: STR | PATH
         Filepath to save the file to.
     labels: LIST[STR], optional
-        List of strings to identify the VSM objects more easily.
-        If not given, the filenames of each VSM-object are used instead.
+        List of strings to identify the magmeas objects more easily.
+        If not given, the filenames of each magmeas objects are used instead.
     prop_only: BOOL, optional
         Whether to only export the the properties and no measurement data. Will
         lead to an AttributeError if this is True but the objects in data only
@@ -316,17 +316,17 @@ def to_yaml(data, filepath, labels=None, prop_only=False):
 
 def to_hdf5(data, filepath, labels=None, prop_only=False):
     """
-    Save all properties derived from list of VSM-measurements to HDF5 file.
+    Save all properties derived from list of magmeas objects to HDF5 file.
 
     Parameters
     ----------
     data: LIST[MH_major | MT]
-        List of VSM objects that will be exported.
+        List of magmeas objects that will be exported.
     filepath: STR | PATH
         Filepath to save the file to.
     labels: LIST[STR], optional
-        List of strings to identify the VSM objects more easily.
-        If not given, the filenames of each VSM-object are used instead.
+        List of strings to identify the magmeas objects more easily.
+        If not given, the filenames of each magmeas objects are used instead.
     prop_only: BOOL, optional
         Whether to only export the the properties and no measurement data. Will
         lead to an AttributeError if this is True but the objects in data only

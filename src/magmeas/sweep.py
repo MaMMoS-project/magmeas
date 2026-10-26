@@ -1,12 +1,12 @@
-"""VSM-like classes and functions using them."""
+"""Magnetometric Sweep class."""
 
 import mammos_entity as me
 import mammos_units as u
 
 
-class VSM(me.EntityCollection):
+class Sweep(me.EntityCollection):
     """
-    Class for importing, storing and using of VSM-data aswell as derived
+    Class for importing, storing and using of magnetometric data aswell as derived
     parameters.
     """
 
@@ -30,7 +30,7 @@ class VSM(me.EntityCollection):
         overwritten if the same keys are used.
 
         Also returns self, so the following works:
-        `vsm = magmeas.VSM().read_custom(some_reader_func, 'path/to/file.DAT')`
+        `some_data = magmeas.Sweep().read_custom(some_reader_func, 'path/to/file.DAT')`
 
         Parameters
         ----------
@@ -65,7 +65,7 @@ class VSM(me.EntityCollection):
         Read VSM-data from a Quantum Design .DAT file generated with Quantum
         Designs PPMS, DynaCool or VersaLab devices and assign it to self.
         Also returns self, so the following works:
-        `vsm = magmeas.VSM().read_PPMS('path/to/file.DAT')`
+        `some_data = magmeas.Sweep().read_PPMS('path/to/file.DAT')`
 
         Parameters
         ----------
@@ -75,7 +75,7 @@ class VSM(me.EntityCollection):
 
         Returns
         -------
-        VSM-like
+        SWEEP-like
             Returns self, see above.
         """
         from magmeas.io import read_PPMS

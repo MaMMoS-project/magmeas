@@ -6,12 +6,12 @@ import numpy as np
 from scipy.signal import find_peaks
 
 from magmeas._utils import _PropertyContainer
-from magmeas.vsm import VSM
+from magmeas.sweep import Sweep
 
 
-class MT(_PropertyContainer, VSM):
+class MT(_PropertyContainer, Sweep):
     """
-    Class for importing, storing and using of VSM-data from M(T)-measurement
+    Class for importing, storing and using of magnetometric data from M(T)-measurement
     aswell as derived properties.
     """
 

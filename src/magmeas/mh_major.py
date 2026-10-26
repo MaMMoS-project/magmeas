@@ -14,8 +14,8 @@ from magmeas.mh import MH
 
 class MH_major(_PropertyContainer, MH):
     """
-    Class for importing, storing and using of VSM-data from major loop M(H)
-    measurements aswell as derived properties.
+    Class for importing, storing and using of magnetometric data from major
+    hysteresis loop M(H) measurements aswell as derived properties.
     """
 
     def __init__(self, datfile=None):
@@ -156,7 +156,7 @@ class MH_major(_PropertyContainer, MH):
     def estimate_saturation(self, threshold=None):
         """
         Calculate an estimation of the saturation magnetisation, return it and
-        simultaneously assign it to the VSM object. A possible high field
+        simultaneously assign it to the self. A possible high field
         susceptibility can optionally be corrected for.
 
         Parameters

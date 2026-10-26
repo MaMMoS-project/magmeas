@@ -3,11 +3,14 @@
 import matplotlib.pyplot as plt
 
 from magmeas._utils import _MH_unit_processing
-from magmeas.vsm import VSM
+from magmeas.sweep import Sweep
 
 
-class MH(VSM):
-    """Class for importing, storing and using of VSM-data from M(H) measurements."""
+class MH(Sweep):
+    """
+    Class for importing, storing and using of magnetometric data from M(H)
+    measurements.
+    """
 
     def plot(self, filepath=None, unit="T", bounds=(None, None), fig_ax=None, **kwargs):
         """

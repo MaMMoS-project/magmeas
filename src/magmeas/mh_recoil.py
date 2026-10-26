@@ -11,7 +11,7 @@ from magmeas.mh import MH
 
 class MH_recoil(MH):
     """
-    Class for importing, storing and using of VSM-data from recoil loop M(H)
+    Class for importing, storing and using of magnetometric data from recoil loop M(H)
     measurements.
     Recoil loop measurements are assumed to be measurements where
     the sample is first saturated at some positive field. After this, a number

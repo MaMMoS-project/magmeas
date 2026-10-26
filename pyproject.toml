@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "magmeas"
-description = "Functionality for handling magnetometry data of permanent magnets."
+description = "Functionality for handling magnetometry data."
 requires-python = ">=3.11,<3.15"
 dependencies = [
 	"mammos-analysis >= 0.6.0",

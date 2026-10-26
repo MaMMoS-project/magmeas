@@ -1,6 +1,6 @@
 # magmeas
 
-Python module enabling the import and handling of VSM-data acquired on a Quantum Design PPMS/DynaCool/Versalab measurement system.
+Python module enabling the import and handling of **mag**netic **meas**urements.
 
 
 | Description   | Badge |
@@ -37,14 +37,14 @@ is assumed to be m / (a * b * c)
 ### Python
 
 There are four distinct classes that conveniently handle specific types of measurement data:
-* `VSM`: general for all types of VSM measurements
+* `Sweep`: general for all types of magnetometry measurements
 * `MH`: for all M(H) measurements, still quite unspecific
 * `MH_major`: for major hysteresis loop measurements
 * `MT`: for M(T) measurements
 
 Here is what each of them do at initialisation or automatically with a method:
 
-|  | `VSM` | `MH` | `MH_major` | `MT` |
+|  | `Sweep` | `MH` | `MH_major` | `MT` |
 |--|-----|----|----------|----|
 | import measurement data from Quantum Design .DAT file | ✅ | ✅ | ✅ | ✅ |
 |export measurement data to csv/yml/hdf5 | ✅ | ✅ | ✅ | ✅ |
@@ -54,6 +54,6 @@ Here is what each of them do at initialisation or automatically with a method:
 
 Experimental support for Recoil-loop- and FORC-measurements is also provided in their respective classes.
 All classes inherit from the `EntityCollection` class in [`mammos-entity`](https://github.com/MaMMoS-project/mammos-entity), using its io functionality. In doing so, they can conveniently be added to a new `EntityCollection` with `magmeas.to_batch`, benefitting from the nested structure in these objects even for data export.
-Plotting of the above highlighted classes is very flexible. Common keyword arguments used in matplotlibs functions can be used. VSM-derived objects can either be plotted to pre-existing matplotlib figures and axes, or they dynamically generate new ones and return them for subsequent formatting.
+Plotting of the above highlighted classes is very flexible. Common keyword arguments used in matplotlibs functions can be used. Sweep-derived objects can either be plotted to pre-existing matplotlib figures and axes, or they dynamically generate new ones and return them for subsequent formatting.
 
 Requires Python >= 3.11, < 3.15 due to dependencies

@@ -8,7 +8,7 @@ from magmeas.mh import MH
 
 
 class FORC(MH):
-    """Class for importing, storing and using VSM data of FORC measurements."""
+    """Class for analysing magnetometric data of FORC measurements."""
 
     def __init__(self, datfile, read_method="auto"):
         super().__init__(datfile, read_method="auto")
