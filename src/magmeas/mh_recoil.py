@@ -1,6 +1,6 @@
 """magmeas.MH_recoil class and functionality around it"""
 
-import mammos_units as mu
+import mammos_units as u
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import find_peaks
@@ -133,7 +133,7 @@ class MH_recoil(MH):
         if demag_fields is not None:
             e_d_f = self.H_ext.q[self.segments(prominence=prominence)[1::2]]
             fit = np.polynomial.Polynomial.fit(e_d_f.value, i_r_f.value, 2)
-            if isinstance(demag_fields, mu.Quantity):
+            if isinstance(demag_fields, u.Quantity):
                 demag_fields = demag_fields.to("A/m").value
             i_r_f = fit(demag_fields)
 
@@ -163,7 +163,7 @@ class MH_recoil(MH):
         demag: BOOL, optional
             Plot the recoil loop measurement only in the second quadrant.
             Default is True.
-        unit: STR | mu.unit | TUPLE(STR | mu.unit), optional
+        unit: STR | u.unit | TUPLE(STR | u.unit), optional
             Unit H and M are going to be plotted in. If string is given then
             both will have the same unit. Otherwise specify respective units
             as tuple (H_unit, M_unit). Default is 'T'.

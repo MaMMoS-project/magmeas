@@ -1,7 +1,7 @@
 """magmeas.MH_major class and functionality around it."""
 
 import mammos_entity as me
-import mammos_units as mu
+import mammos_units as u
 import matplotlib.pyplot as plt
 import numpy as np
 from mammos_analysis.hysteresis import extrinsic_properties
@@ -198,7 +198,7 @@ class MH_major(_PropertyContainer, MH):
                 filt = np.max(H) * threshold < H
                 linreg1 = linregress(H[filt], M[filt])
                 linreg2 = linregress(1 / H[filt], M[filt] - H[filt] * linreg1.slope)
-                Ms.append(mu.Quantity(linreg2.intercept, "A/m"))
+                Ms.append(u.Quantity(linreg2.intercept, "A/m"))
 
         Ms = me.Entity("SaturationMagnetization", max(Ms), "MA / m")
         self.properties.saturation = Ms
@@ -269,7 +269,7 @@ class MH_major(_PropertyContainer, MH):
         demag: BOOL, optional
             Boolean that determines if demagnetization curve is plotted as an
             inset next to hysteresis loop. Default is True.
-        unit: STR | mu.unit | TUPLE(STR | mu.unit), optional
+        unit: STR | u.unit | TUPLE(STR | u.unit), optional
             Unit H and M are going to be plotted in. If string is given then
             both will have the same unit. Otherwise specify respective units
             as tuple (H_unit, M_unit). Default is 'T'.

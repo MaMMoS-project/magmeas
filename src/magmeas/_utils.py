@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-import mammos_units as mu
+import mammos_units as u
 import numpy as np
 
 
@@ -59,9 +59,9 @@ def rextract(superstr, startsub, endsub):
 
 def _MH_unit_processing(unit):
     """Return units and labels used for plotting of MH-derived objects."""
-    if isinstance(unit, str | mu.Unit | mu.CompositeUnit):
-        H_unit = mu.Unit(unit)
-        M_unit = mu.Unit(unit)
+    if isinstance(unit, str | u.Unit | u.CompositeUnit):
+        H_unit = u.Unit(unit)
+        M_unit = u.Unit(unit)
     else:
         if len(unit) > 2:
             raise ValueError(
@@ -69,24 +69,24 @@ def _MH_unit_processing(unit):
                 + "Please only pass two values: (H_unit, M_unit)."
             )
         elif len(unit) == 2:
-            H_unit = mu.Unit(unit[0])
-            M_unit = mu.Unit(unit[1])
+            H_unit = u.Unit(unit[0])
+            M_unit = u.Unit(unit[1])
         else:
-            H_unit = mu.Unit(unit[0])
-            M_unit = mu.Unit(unit[0])
+            H_unit = u.Unit(unit[0])
+            M_unit = u.Unit(unit[0])
 
-    if H_unit.is_equivalent(mu.T, equivalencies=None):
+    if H_unit.is_equivalent(u.T, equivalencies=None):
         H_label = "$\\mu_0 H_{int}$"
-    elif H_unit.is_equivalent(mu.A / mu.m, equivalencies=None):
+    elif H_unit.is_equivalent(u.A / u.m, equivalencies=None):
         H_label = "$H_{int}$"
     else:
         raise ValueError(
             f"Unit {H_unit} is incompatible with magnetic "
             + "field or magnetic flux density units."
         )
-    if M_unit.is_equivalent(mu.T, equivalencies=None):
+    if M_unit.is_equivalent(u.T, equivalencies=None):
         M_label = "J"
-    elif M_unit.is_equivalent(mu.A / mu.m, equivalencies=None):
+    elif M_unit.is_equivalent(u.A / u.m, equivalencies=None):
         M_label = "M"
     else:
         raise ValueError(
