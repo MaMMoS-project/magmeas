@@ -2,6 +2,7 @@
 
 import mammos_entity as me
 import mammos_units as u
+from mammos_analysis.demag import demag_cuboid
 
 
 class Sweep(me.EntityCollection):
@@ -221,4 +222,105 @@ class Sweep(me.EntityCollection):
             "MagneticPolarisation",
             self[moment_key].q / volume * u.constants.mu0,
             "T",
+        )
+
+    def corr_demag(self, **kwargs):
+        r"""
+        Correct the ExternalMagneticField for the demagnetising field created by
+        the samples own Magnetization. This yields the InternalMagneticField,
+        which will be assigned to self with the key 'H'.
+        For this, self must contain one (and only one) Entity which has the
+        ontology_label 'ExternalMagneticField', another one with 'Magnetization'
+        and one of the following:
+
+        - an Entity with the ontology_label 'DemagnetizingFactor'
+        - an Entity with the ontology_label 'Length', containing three values
+          (and only three!) which are assumed to be the side lenghts of a
+          rectangular cuboid. The FIRST value in this Entity is assumed to be
+          parallel to the direction of the ExternalMagneticField.
+          The function mammos_analysis.demag.rectangular_cuboid will be used to
+          calculate the DemagnetizingFactor of this rectangular cuboid. Doing so
+          manually and only passing the relevant value as its own Entity with
+          the ontology_label 'DemagnetizingFactor' like above is recommended.
+
+        If more than one variant would be possible, only one will be chosen. The
+        choice will fall on the option higher in the list above. If the thus
+        chosen option is satisfied by more than one Entity contained in self,
+        the calculation will be canceled as the ambiguity cannot be fixed
+        automatically (e.g. two Entities have the ontology_label 'Length').
+        Optionally, the needed Entities from the list above can be given as
+        keyword arguments of this function to provide them for this calculation.
+        They will then be assigned to self and the same logic as before is
+        followed. Assignments to self will happen whether the given Entities
+        are used in the calculation or not. Already assigned Entities will be
+        overwritten if the same key is used, which also applies to entities with
+        the key 'H'.
+
+        The following equations are used:
+        .. math::
+
+            H_{int} = H_{ext} - D \cdot M
+
+        Parameters
+        ----------
+        kwargs: ENTITY, optional
+            Keyword arguments that will be assigned to self and possibly
+            contribute to the calculation of H if they are relevant.
+
+        Returns
+        -------
+        None
+        """
+        magnetisation_key = self.get_entity_key("Magnetization")
+        ext_field_key = self.get_entity_key("ExternalMagneticField")
+        if isinstance(magnetisation_key, bool) or isinstance(ext_field_key, bool):
+            raise AttributeError(
+                "Either an Entity with the ontology_label 'Magnetization' or "
+                + " 'ExternalMagneticField' could not be found in self. "
+                + "Please provide both first and try again."
+            )
+        if isinstance(magnetisation_key, list) or isinstance(ext_field_key, list):
+            raise AttributeError(
+                "More than one entity with the ontology_label 'Magnetization' "
+                + "or 'ExternalMagneticField' could be found in self. "
+                + "Please provide only one. The entities found were "
+                + f"{magnetisation_key} and {ext_field_key}."
+            )
+
+        for key, value in kwargs.items():
+            if isinstance(value, me.Entity):
+                self[key] = value
+            else:
+                raise TypeError(
+                    f"The type of the kwarg ´{key}´ was {type(value)}, which is not "
+                    + "allowed for this method. Please only pass kwargs of type "
+                    + "mammos_entity.Entity to this method."
+                )
+
+        demag_key = self.get_entity_key("DemagnetizingFactor")
+        length_key = self.get_entity_key("Length")
+        # self.get_entity_key only returns a str if the ontology_label was found
+        # exactly once. Therefore, isinstance(key, str) is a sufficient check.
+        if isinstance(demag_key, str):
+            demag_factor = self[demag_key]
+        elif isinstance(length_key, str):
+            if self[length_key].q.shape != (3,):
+                raise AttributeError(
+                    f"The entity ´{length_key}´ in self does have the ontology_label "
+                    + "'Length', but not the right shape of (3,). The detected "
+                    + f"shape was {self[length_key].q.shape}."
+                )
+            else:
+                demag_factor = demag_cuboid(*self[length_key].q)[0]
+        else:
+            raise AttributeError(
+                "No suitable sample information (DemagnetizingFactor | Length)"
+                + "could be found within self. Please provide sufficient information "
+                + "for the calculation of H, see the docstring and try again."
+            )
+
+        self["H"] = me.Entity(
+            "InternalMagneticField",
+            self[ext_field_key].q - self[magnetisation_key].q * demag_factor.q,
+            "A/m",
         )
