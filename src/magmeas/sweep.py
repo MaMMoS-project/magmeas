@@ -2,7 +2,10 @@
 
 import mammos_entity as me
 import mammos_units as u
+import matplotlib.pyplot as plt
 from mammos_analysis.demag import demag_cuboid
+
+from magmeas._utils import _arg_processing
 
 
 class Sweep(me.EntityCollection):
@@ -329,3 +332,88 @@ class Sweep(me.EntityCollection):
             self[ext_field_key].q - self[magnetisation_key].q * demag_factor.q,
             "A/m",
         )
+
+    def plot(
+        self,
+        *args,
+        filepath=None,
+        bounds=(None, None),
+        fig_ax=None,
+        **kwargs,
+    ):
+        """
+        Plot arguments and save figure if a filepath is given.
+
+        Parameters
+        ----------
+        args: STR | ENTITY | QUANTITY | ARRAY
+            This determines the values to be plotted. Can only be comprised of
+            one or two values. In the case of a string, it is first attempted
+            to use it as a key for the values in self. If the string is not a
+            key in self, then it is assumed to be an ontology_label and the
+            entitity in self with the fitting ontology_label will be used. If
+            more than one entities have a fitting ontology_label, this method
+            fails.
+            In the case of an Entity, a Quantity or an array, they are attempted
+            to be plotted directly.
+        filepath: STR | PATH, optional
+            Filepath for saving the figure. Default is None, in that case no
+            file is saved and the generated figure as well as all axes objects
+            are returned.
+        bounds: TUPLE(NONE | INT), optional
+            Indices (start, end) at which the data to be plotted will be cut
+            off. Use None to plot until the respective start or end.
+            Default is (None, None).
+        fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
+            Tuple of figure and axes the data should be plotted to. If None is
+            given they will be generated dynamically. Default is None.
+        kwargs:
+            Keyword arguments to change the appearance of plots.
+            See documentation of matplotlib.pyplot.plot for more information.
+
+        Returns
+        -------
+        None | (matplotlib.Figure, matplotlib.Axes)
+            Return figure and axes object if filepath is not specified.
+        """
+        start, end = bounds
+        if fig_ax is None:
+            fig, ax = plt.subplots()
+        else:
+            fig, ax = fig_ax
+
+        if len(args) == 0:
+            raise Exception("No values to plot were given, nothing to do.")
+        elif len(args) == 1:
+            y = _arg_processing(self, args[0])
+            if isinstance(y, me.Entity):
+                ax.plot(y.q[start:end], **kwargs)
+                ax.set_ylabel(y.axis_label)
+            elif isinstance(y, u.Quantity):
+                ax.plot(y[start:end], **kwargs)
+                ax.set_ylabel("(" + str(y.unit) + ")")
+            else:
+                ax.plot(y[start:end], **kwargs)
+        elif len(args) == 2:
+            x, y = (_arg_processing(self, arg) for arg in args)
+            if isinstance(x, me.Entity):
+                ax.set_xlabel(x.axis_label)
+                x = x.q
+            elif isinstance(x, u.Quantity):
+                ax.set_xlabel("(" + str(x.unit) + ")")
+            if isinstance(y, me.Entity):
+                ax.set_ylabel(y.axis_label)
+                y = y.q
+            elif isinstance(y, u.Quantity):
+                ax.set_ylabel("(" + str(y.unit) + ")")
+            ax.plot(x[start:end], y[start:end], **kwargs)
+        else:
+            raise ValueError(
+                f"A number of {len(args)} args was given. Please use at most two."
+            )
+
+        # save figure if filepath is given
+        if filepath is not None:
+            fig.savefig(filepath)
+        if filepath is None:
+            return fig, ax
