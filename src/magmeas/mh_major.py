@@ -9,10 +9,10 @@ from scipy.signal import find_peaks
 from scipy.stats import linregress
 
 from magmeas._utils import _MH_unit_processing, _PropertyContainer
-from magmeas.mh import MH
+from magmeas.sweep import Sweep
 
 
-class MH_major(_PropertyContainer, MH):
+class MH_major(_PropertyContainer, Sweep):
     """
     Class for importing, storing and using of magnetometric data from major
     hysteresis loop M(H) measurements aswell as derived properties.

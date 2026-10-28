@@ -4,10 +4,10 @@ import numpy as np
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 
-from magmeas.mh import MH
+from magmeas.sweep import Sweep
 
 
-class FORC(MH):
+class FORC(Sweep):
     """Class for analysing magnetometric data of FORC measurements."""
 
     def __init__(self, datfile, read_method="auto"):
