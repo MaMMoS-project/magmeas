@@ -86,10 +86,12 @@ class MH_major(_PropertyContainer, MH):
 
     @property
     def squareness(self) -> float:
-        """
+        r"""
         The hysteresis loop squareness factor calculated from the measurement
         data. It is calculated according to:
-            .. math:: S = \\frac{H_k}{H_c}
+
+        .. math:: S = \frac{H_k}{H_c}
+
         with Hk being the kneefield and Hc being the coercivity.
         """
         return self.properties.squareness

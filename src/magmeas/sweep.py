@@ -31,7 +31,8 @@ class Sweep(me.EntityCollection):
         overwritten if the same keys are used.
 
         Also returns self, so the following works:
-        `some_data = magmeas.Sweep().read_custom(some_reader_func, 'path/to/file.DAT')`
+
+            some_data = magmeas.Sweep().read_custom(some_func, 'path/to/file.DAT')
 
         Parameters
         ----------
@@ -66,7 +67,8 @@ class Sweep(me.EntityCollection):
         Read VSM-data from a Quantum Design .DAT file generated with Quantum
         Designs PPMS, DynaCool or VersaLab devices and assign it to self.
         Also returns self, so the following works:
-        `some_data = magmeas.Sweep().read_PPMS('path/to/file.DAT')`
+
+            some_data = magmeas.Sweep().read_PPMS('path/to/file.DAT')
 
         Parameters
         ----------
@@ -142,7 +144,9 @@ class Sweep(me.EntityCollection):
         the keys 'M' and 'J'.
 
         The following equations are used:
+
         .. math::
+
             M &= \frac{\mu}{V}\\
             J &= \mu _0 \cdot M\\
             V &= m \cdot \rho\\
@@ -257,6 +261,7 @@ class Sweep(me.EntityCollection):
         the key 'H'.
 
         The following equations are used:
+
         .. math::
 
             H_{int} = H_{ext} - D \cdot M

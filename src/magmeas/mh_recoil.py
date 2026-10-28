@@ -88,7 +88,7 @@ class MH_recoil(MH):
         return recoil_suscep
 
     def external_comp_field(self, demag_fields=None, prominence=5e3):
-        """
+        r"""
         Return external compensation fields, that will lead to an endpoint
         close to an internal magnetic field of zero for each recoil loop. This
         only makes sense to be calculated from recoil loop measurements, where
@@ -100,7 +100,8 @@ class MH_recoil(MH):
         External compensation field is calculated from the internal recoil
         fields (at the end of each recoil loop) and the recoil susceptibility
         according to:
-            .. math:: H^e_{comp} = \\frac{- H^i_{recoil}}{1 - D * \\chi_{recoil}}
+
+            .. math:: H^e_{comp} = \frac{- H^i_{recoil}}{1 - D * \chi_{recoil}}
 
         Parameters
         ----------
