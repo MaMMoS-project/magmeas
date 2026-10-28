@@ -108,7 +108,11 @@ class Sweep(me.EntityCollection):
             found or a list of all keys for which the respective entity has the
             specified ontology label.
         """
-        entities = {key: entity.ontology_label for key, entity in self}
+        entities = {
+            key: value.ontology_label
+            for key, value in self
+            if isinstance(value, me.Entity)
+        }
         labels = set(entities.values())
         if ontology_label not in labels:
             return None
