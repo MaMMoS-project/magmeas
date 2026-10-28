@@ -89,7 +89,7 @@ class Sweep(me.EntityCollection):
     def get_entity_key(self, ontology_label):
         """Check, whether collection contains entities of the given label and
         return their respective keys. If no entities of this label can be found,
-        the boolean False is returned.
+        then None is returned.
 
         Parameters
         ----------
@@ -99,8 +99,8 @@ class Sweep(me.EntityCollection):
 
         Returns
         -------
-        STR | LIST[STR] | BOOL
-            False if entities with the given ontology label could not be found,
+        STR | LIST[STR] | NONE
+            None if entities with the given ontology label could not be found,
             the key of the entity that had the specified label if only one was
             found or a list of all keys for which the respective entity has the
             specified ontology label.
@@ -108,7 +108,7 @@ class Sweep(me.EntityCollection):
         entities = {key: entity.ontology_label for key, entity in self}
         labels = set(entities.values())
         if ontology_label not in labels:
-            return False
+            return None
         results = {label: [] for label in labels}
         for key, value in entities.items():
             results[value].append(key)
@@ -163,7 +163,7 @@ class Sweep(me.EntityCollection):
         None
         """
         moment_key = self.get_entity_key("MagneticMoment")
-        if isinstance(moment_key, bool):
+        if moment_key is None:
             raise AttributeError(
                 "No entity with the ontology_label 'MagneticMoment' could be "
                 + "found in self. Please provide a MagneticMoment first and try "
@@ -278,7 +278,7 @@ class Sweep(me.EntityCollection):
         """
         magnetisation_key = self.get_entity_key("Magnetization")
         ext_field_key = self.get_entity_key("ExternalMagneticField")
-        if isinstance(magnetisation_key, bool) or isinstance(ext_field_key, bool):
+        if magnetisation_key is None or ext_field_key is None:
             raise AttributeError(
                 "Either an Entity with the ontology_label 'Magnetization' or "
                 + " 'ExternalMagneticField' could not be found in self. "
