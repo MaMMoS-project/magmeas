@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import mammos_entity as me
 import mammos_units as u
 import numpy as np
 
@@ -122,21 +123,32 @@ def droot(x, y):
     return r
 
 
-def diff(a, b):
-    """
-    Calculate the difference between value a and value b relative to
-    value a in percent.
-
-    Parameters
-    ----------
-    a : INT | FLOAT
-        Numerical value.
-    b : INT | FLOAT
-        Numerical value.
-
-    Returns
-    -------
-    FLOAT
-        Difference of Value a and b in percent.
-    """
-    return (b - a) / a * 100
+def _arg_processing(sweep, arg):
+    """Doe some internal processing to return the values to plot."""
+    if isinstance(arg, me.Entity | u.Quantity | np.ndarray | list):
+        return arg
+    elif isinstance(arg, str):
+        if arg in sweep:
+            return sweep[arg]
+        else:
+            arg_key = sweep.get_entity_key(arg)
+            if arg_key is None:
+                raise AttributeError(
+                    f"The given argument was of type string and contained '{arg}'. "
+                    + "This could neither be found as a key, nor as an "
+                    + "ontology_label. Please check, if the argument was correct."
+                )
+            elif isinstance(arg_key, list):
+                raise AttributeError(
+                    f"The ontology_label '{arg}' was found more than once in "
+                    + f"the given magmeas object under the keys {arg_key}. "
+                    + "Please resolve this ambiguity and try again."
+                )
+            else:
+                return sweep[arg_key]
+    else:
+        raise TypeError(
+            f"The given argument was of type {type(arg)} which is not supported. "
+            + "Please only pass keys as strings or objects of type Entity, "
+            + "Quantity, ndarray or list to this function."
+        )
