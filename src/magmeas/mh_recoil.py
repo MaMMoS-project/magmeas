@@ -1,7 +1,6 @@
 """magmeas.MH_recoil class and functionality around it"""
 
 import mammos_units as u
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import find_peaks
 from scipy.stats import linregress
@@ -142,62 +141,3 @@ class MH_recoil(Sweep):
         e_c_f = -i_r_f / (1 - D * r_chi)
 
         return e_c_f
-
-    def plot(
-        self,
-        filepath=None,
-        demag=True,
-        unit="T",
-        segments=(0, None),
-        fig_ax=None,
-        **kwargs,
-    ):
-        """
-        Plot recoil loop measurement and save figure if a filepath is given.
-
-        Parameters
-        ----------
-        filepath: STR | PATH, optional
-            Filepath for saving the figure. Default is None, in that case no
-            file is saved and the generated figure as well as all axes objects
-            are returned.
-        demag: BOOL, optional
-            Plot the recoil loop measurement only in the second quadrant.
-            Default is True.
-        unit: STR | u.unit | TUPLE(STR | u.unit), optional
-            Unit H and M are going to be plotted in. If string is given then
-            both will have the same unit. Otherwise specify respective units
-            as tuple (H_unit, M_unit). Default is 'T'.
-        segments: TUPLE(NONE | INT), optional
-            Segmentation points (start, end) at which the data to be plotted
-            will be cut off. See the method 'segments' for more information.
-            Note that valid input here are only the indices FOR the output from
-            the segments method and NOT the indices of the actual measurement
-            points. Use None to plot until the respective start or end.
-            Default is (0, None).
-        fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
-            Tuple of figure and axes the data should be plotted to. If None is
-            given they will be generated dynamically. Default is None.
-        kwargs:
-            Keyword arguments to change the appearance of plots.
-            See documentation of matplotlib.pyplot.plot for more information.
-
-        Returns
-        -------
-        None | (matplotlib.Figure, matplotlib.Axes)
-            Return figure and axes object if filepath is not specified.
-        """
-        if fig_ax is None:
-            fig, ax = plt.subplots()
-        else:
-            fig, ax = fig_ax
-
-        start, end = segments
-        if start is not None:
-            start = self.segments()[start]
-        if end is not None:
-            end = self.segments()[end]
-
-        super().plot(
-            filepath=None, unit=unit, bounds=(start, end), fig_ax=(fig, ax), **kwargs
-        )

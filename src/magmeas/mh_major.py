@@ -2,13 +2,11 @@
 
 import mammos_entity as me
 import mammos_units as u
-import matplotlib.pyplot as plt
 import numpy as np
 from mammos_analysis.hysteresis import extrinsic_properties
 from scipy.signal import find_peaks
 from scipy.stats import linregress
 
-from magmeas._utils import _MH_unit_processing
 from magmeas.sweep import Sweep
 
 
@@ -248,97 +246,3 @@ class MH_major(Sweep):
         if len(s[s > ((1 - edge_frac) * len(t))]) != 0:
             s = s[: -len(s[s > ((1 - edge_frac) * len(t))])]
         return s
-
-    def plot(
-        self,
-        filepath=None,
-        demag=True,
-        unit="T",
-        segments=(None, None),
-        fig_ax=None,
-        **kwargs,
-    ):
-        """
-        Plot major hysteresis loop, optionally with inset of demagnetization
-        curve and save figure if a filepath is given.
-
-        Parameters
-        ----------
-        filepath: STR | PATH, optional
-            Filepath for saving the figure. Default is None, in that case no
-            file is saved and the generated figure as well as all axes objects
-            are returned.
-        demag: BOOL, optional
-            Boolean that determines if demagnetization curve is plotted as an
-            inset next to hysteresis loop. Default is True.
-        unit: STR | u.unit | TUPLE(STR | u.unit), optional
-            Unit H and M are going to be plotted in. If string is given then
-            both will have the same unit. Otherwise specify respective units
-            as tuple (H_unit, M_unit). Default is 'T'.
-        segments: TUPLE(NONE | INT), optional
-            Segmentation points (start, end) at which the data to be plotted
-            will be cut off. See the method 'segments' for more information.
-            Note that valid input here are only the indices FOR the output from
-            the segments method and NOT the indices of the actual measurement
-            points. Use None to plot until the respective start or end. The
-            demagnetisation curve will not be affected by this, it is always
-            plotted in the same way between the same bounds.
-            Default is (None, None).
-        fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
-            Tuple of figure and axes the data should be plotted to. If None is
-            given they will be generated dynamically. Default is None.
-        kwargs:
-            Keyword arguments to change the appearance of plots.
-            See documentation of matplotlib.pyplot.plot for more information.
-
-        Returns
-        -------
-        None | (matplotlib.Figure, matplotlib.Axes)
-            Return figure and axes object if filepath is not specified.
-        """
-        if fig_ax is None:
-            fig, ax1 = plt.subplots()
-        elif len(fig_ax) == 3:
-            fig, ax1, ax2 = fig_ax
-        else:
-            fig, ax1 = fig_ax
-
-        start, end = segments
-        if start is not None:
-            start = self.segments()[start]
-        if end is not None:
-            end = self.segments()[end]
-
-        super().plot(
-            filepath=None, unit=unit, bounds=(start, end), fig_ax=(fig, ax1), **kwargs
-        )
-
-        # plot inset of demagnetization curve
-        if demag:
-            H_unit, M_unit, _, _ = _MH_unit_processing(unit)
-            # The demagnetisation curve will always be plotted in the same way
-            start_idx, end_idx = self.segments()[:2]
-            if "ax2" not in locals():
-                ax2 = ax1.inset_axes([0.625, 0.15, 0.3, 0.5])
-            ax2.plot(
-                self.H.q.to(H_unit)[start_idx:end_idx],
-                self.M.q.to(M_unit)[start_idx:end_idx],
-                **kwargs,
-            )
-
-            # format inset
-            Hmin = self.coercivity.q.to(H_unit).value * -1.1
-            Jmax = self.remanence.q.to(M_unit).value * 1.1
-            ax2.axis([Hmin, 0, 0, Jmax])
-            ax2.yaxis.set_label_position("right")
-            ax2.set_xlabel(ax1.get_xlabel())
-            ax2.set_ylabel(ax1.get_ylabel())
-
-        # save figure if filepath is given
-        if filepath is not None:
-            fig.savefig(filepath, dpi=300)
-        if filepath is None:
-            if demag:
-                return fig, ax1, ax2
-            else:
-                return fig, ax1

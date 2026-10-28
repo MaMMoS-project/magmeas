@@ -1,7 +1,6 @@
 """magmeas.MT class and functionality around it"""
 
 import mammos_entity as me
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import find_peaks
 
@@ -146,90 +145,6 @@ class MT(Sweep):
         if len(s[s > ((1 - edge_frac) * len(t))]) != 0:
             s = s[: -len(s[s > ((1 - edge_frac) * len(t))])]
         return s
-
-    def plot(
-        self,
-        filepath=None,
-        derivative=True,
-        segments=(None, None),
-        fig_ax=None,
-        kernel_width=40,
-        edge_frac=0.05,
-        **kwargs,
-    ):
-        """
-        Plot cooling curve of M(T) measurement. Save to file if path is given.
-
-        Parameters
-        ----------
-        filepath : STR | PATH, optional
-            Filepath for saving the figure. Default is None, in that case no
-            file is saved.
-        derivative: BOOL, optional
-            Whether to plot the first derivative dM/dT on a second axes.
-            Default is True.
-        segments: TUPLE(NONE | INT), optional
-            Segmentation points (start, end) at which the data to be plotted
-            will be cut off. See the method 'segments' for more information.
-            Note that valid input here are only the indices FOR the output from
-            the segments method and NOT the indices of the actual measurement
-            points. Use None to plot until the respective start or end.
-            Default is (None, None).
-        fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
-            Tuple of figure and axes the data should be plotted to. If None is
-            given they will be generated dynamically.
-            Default is None.
-        kernel_width: INT, optional
-            Kernel width to be used for smoothing of derivative.
-            Default is 40.
-        edge_frac: FLOAT, optional
-            Fraction of measurement range to be masked at the edges, since those
-            regions are usually very noisy.
-            Default is 0.05.
-        kwargs:
-            Keyword arguments to change the appearance of plots.
-            See documentation of matplotlib.pyplot.plot for more information.
-
-        Returns
-        -------
-        None | (matplotlib.Figure, matplotlib.Axes)
-            Return figure and axes object if filepath is not specified.
-        """
-        if derivative and fig_ax is None:
-            fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
-        elif derivative and fig_ax is not None:
-            fig, ax1, ax2 = fig_ax
-        elif not derivative and fig_ax is None:
-            fig, ax1 = plt.subplots(1, 1)
-        elif not derivative and fig_ax is not None:
-            fig, ax1 = fig_ax
-
-        start, end = segments
-        if start is not None:
-            start = self.segments(edge_frac=edge_frac)[start]
-        if end is not None:
-            end = self.segments(edge_frac=edge_frac)[end]
-
-        T = self.T.q[start:end]
-        M = self.M.q[start:end]
-
-        ax1.plot(T, M, **kwargs)
-        ax1.set_xlabel(f"Temperature in {self.T.unit}")
-        ax1.set_ylabel(f"Magnetization in {self.M.unit}")
-
-        if derivative:
-            dMdT = _dMdT(T, M, kernel_width, edge_frac)
-            ax2.plot(T, dMdT, **kwargs)
-            ax2.set_ylabel("$\\frac{dM}{dT}$")
-            ax2.set_xlabel(f"Temperature in {self.T.unit}")
-
-        if filepath is not None:
-            fig.savefig(filepath, dpi=300)
-        if filepath is None:
-            if derivative:
-                return fig, ax1, ax2
-            else:
-                return fig, ax1
 
 
 def _dMdT(T, M, kernel_width, edge_frac):
