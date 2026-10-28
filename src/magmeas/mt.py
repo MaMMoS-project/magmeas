@@ -5,11 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import find_peaks
 
-from magmeas._utils import _PropertyContainer
 from magmeas.sweep import Sweep
 
 
-class MT(_PropertyContainer, Sweep):
+class MT(Sweep):
     """
     Class for importing, storing and using of magnetometric data from M(T)-measurement
     aswell as derived properties.

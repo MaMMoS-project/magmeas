@@ -1,33 +1,8 @@
 """Utility classses and functions called within magmas. Not intended for use."""
 
-from pathlib import Path
-
 import mammos_entity as me
 import mammos_units as u
 import numpy as np
-
-
-class _PropertyContainer:
-    """Abstract parent class that introduces handling of properties."""
-
-    def to_csv(self, filename):
-        """
-        Write measurement data and calculated properties to two separate
-        CSV-files.
-
-        Parameters
-        ----------
-        filename: STR | PATH
-            Base of the generated files. Measurement data will have a '_data'
-            attached before the file extension and properties '_properties'.
-
-        Returns
-        -------
-        None
-        """
-        path = Path(filename)
-        self.measurement_data.to_csv(path.with_stem(path.stem + "_data"))
-        self.properties.to_csv(path.with_stem(path.stem + "_properties"))
 
 
 def rextract(superstr, startsub, endsub):
