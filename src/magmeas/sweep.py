@@ -341,8 +341,10 @@ class Sweep(me.EntityCollection):
         self,
         *args,
         filepath=None,
-        bounds=(None, None),
+        bounds=None,
         fig_ax=None,
+        segments=None,
+        segments_kwargs=None,
         **kwargs,
     ):
         """
@@ -364,13 +366,27 @@ class Sweep(me.EntityCollection):
             Filepath for saving the figure. Default is None, in that case no
             file is saved and the generated figure as well as all axes objects
             are returned.
-        bounds: TUPLE(NONE | INT), optional
+        bounds: NONE | TUPLE(NONE | INT), optional
             Indices (start, end) at which the data to be plotted will be cut
             off. Use None to plot until the respective start or end.
-            Default is (None, None).
+            Default is None.
         fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional
             Tuple of figure and axes the data should be plotted to. If None is
             given they will be generated dynamically. Default is None.
+        segments: NONE | TUPLE(NONE | INT), optional
+            Segmentation points (start, end) at which the data to be plotted
+            will be cut off. See the method self.segments for more information.
+            Note that valid input here are only the indices FOR the output from
+            the segments method and NOT the indices of the actual measurement
+            points. Use None to plot until the respective start or end.
+            Will be overwritten by bounds.
+            If only None and no tuple is given, this will be ignored.
+            Default is None.
+        segments_kwargs: NONE | DICT, optional
+            Dictionary of keyword arguments that will be unpacked in the
+            segments method of self, if self has one. See the respective method
+            for more details.
+            Defailt is None.
         kwargs:
             Keyword arguments to change the appearance of plots.
             See documentation of matplotlib.pyplot.plot for more information.
@@ -380,7 +396,23 @@ class Sweep(me.EntityCollection):
         None | (matplotlib.Figure, matplotlib.Axes)
             Return figure and axes object if filepath is not specified.
         """
-        start, end = bounds
+        if bounds is not None:
+            start, end = bounds
+        elif segments is not None and segments_kwargs is not None:
+            start, end = segments
+            if start is not None:
+                start = self.segments(**segments_kwargs)[start]
+            if end is not None:
+                end = self.segments(**segments_kwargs)[end]
+        elif segments is not None and segments_kwargs is None:
+            start, end = segments
+            if start is not None:
+                start = self.segments()[start]
+            if end is not None:
+                end = self.segments()[end]
+        else:
+            start, end = (None, None)
+
         if fig_ax is None:
             fig, ax = plt.subplots()
         else:
