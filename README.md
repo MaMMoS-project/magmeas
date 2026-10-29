@@ -1,6 +1,6 @@
 # magmeas
 
-Python module enabling the import and handling of **mag**netic **meas**urements.
+Python module enabling the import and analysis of **mag**netic **meas**urements.
 
 
 | Description   | Badge |
@@ -21,39 +21,23 @@ pip install magmeas
 
 ## Usage
 
-### Input file formatting
-
-For conveniently importing automatically, make sure that the necessary sample properties are given in the .DAT file. The formatting is as follows:
-
-```
-INFO,m,SAMPLE_MASS
-INFO,(a, b, c),SAMPLE_SIZE
-```
-
-With `m` being the sample mass in mg, `a` and `b` being the sample dimensions perpendicular to the magnetization axis and
-`c` being the sample dimension parallel to the magnetization axis. So far only cuboid samples are supported and the density
-is assumed to be m / (a * b * c)
-
-### Python
-
-There are four distinct classes that conveniently handle specific types of measurement data:
+There are three distinct classes that conveniently handle specific types of measurement data:
 * `Sweep`: general for all types of magnetometry measurements
-* `MH`: for all M(H) measurements, still quite unspecific
 * `MH_major`: for major hysteresis loop measurements
 * `MT`: for M(T) measurements
 
 Here is what each of them do at initialisation or automatically with a method:
 
-|  | `Sweep` | `MH` | `MH_major` | `MT` |
-|--|-----|----|----------|----|
-| import measurement data from Quantum Design .DAT file | ✅ | ✅ | ✅ | ✅ |
-|export measurement data to csv/yml/hdf5 | ✅ | ✅ | ✅ | ✅ |
-| plotting | ❌ | ✅ | ✅ | ✅ |
-| calculate properties | ❌ | ❌ | ✅ $H_c$, $M_r$, $BH_{max}$, $H_k$, S, $M_s$ (optional) | ✅ $T_c$ |
-|export properties to csv/yml/hdf5 | ❌ | ❌ | ✅ | ✅ |
+|  | `Sweep` | `MH_major` | `MT` |
+|--|---------|------------|------|
+|accept general measurement data | ✅ | ✅ | ✅ |
+|import measurement data from Quantum Design .DAT file | ✅ | ✅ | ✅ |
+|export measurement data to csv/yml/hdf5 | ✅ | ✅ | ✅ |
+|plotting | ✅ | ✅ | ✅ |
+|calculate properties | ❌ | ✅ $H_c$, $M_r$, $BH_{max}$, $H_k$, S, $M_s$ (optional) | ✅ $T_c$ |
 
 Experimental support for Recoil-loop- and FORC-measurements is also provided in their respective classes.
-All classes inherit from the `EntityCollection` class in [`mammos-entity`](https://github.com/MaMMoS-project/mammos-entity), using its io functionality. In doing so, they can conveniently be added to a new `EntityCollection` with `magmeas.to_batch`, benefitting from the nested structure in these objects even for data export.
+All classes inherit from the `EntityCollection` class in [`mammos-entity`](https://github.com/MaMMoS-project/mammos-entity), using its io functionality. In doing so, they can conveniently be added to a new `EntityCollection`, benefitting from the nested structure in these objects even for data export.
 Plotting of the above highlighted classes is very flexible. Common keyword arguments used in matplotlibs functions can be used. Sweep-derived objects can either be plotted to pre-existing matplotlib figures and axes, or they dynamically generate new ones and return them for subsequent formatting.
 
 Requires Python >= 3.11, < 3.15 due to dependencies
