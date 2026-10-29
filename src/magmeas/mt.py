@@ -13,26 +13,8 @@ class MT(Sweep):
     aswell as derived properties.
     """
 
-    def __init__(self, filepath=None):
-        # import data
-        super().__init__(filepath)
-
-        # Initialise property collection
-        self.properties = me.EntityCollection(
-            "Sample properties derived from the measurement data."
-        )
-        if filepath is not None:
-            # calculate properties
-            self.calc_Tc()
-
-    @property
-    def Tc(self) -> me.Entity:
-        """The Curie-temperature(s) calculated from the measurement data."""
-        return self.properties.Tc
-
     def calc_Tc(
         self,
-        save=True,
         segments=(0, None),
         kernel_width=40,
         edge_frac=0.05,
@@ -47,14 +29,10 @@ class MT(Sweep):
 
         Parameters
         ----------
-        save: BOOL, optional
-            Whether to save the calculated Curie-Temperature(s) in the MT object
-            or just return them.
-            Default is True.
         segments: TUPLE(NONE | INT), optional
             Segmentation points (start, end) at which the data used for the
-            calculation will be cut off. This is usually yields better results
-            than using the whole dataset. Experience has shown that the cooling
+            calculation will be cut off. This usually yields better results
+            than using the whole dataset. Experience has shown that the return
             curve is often more useful, but this should be checked for each
             dataset.
             Default is (0, None).
@@ -88,7 +66,7 @@ class MT(Sweep):
 
         T = self.T.q[start:end]
         M = self.M.q[start:end]
-        dMdT = _dMdT(T, M, kernel_width, edge_frac)
+        dMdT = self.dMdT(T, M, kernel_width, edge_frac)
         # norm dM/dT to values between -1 and 1
         ndMdT = (dMdT - np.nanmin(dMdT)) / (np.nanmax(dMdT) - np.nanmin(dMdT))
         # find peaks in normalised dM/dT
@@ -97,10 +75,8 @@ class MT(Sweep):
         Tc = np.sort(T[p])
         # pass all peaks of normalised dM/dT to Curie-Temperature
         # the user should decide themselves, which of them make sense and recalculate
-        Tc = me.Entity("CurieTemperature", Tc)
-        if save:
-            self.properties.Tc = Tc
-        return Tc
+        Tc = me.Entity("CurieTemperature", Tc, "K")
+        self.Tc = Tc
 
     def segments(self, edge_frac=0.05, prominence=5, **kwargs):
         r"""
@@ -146,55 +122,54 @@ class MT(Sweep):
             s = s[: -len(s[s > ((1 - edge_frac) * len(t))])]
         return s
 
+    def dMdT(self, T, M, kernel_width, edge_frac):
+        """
+        Return first derivative of magnetisation over temperature. Includes
+        smoothing and masking functionality.
 
-def _dMdT(T, M, kernel_width, edge_frac):
-    """
-    Return first derivative of magnetisation over temperature. Includes
-    smoothing and masking functionality.
+        Parameters
+        ----------
+        T: ARRAY | QUANTITY
+            Thermodynamic temperature.
+        M: ARRAY | QUANTITY
+            Magnetisation or magnetic polarisation.
+        kernel_width: INT
+            Width of kernel to be used for smoothing. Should be even value.
+        edge_frac: FLOAT
+            Fraction of the array to be masked off at the edges.
 
-    Parameters
-    ----------
-    T: ARRAY | QUANTITY
-        Thermodynamic temperature.
-    M: ARRAY | QUANTITY
-        Magnetisation or magnetic polarisation.
-    kernel_width: INT
-        Width of kernel to be used for smoothing. Should be even value.
-    edge_frac: FLOAT
-        Fraction of the array to be masked off at the edges.
+        Returns
+        -------
+        dMdT: QUANTITY
+            First derivative of magnetisation over temperature.
+        """
+        if kernel_width % 2 != 0:
+            raise ValueError(
+                """Kernel width was detected to be uneven! Please only use even
+                integer kernel widths."""
+            )
+        if not isinstance(kernel_width, int):
+            raise TypeError(
+                f"""Kernel width is expected to be of type int, but type
+                {type(kernel_width)} was used."""
+            )
+        if edge_frac is not None and not (0 <= edge_frac <= 1):
+            raise ValueError(
+                f"""Please only use values of edge_frac between 0 and 1.
+                edge_frac was {edge_frac}."""
+            )
+        kernel = np.ones(kernel_width) / kernel_width
+        sT = np.convolve(T, kernel, mode="same")
+        sM = np.convolve(M, kernel, mode="same")
 
-    Returns
-    -------
-    dMdT: QUANTITY
-        First derivative of magnetisation over temperature.
-    """
-    if kernel_width % 2 != 0:
-        raise ValueError(
-            """Kernel width was detected to be uneven! Please only use even
-            integer kernel widths."""
-        )
-    if not isinstance(kernel_width, int):
-        raise TypeError(
-            f"""Kernel width is expected to be of type int, but type
-            {type(kernel_width)} was used."""
-        )
-    if edge_frac is not None and not (0 <= edge_frac <= 1):
-        raise ValueError(
-            f"""Please only use values of edge_frac between 0 and 1.
-            edge_frac was {edge_frac}."""
-        )
-    kernel = np.ones(kernel_width) / kernel_width
-    sT = np.convolve(T, kernel, mode="same")
-    sM = np.convolve(M, kernel, mode="same")
+        dT = np.gradient(sT)
+        dM = np.gradient(sM)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            dMdT = dM / dT
+        dMdT = np.where(np.isfinite(dMdT), dMdT, np.nan)
 
-    dT = np.gradient(sT)
-    dM = np.gradient(sM)
-    with np.errstate(divide="ignore", invalid="ignore"):
-        dMdT = dM / dT
-    dMdT = np.where(np.isfinite(dMdT), dMdT, np.nan)
-
-    if edge_frac:
-        edge_len = (np.max(T) - np.min(T)) * edge_frac
-        dMdT[np.min(T) + edge_len >= T] = np.nan
-        dMdT[np.max(T) - edge_len <= T] = np.nan
-    return dMdT
+        if edge_frac:
+            edge_len = (np.max(T) - np.min(T)) * edge_frac
+            dMdT[np.min(T) + edge_len >= T] = np.nan
+            dMdT[np.max(T) - edge_len <= T] = np.nan
+        return dMdT
