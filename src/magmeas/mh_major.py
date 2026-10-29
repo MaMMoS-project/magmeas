@@ -16,11 +16,6 @@ class MH_major(Sweep):
     hysteresis loop M(H) measurements aswell as derived properties.
     """
 
-    def __init__(self, datfile=None):
-        super().__init__(datfile)
-        if datfile is not None:
-            self.calc_properties()
-
     def calc_properties(self, **kwargs):
         """
         Calculate extrinsic magnetic properties from the demagnetisation curve
@@ -35,74 +30,23 @@ class MH_major(Sweep):
         -------
         None
         """
-        self.properties = me.EntityCollection(
-            "Sample properties derived from the measurement data."
-        )
+        magnetisation_key = self.get_entity_key("Magnetization")
+        int_field_key = self.get_entity_key("InternalMagneticField")
+        if magnetisation_key is None or int_field_key is None:
+            raise AttributeError(
+                "Either the Magnetization or the InternalMagneticField could "
+                + "not be found in self. This is currently not yet supported."
+            )
         s = self.segments(**kwargs)
         idx = np.argsort(self.H.q[s[0] : s[1]]) + s[0]
         prop = extrinsic_properties(self.H.q[idx], self.M.q[idx], 0)
-        self.properties.remanence = me.Entity("Remanence", prop.Mr.q, "MA/m")
-        self.properties.coercivity = me.Entity("CoercivityHc", prop.Hc.q, "MA/m")
-        self.properties.BHmax = me.Entity("MaximumEnergyProduct", prop.BHmax.q, "kJ/m3")
-        self.properties.kneefield = me.Entity(
-            "KneeField", self._calc_kneefield(), "MA/m"
-        )
-        self.properties.squareness = self._calc_squareness()
+        self.Mr = me.Entity("Remanence", prop.Mr.q, "MA/m")
+        self.Hc = me.Entity("CoercivityHc", prop.Hc.q, "MA/m")
+        self.BHmax = me.Entity("MaximumEnergyProduct", prop.BHmax.q, "kJ/m3")
+        self.Hk = me.Entity("KneeField", self.calc_Hk(), "MA/m")
+        self.SF = me.Entity("LoopSquarenessFactorInternal", self.calc_SF())
 
-    @property
-    def remanence(self) -> me.Entity:
-        """
-        The remanence calculated from the measurement data.
-        See mammos_analysis.hysteresis.extrinsic_properties for more details.
-        """
-        return self.properties.remanence
-
-    @property
-    def coercivity(self) -> me.Entity:
-        """
-        The coercivity calculated from the measurement data.
-        See mammos_analysis.hysteresis.extrinsic_properties for more details.
-        """
-        return self.properties.coercivity
-
-    @property
-    def BHmax(self) -> me.Entity:
-        """
-        The maximum energy product calculated from the measurement data.
-        See mammos_analysis.hysteresis.extrinsic_properties for more details.
-        """
-        return self.properties.BHmax
-
-    @property
-    def kneefield(self) -> me.Entity:
-        """
-        The kneefield calculated from the measurement data. This is the internal
-        magnetic field at which a magnetisation of 90 % of the remanence is
-        reached.
-        """
-        return self.properties.kneefield
-
-    @property
-    def squareness(self) -> float:
-        r"""
-        The hysteresis loop squareness factor calculated from the measurement
-        data. It is calculated according to:
-
-        .. math:: S = \frac{H_k}{H_c}
-
-        with Hk being the kneefield and Hc being the coercivity.
-        """
-        return self.properties.squareness
-
-    @property
-    def saturation(self) -> me.Entity:
-        """
-        The saturation magnetisation if it has been calculated. See the method
-        `estimate_saturation` for more details.
-        """
-        return self.properties.saturation
-
-    def _calc_kneefield(self):
+    def calc_Hk(self, **kwargs):
         """
         Calculate kneefield of demagnetization curve. The knee field strength
         is the internal magnetic field at which the magnetization in the
@@ -110,24 +54,26 @@ class MH_major(Sweep):
 
         Parameters
         ----------
-        None
+        kwargs: optional
+            Keyword arguments used for the segmentation. See MH_major.segments
+            for more details
 
         Returns
         -------
-        kneefield: ENTITY
+        Hk: ENTITY
             Knee field strength as mammos_entity.Entity
         """
         s = self.segments()
         idx0 = np.argsort(self.M.q[s[0] : s[1]])
         Hk0 = np.interp(
-            self.remanence.q * 0.9,
+            self.Mr.q * 0.9,
             self.M.q[s[0] : s[1]][idx0],
             self.H.q[s[0] : s[1]][idx0],
         )
         if len(s) >= 5:
             idx1 = np.argsort(self.M.q[s[2] : s[3]])
             Hk1 = np.interp(
-                self.remanence.q * -0.9,
+                self.Mr.q * -0.9,
                 self.M.q[s[2] : s[3]][idx1],
                 self.H.q[s[2] : s[3]][idx1],
             )
@@ -136,7 +82,7 @@ class MH_major(Sweep):
             Hk = me.Entity("KneeField", Hk0)
         return Hk
 
-    def _calc_squareness(self):
+    def calc_SF(self):
         r"""
         Calculate squareness of demagnetization curve.
 
@@ -151,7 +97,7 @@ class MH_major(Sweep):
         S: FLOAT
             Squareness (dimensionless)
         """
-        return (self.kneefield.q / self.coercivity.q).value
+        return (self.Hk.q / self.Hc.q).value
 
     def estimate_saturation(self, threshold=None):
         """
@@ -204,7 +150,7 @@ class MH_major(Sweep):
         self.properties.saturation = Ms
         return Ms
 
-    def segments(self, edge_frac=0.05, prominence=1e6):
+    def segments(self, edge_frac=0.05, prominence=1e6, **kwargs):
         r"""
         Find indices of segmentation points which can be used to seperate each
         measurement segment from each other. The segments are seperated by a
@@ -220,10 +166,13 @@ class MH_major(Sweep):
             Percentage of measurement to be treated as edge. Default is 0.05,
             which means that segmentation points closer than 5 % of the total
             measurement width to the edges will be discarded.
-        prominence : FLOAT, optional
+        prominence: FLOAT, optional
             The prominence which is used to find all peaks in H_ext(t). See the
             documentation of scipy.signal.find_peaks for more details.
             The default is 1e6.
+        kwargs: optional
+            Additional keyword arguments that can be used for peak finding.
+            See scipy.signal.find_peaks for more details
 
         Returns
         -------
@@ -237,7 +186,7 @@ class MH_major(Sweep):
         # find all roots
         r = np.nonzero(np.diff(np.sign(m)))[0] + 2
         # find peaks, we know that they must be higher than 3e6 A/m and far apart
-        p = find_peaks(np.abs(h), prominence=prominence)[0]
+        p = find_peaks(np.abs(h), prominence=prominence, **kwargs)[0]
         # all segmentation points
         s = np.sort(np.append(r, p))
         # discard segmentation points if they're very close to start
