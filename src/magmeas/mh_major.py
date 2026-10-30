@@ -205,14 +205,14 @@ class MH_major(Sweep):
                 + "this and try again."
             )
         # find all roots
-        r = np.nonzero(np.diff(np.sign(m)))[0] + 2
+        r = np.nonzero(np.diff(np.sign(m.q)))[0] + 2
         # find peaks, we know that they must be higher than 3e6 A/m and far apart
-        p = find_peaks(np.abs(h), prominence=prominence, **kwargs)[0]
+        p = find_peaks(np.abs(h.q), prominence=prominence, **kwargs)[0]
         # all segmentation points
         s = np.sort(np.append(r, p))
         # discard segmentation points if they're very close to start
-        s = s[len(s[s < (edge_frac * len(h))]) :]
+        s = s[len(s[s < (edge_frac * len(h.q))]) :]
         # discard segmentation points if they're very close to end
-        if len(s[s > ((1 - edge_frac) * len(h))]) != 0:
-            s = s[: -len(s[s > ((1 - edge_frac) * len(h))])]
+        if len(s[s > ((1 - edge_frac) * len(h.q))]) != 0:
+            s = s[: -len(s[s > ((1 - edge_frac) * len(h.q))])]
         return s
