@@ -176,7 +176,7 @@ class MH_major(Sweep):
 
         Returns
         -------
-         s: ARRAY[INT]
+        s: ARRAY[INT]
             Array of segmentation points that can be used to segmentise the
             measurement.
         """
