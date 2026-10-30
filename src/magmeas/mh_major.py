@@ -180,9 +180,30 @@ class MH_major(Sweep):
             Array of segmentation points that can be used to segmentise the
             measurement.
         """
-        t = self.t.q
-        h = self.H_ext.q
-        m = self.M.q
+        if isinstance(self.get_entity_key("ExternalMagneticField"), str):
+            h = self[self.get_entity_key("ExternalMagneticField")]
+        elif isinstance(self.get_entity_key("InternalMagneticField"), str):
+            h = self[self.get_entity_key("InternalMagneticField")]
+        else:
+            raise AttributeError(
+                "The segments method needs exactly one entity with the ontology_label "
+                + "'ExternalMagneticField' or 'InternalMagneticField' in self. "
+                + "Either none or too many were found. Please resolve this and "
+                + "try again."
+            )
+        if isinstance(self.get_entity_key("MagneticMoment"), str):
+            m = self[self.get_entity_key("MagneticMoment")]
+        elif isinstance(self.get_entity_key("Magnetization"), str):
+            m = self[self.get_entity_key("Magnetization")]
+        elif isinstance(self.get_entity_key("MagneticPolarisation"), str):
+            m = self[self.get_entity_key("MagneticPolarisation")]
+        else:
+            raise AttributeError(
+                "The segments method needs exactly one entity with the ontology_label "
+                + "'MagneticMoment', 'Magnetization' or 'MagneticPolarisation' "
+                + "in self. Either none or too many were found. Please resolve "
+                + "this and try again."
+            )
         # find all roots
         r = np.nonzero(np.diff(np.sign(m)))[0] + 2
         # find peaks, we know that they must be higher than 3e6 A/m and far apart
@@ -190,8 +211,8 @@ class MH_major(Sweep):
         # all segmentation points
         s = np.sort(np.append(r, p))
         # discard segmentation points if they're very close to start
-        s = s[len(s[s < (edge_frac * len(t))]) :]
+        s = s[len(s[s < (edge_frac * len(h))]) :]
         # discard segmentation points if they're very close to end
-        if len(s[s > ((1 - edge_frac) * len(t))]) != 0:
-            s = s[: -len(s[s > ((1 - edge_frac) * len(t))])]
+        if len(s[s > ((1 - edge_frac) * len(h))]) != 0:
+            s = s[: -len(s[s > ((1 - edge_frac) * len(h))])]
         return s
