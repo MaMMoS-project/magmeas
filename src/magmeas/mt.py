@@ -106,20 +106,33 @@ class MT(Sweep):
             Array of segmentation points that can be used to segmentise the
             measurement.
         """
-        t = self.t.q
-        T = self.T.q
+        T_key = self.get_entity_key("ThermodynamicTemperature")
+        if isinstance(T_key, str):
+            T = self[T_key]
+        elif T_key is None:
+            raise AttributeError(
+                "No Entity with the ontology_label 'ThermodynamicTemperature' "
+                + "could be found in self. Please provide one and try again."
+            )
+        else:
+            raise AttributeError(
+                "More than one Entity with the ontology_label "
+                + "'ThermodynamicTemperature' could be found in self. "
+                + "Please resolve this ambiguity, make sure only one is present "
+                + "and try again."
+            )
         # find segmentation points
         # look for positive peak in T(t) (when measurement heats above RT)
-        pos_peaks = find_peaks(T, prominence=prominence, **kwargs)[0]
+        pos_peaks = find_peaks(T.q, prominence=prominence, **kwargs)[0]
         # look for negative peak in T(t) (when measurement cools below RT)
-        neg_peaks = find_peaks(-T, prominence=prominence, **kwargs)[0]
+        neg_peaks = find_peaks(-T.q, prominence=prominence, **kwargs)[0]
         # unify all peaks in one segmentation point array
         s = np.sort(np.append(pos_peaks, neg_peaks))
         # discard segmentation points if they're very close to start
-        s = s[len(s[s < (edge_frac * len(t))]) :]
+        s = s[len(s[s < (edge_frac * len(T.q))]) :]
         # discard segmentation points if they're very close to end
-        if len(s[s > ((1 - edge_frac) * len(t))]) != 0:
-            s = s[: -len(s[s > ((1 - edge_frac) * len(t))])]
+        if len(s[s > ((1 - edge_frac) * len(T.q))]) != 0:
+            s = s[: -len(s[s > ((1 - edge_frac) * len(T.q))])]
         return s
 
     def dMdT(self, T, M, kernel_width, edge_frac):
