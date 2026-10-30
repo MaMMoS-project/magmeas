@@ -20,7 +20,7 @@ class MH_recoil(Sweep):
     positive external field which increases the internal field to 0.
     """
 
-    def segments(self, prominence=5e3, **kwargs):
+    def segments(self, edge_frac=0.01, prominence=5e3, **kwargs):
         """
         Get indices of segmentation points. Segmentation point 0 occurs
         at H = H_max. All uneven segmentation points are the start of a recoil
@@ -29,6 +29,10 @@ class MH_recoil(Sweep):
 
         Parameters
         ----------
+        edge_frac: FLOAT, optional
+            Percentage of measurement to be treated as edge. Default is 0.05,
+            which means that segmentation points closer than 5 % of the total
+            measurement width to the edges will be discarded.
         prominence : FLOAT, optional
             The prominence which is used to find all peaks in H_ext(t). See the
             documentation of scipy.signal.find_peaks for more details.
@@ -42,13 +46,29 @@ class MH_recoil(Sweep):
         segments: ARRAY
             Segmentation points used to extract each recoil loop.
         """
-        npeaks, _ = find_peaks(-self.H_ext.q, prominence=prominence, **kwargs)
+        if isinstance(self.get_entity_key("ExternalMagneticField"), str):
+            h = self[self.get_entity_key("ExternalMagneticField")]
+        elif isinstance(self.get_entity_key("InternalMagneticField"), str):
+            h = self[self.get_entity_key("InternalMagneticField")]
+        else:
+            raise AttributeError(
+                "The segments method needs exactly one entity with the ontology_label "
+                + "'ExternalMagneticField' or 'InternalMagneticField' in self. "
+                + "Either none or too many were found. Please resolve this and "
+                + "try again."
+            )
+        npeaks, _ = find_peaks(-h.q, prominence=prominence, **kwargs)
         # npeaks = npeaks[self.H.q[npeaks] < 0] + 1
         npeaks = npeaks + 1
-        ppeaks, _ = find_peaks(self.H_ext.q, prominence=prominence, **kwargs)
+        ppeaks, _ = find_peaks(h.q, prominence=prominence, **kwargs)
         # ppeaks = ppeaks[self.H.q[ppeaks] < 0]
         ppeaks = np.append(ppeaks, len(self.H.q) - 1)
         apeaks = np.sort(np.append(npeaks, ppeaks))
+        # discard segmentation points if they're very close to start
+        apeaks = apeaks[len(apeaks[apeaks < (edge_frac * len(h.q))]) :]
+        # discard segmentation points if they're very close to end
+        if len(apeaks[apeaks > ((1 - edge_frac) * len(h.q))]) != 0:
+            apeaks = apeaks[: -len(apeaks[apeaks > ((1 - edge_frac) * len(h.q))])]
         return apeaks
 
     def recoil_susceptibility(self, prominence=5e3, take_mean=True):
