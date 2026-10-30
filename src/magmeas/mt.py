@@ -15,7 +15,7 @@ class MT(Sweep):
 
     def calc_Tc(
         self,
-        segments=(0, None),
+        segments=None,
         kernel_width=40,
         edge_frac=0.05,
         prominence=0.2,
@@ -35,7 +35,7 @@ class MT(Sweep):
             than using the whole dataset. Experience has shown that the return
             curve is often more useful, but this should be checked for each
             dataset.
-            Default is (0, None).
+            Default is None.
         kernel_width: INT, optional
             Kernel width to be used for smoothing of derivative.
             Default is 40.
@@ -58,21 +58,56 @@ class MT(Sweep):
         Tc: ENTITY
             Curie-Temperature as mammos_entity.Entity
         """
-        start, end = segments
+        T_key = self.get_entity_key("ThermodynamicTemperature")
+        if isinstance(T_key, str):
+            T = self[T_key]
+        elif T_key is None:
+            raise AttributeError(
+                "No Entity with the ontology_label 'ThermodynamicTemperature' "
+                + "could be found in self. Please provide one and try again."
+            )
+        else:
+            raise AttributeError(
+                "More than one Entity with the ontology_label "
+                + "'ThermodynamicTemperature' could be found in self. "
+                + "Please resolve this ambiguity, make sure only one is present "
+                + "and try again."
+            )
+        if isinstance(self.get_entity_key("MagneticMoment"), str):
+            m = self[self.get_entity_key("MagneticMoment")]
+        elif isinstance(self.get_entity_key("Magnetization"), str):
+            m = self[self.get_entity_key("Magnetization")]
+        elif isinstance(self.get_entity_key("MagneticPolarisation"), str):
+            m = self[self.get_entity_key("MagneticPolarisation")]
+        elif isinstance(self.get_entity_key("MagneticMomentPerUnitMass"), str):
+            m = self[self.get_entity_key("MagneticMomentPerUnitMass")]
+        else:
+            raise AttributeError(
+                "The segments method needs exactly one entity with the ontology_label "
+                + "'MagneticMoment', 'Magnetization' or 'MagneticPolarisation' "
+                + "in self. Either none or too many were found. Please resolve "
+                + "this and try again."
+            )
+
+        if segments is None:
+            start = None
+            end = None
+        else:
+            start, end = segments
         if start is not None:
             start = self.segments(edge_frac=edge_frac)[start]
         if end is not None:
             end = self.segments(edge_frac=edge_frac)[end]
+        T = T[start:end]
+        m = m[start:end]
 
-        T = self.T.q[start:end]
-        M = self.M.q[start:end]
-        dMdT = self.dMdT(T, M, kernel_width, edge_frac)
+        dMdT = self.dMdT(T.q, m.q, kernel_width, edge_frac)
         # norm dM/dT to values between -1 and 1
         ndMdT = (dMdT - np.nanmin(dMdT)) / (np.nanmax(dMdT) - np.nanmin(dMdT))
         # find peaks in normalised dM/dT
         p = find_peaks(-ndMdT, prominence=prominence)[0]
         # sort peaks
-        Tc = np.sort(T[p])
+        Tc = np.sort(T.q[p])
         # pass all peaks of normalised dM/dT to Curie-Temperature
         # the user should decide themselves, which of them make sense and recalculate
         Tc = me.Entity("CurieTemperature", Tc, "K")
