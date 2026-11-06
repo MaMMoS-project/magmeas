@@ -337,6 +337,90 @@ class Sweep(me.EntityCollection):
             "A/m",
         )
 
+    def calc_B(self, **kwargs):
+        r"""
+        Calculate MagneticFluxDensity and assign it to self with the key 'B'.
+        For this, self must contain one (and only one) Entity which has the
+        ontology_label 'InternalMagneticField' and one of the following:
+
+        - an Entity with the ontology_label 'Magnetization'
+        - an Entity with the ontology_label 'MagneticPolarisation'
+
+        If more than one variant would be possible, only one will be chosen. The
+        choice will fall on the option higher in the list above. If the thus
+        chosen option is satisfied by more than one Entity contained in self,
+        the calculation will be canceled as the ambiguity cannot be fixed
+        automatically (e.g. two Entities have the ontology_label 'Magnetization').
+        Optionally, the needed Entities from the list above can be given as
+        keyword arguments of this function to provide them for this calculation.
+        They will then be assigned to self and the same logic as before is
+        followed. Assignments to self will happen whether the given Entities
+        are used in the calculation or not. Already assigned Entities will be
+        overwritten if the same key is used, which also applies to entities with
+        the key 'B'.
+        The following equations will be used:
+
+        .. math::    
+
+            B &= \mu _0 \cdot (H_{int} + M)\\
+            B &= \mu _0 \cdot H_{int} + J
+
+        Parameters
+        ----------
+        kwargs: ENTITY, optional
+            Keyword arguments that will be assigned to self and possibly
+            contribute to the calculation of B if they are relevant.
+
+        Returns
+        -------
+        None
+        """
+        field_key = self.get_entity_key("InternalMagneticField")
+        if field_key is None:
+            raise AttributeError(
+                "No entity with the ontology_label 'InternalMagneticField' could be "
+                + "found in self. Please provide a InternalMagneticField first and try "
+                + "again."
+            )
+        if isinstance(field_key, list):
+            raise AttributeError(
+                "More than one entity with the ontology_label 'InternalMagneticField' "
+                + "could be found in self. Please provide only one. The entities "
+                + f"found were {field_key}."
+            )
+
+        for key, value in kwargs.items():
+            if isinstance(value, me.Entity):
+                self[key] = value
+            else:
+                raise TypeError(
+                    f"The type of the kwarg ´{key}´ was {type(value)}, which is not "
+                    + "allowed for this method. Please only pass kwargs of type "
+                    + "mammos_entity.Entity to this method."
+                )
+
+        magn_key = self.get_entity_key("Magnetization")
+        pol_key = self.get_entity_key("MagneticPolarisation")
+        if isinstance(magn_key, str):
+            self["B"] = me.Entity(
+                "MagneticFluxDensity",
+                u.constants.mu0 * (self[field_key].q + self[magn_key].q),
+                "T",
+            )
+        elif isinstance(pol_key, str):
+            self["B"] = me.Entity(
+                "MagneticFluxDensity",
+                u.constants.mu0 * self[field_key].q + self[pol_key].q,
+                "T",
+            )
+        else:
+            raise AttributeError(
+                "No suitable sample information "
+                + "(InternalMagneticField & (Magnetization | MagneticPolarisation)) "
+                + "could be found within self. Please provide sufficient information "
+                + "for the calculation of B, see the docstring and try again."
+            )
+
     def plot(
         self,
         *args,
