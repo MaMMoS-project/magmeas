@@ -57,7 +57,7 @@ class MH_major(Sweep):
                 + "kwargs and try again. See self.segments for more information."
             )
         else:
-            idx = np.argsort(self[int_field_key].q[:s[0]])
+            idx = np.argsort(self[int_field_key].q[: s[0]])
         prop = extrinsic_properties(
             self[int_field_key].q[idx],
             self[magnetisation_key].q[idx],
