@@ -16,12 +16,17 @@ class MH_major(Sweep):
     hysteresis loop M(H) measurements aswell as derived properties.
     """
 
-    def calc_properties(self, **kwargs):
+    def calc_properties(self, demag_only=False, **kwargs):
         """
         Calculate extrinsic magnetic properties from the demagnetisation curve
 
         Parameters
         ----------
+        demag_only: BOOL, optional
+            Whether the dataset in self only contains the demagnetisation curve
+            and no initial magnetisation. This affects the number of expected
+            segmentation points in the dataset (see self.segments).
+            Default is False.
         kwargs: optional
             Keyword arguments used for the segmentation. See MH_major.segments
             for more details
@@ -35,11 +40,29 @@ class MH_major(Sweep):
         if magnetisation_key is None or int_field_key is None:
             raise AttributeError(
                 "Either the Magnetization or the InternalMagneticField could "
-                + "not be found in self. This is currently not yet supported."
+                + "not be found in self. This is currently not supported."
             )
         s = self.segments(**kwargs)
-        idx = np.argsort(self.H.q[s[0] : s[1]]) + s[0]
-        prop = extrinsic_properties(self.H.q[idx], self.M.q[idx], 0)
+        if not demag_only and (len(s) < 2):
+            raise ValueError(
+                f"Not enough segmentation points were found, only {len(s)}. "
+                + "Please make sure that enough segmentation points can be "
+                + "found and adjust demag_only and kwargs if needed."
+            )
+        elif not demag_only and (len(s) >= 2):
+            idx = np.argsort(self[int_field_key].q[s[0] : s[1]]) + s[0]
+        elif demag_only and (len(s) < 1):
+            raise ValueError(
+                "No segmentation points could be found. Please adjust the "
+                + "kwargs and try again. See self.segments for more information."
+            )
+        else:
+            idx = np.argsort(self[int_field_key].q[:s[0]])
+        prop = extrinsic_properties(
+            self[int_field_key].q[idx],
+            self[magnetisation_key].q[idx],
+            0,
+        )
         self.Mr = me.Entity("Remanence", prop.Mr.q, "MA/m")
         self.Hc = me.Entity("CoercivityHc", prop.Hc.q, "MA/m")
         self.BHmax = me.Entity("MaximumEnergyProduct", prop.BHmax.q, "kJ/m3")
