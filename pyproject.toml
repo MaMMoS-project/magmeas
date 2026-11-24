@@ -37,7 +37,9 @@ dynamic = ["version"]
 dev = [
     "ruff",
     "pre-commit >= 1.16",
-    "pytest"
+    "pytest",
+    "build",
+    "twine",
 ]
 
 doc = [
