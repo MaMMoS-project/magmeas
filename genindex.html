@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; magmeas 0.5.1 documentation</title>
+    <title>Index &#8212; magmeas 0.6.0 documentation</title>
   
   
   
@@ -26,26 +25,27 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="_static/documentation_options.js?v=b9afe91b"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/documentation_options.js?v=8fa8b3e9"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
   
@@ -65,7 +65,9 @@
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -93,7 +95,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -113,7 +115,7 @@
   
   
   
-    <p class="title logo__title">magmeas 0.5.1 documentation</p>
+    <p class="title logo__title">magmeas 0.6.0 documentation</p>
   
 </a></div>
     
@@ -151,7 +153,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -161,11 +163,18 @@
       
         <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
       
     </div>
     
@@ -174,7 +183,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -195,7 +204,7 @@
       
         
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
@@ -236,11 +245,18 @@
         
           <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
         
       </div>
     
@@ -278,65 +294,100 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#B"><strong>B</strong></a>
- | <a href="#C"><strong>C</strong></a>
+ <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
- | <a href="#H"><strong>H</strong></a>
- | <a href="#K"><strong>K</strong></a>
+ | <a href="#G"><strong>G</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
- | <a href="#V"><strong>V</strong></a>
  
 </div>
-<h2 id="B">B</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.MH_major.BHmax">BHmax (magmeas.base.MH_major property)</a>
-</li>
-  </ul></td>
-</tr></table>
-
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.MH_major.coercivity">coercivity (magmeas.base.MH_major property)</a>
+      <li><a href="api_ref.html#magmeas.FORC.calc_B">calc_B() (magmeas.FORC method)</a>
+
+      <ul>
+        <li><a href="api_ref.html#magmeas.MH_major.calc_B">(magmeas.MH_major method)</a>
 </li>
+        <li><a href="api_ref.html#magmeas.MH_recoil.calc_B">(magmeas.MH_recoil method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MT.calc_B">(magmeas.MT method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.Sweep.calc_B">(magmeas.Sweep method)</a>
+</li>
+      </ul></li>
+      <li><a href="api_ref.html#magmeas.MH_major.calc_Hk">calc_Hk() (magmeas.MH_major method)</a>
+</li>
+      <li><a href="api_ref.html#magmeas.FORC.calc_M">calc_M() (magmeas.FORC method)</a>
+
+      <ul>
+        <li><a href="api_ref.html#magmeas.MH_major.calc_M">(magmeas.MH_major method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MH_recoil.calc_M">(magmeas.MH_recoil method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MT.calc_M">(magmeas.MT method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.Sweep.calc_M">(magmeas.Sweep method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref.html#magmeas.MH_major.calc_properties">calc_properties() (magmeas.MH_major method)</a>
+</li>
+      <li><a href="api_ref.html#magmeas.MH_major.calc_SF">calc_SF() (magmeas.MH_major method)</a>
+</li>
+      <li><a href="api_ref.html#magmeas.MT.calc_Tc">calc_Tc() (magmeas.MT method)</a>
+</li>
+      <li><a href="api_ref.html#magmeas.FORC.corr_demag">corr_demag() (magmeas.FORC method)</a>
+
+      <ul>
+        <li><a href="api_ref.html#magmeas.MH_major.corr_demag">(magmeas.MH_major method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MH_recoil.corr_demag">(magmeas.MH_recoil method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MT.corr_demag">(magmeas.MT method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.Sweep.corr_demag">(magmeas.Sweep method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.FORC.description">description (magmeas.base.FORC property)</a>
+      <li><a href="api_ref.html#magmeas.FORC.description">description (magmeas.FORC property)</a>
 
       <ul>
-        <li><a href="api_ref.html#magmeas.base.MH.description">(magmeas.base.MH property)</a>
+        <li><a href="api_ref.html#magmeas.MH_major.description">(magmeas.MH_major property)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.description">(magmeas.base.MH_major property)</a>
+        <li><a href="api_ref.html#magmeas.MH_recoil.description">(magmeas.MH_recoil property)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.description">(magmeas.base.MH_recoil property)</a>
+        <li><a href="api_ref.html#magmeas.MT.description">(magmeas.MT property)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MT.description">(magmeas.base.MT property)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.VSM.description">(magmeas.base.VSM property)</a>
+        <li><a href="api_ref.html#magmeas.Sweep.description">(magmeas.Sweep property)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref.html#magmeas.MT.dMdT">dMdT() (magmeas.MT method)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.MH_major.estimate_saturation">estimate_saturation() (magmeas.base.MH_major method)</a>
+      <li><a href="api_ref.html#magmeas.MH_major.estimate_saturation">estimate_saturation() (magmeas.MH_major method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.MH_recoil.external_comp_field">external_comp_field() (magmeas.base.MH_recoil method)</a>
+      <li><a href="api_ref.html#magmeas.MH_recoil.external_comp_field">external_comp_field() (magmeas.MH_recoil method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -344,137 +395,81 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.FORC">FORC (class in magmeas.base)</a>
+      <li><a href="api_ref.html#magmeas.FORC">FORC (class in magmeas)</a>
 </li>
-      <li><a href="api_ref.html#magmeas.base.FORC.forc_dist">forc_dist() (magmeas.base.FORC method)</a>
+      <li><a href="api_ref.html#magmeas.FORC.forc_dist">forc_dist() (magmeas.FORC method)</a>
 </li>
-      <li><a href="api_ref.html#magmeas.base.FORC.forc_grid">forc_grid() (magmeas.base.FORC method)</a>
+      <li><a href="api_ref.html#magmeas.FORC.forc_grid">forc_grid() (magmeas.FORC method)</a>
 </li>
-      <li><a href="api_ref.html#magmeas.base.FORC.from_dataframe">from_dataframe() (magmeas.base.FORC class method)</a>
+      <li><a href="api_ref.html#magmeas.FORC.from_dataframe">from_dataframe() (magmeas.FORC class method)</a>
 
       <ul>
-        <li><a href="api_ref.html#magmeas.base.MH.from_dataframe">(magmeas.base.MH class method)</a>
+        <li><a href="api_ref.html#magmeas.MH_major.from_dataframe">(magmeas.MH_major class method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.from_dataframe">(magmeas.base.MH_major class method)</a>
+        <li><a href="api_ref.html#magmeas.MH_recoil.from_dataframe">(magmeas.MH_recoil class method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.from_dataframe">(magmeas.base.MH_recoil class method)</a>
+        <li><a href="api_ref.html#magmeas.MT.from_dataframe">(magmeas.MT class method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MT.from_dataframe">(magmeas.base.MT class method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.VSM.from_dataframe">(magmeas.base.VSM class method)</a>
+        <li><a href="api_ref.html#magmeas.Sweep.from_dataframe">(magmeas.Sweep class method)</a>
 </li>
       </ul></li>
   </ul></td>
 </tr></table>
 
-<h2 id="H">H</h2>
+<h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.FORC.H">H (magmeas.base.FORC property)</a>
+      <li><a href="api_ref.html#magmeas.FORC.get_entity_key">get_entity_key() (magmeas.FORC method)</a>
 
       <ul>
-        <li><a href="api_ref.html#magmeas.base.MH.H">(magmeas.base.MH property)</a>
+        <li><a href="api_ref.html#magmeas.MH_major.get_entity_key">(magmeas.MH_major method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.H">(magmeas.base.MH_major property)</a>
+        <li><a href="api_ref.html#magmeas.MH_recoil.get_entity_key">(magmeas.MH_recoil method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.H">(magmeas.base.MH_recoil property)</a>
+        <li><a href="api_ref.html#magmeas.MT.get_entity_key">(magmeas.MT method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MT.H">(magmeas.base.MT property)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.VSM.H">(magmeas.base.VSM property)</a>
+        <li><a href="api_ref.html#magmeas.Sweep.get_entity_key">(magmeas.Sweep method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.FORC.H_ext">H_ext (magmeas.base.FORC property)</a>
-
-      <ul>
-        <li><a href="api_ref.html#magmeas.base.MH.H_ext">(magmeas.base.MH property)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.H_ext">(magmeas.base.MH_major property)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.H_ext">(magmeas.base.MH_recoil property)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MT.H_ext">(magmeas.base.MT property)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.VSM.H_ext">(magmeas.base.VSM property)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="K">K</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.MH_major.kneefield">kneefield (magmeas.base.MH_major property)</a>
-</li>
   </ul></td>
 </tr></table>
 
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.FORC.M">M (magmeas.base.FORC property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.FORC.m">m (magmeas.base.FORC property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH.M">M (magmeas.base.MH property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH.m">m (magmeas.base.MH property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH_major.M">M (magmeas.base.MH_major property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH_major.m">m (magmeas.base.MH_major property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH_recoil.M">M (magmeas.base.MH_recoil property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH_recoil.m">m (magmeas.base.MH_recoil property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MT.M">M (magmeas.base.MT property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MT.m">m (magmeas.base.MT property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.VSM.M">M (magmeas.base.VSM property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.VSM.m">m (magmeas.base.VSM property)</a>
-</li>
       <li>
-    magmeas.base
+    magmeas
 
       <ul>
-        <li><a href="api_ref.html#module-magmeas.base">module</a>
+        <li><a href="api_ref.html#module-magmeas">module</a>
+</li>
+      </ul></li>
+      <li><a href="api_ref.html#magmeas.FORC.metadata">metadata() (magmeas.FORC method)</a>
+
+      <ul>
+        <li><a href="api_ref.html#magmeas.MH_major.metadata">(magmeas.MH_major method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MH_recoil.metadata">(magmeas.MH_recoil method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MT.metadata">(magmeas.MT method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.Sweep.metadata">(magmeas.Sweep method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.FORC.metadata">metadata() (magmeas.base.FORC method)</a>
-
-      <ul>
-        <li><a href="api_ref.html#magmeas.base.MH.metadata">(magmeas.base.MH method)</a>
+      <li><a href="api_ref.html#magmeas.MH_major">MH_major (class in magmeas)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.metadata">(magmeas.base.MH_major method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.metadata">(magmeas.base.MH_recoil method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MT.metadata">(magmeas.base.MT method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.VSM.metadata">(magmeas.base.VSM method)</a>
-</li>
-      </ul></li>
-      <li><a href="api_ref.html#magmeas.base.MH">MH (class in magmeas.base)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH_major">MH_major (class in magmeas.base)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH_recoil">MH_recoil (class in magmeas.base)</a>
+      <li><a href="api_ref.html#magmeas.MH_recoil">MH_recoil (class in magmeas)</a>
 </li>
       <li>
     module
 
       <ul>
-        <li><a href="api_ref.html#module-magmeas.base">magmeas.base</a>
+        <li><a href="api_ref.html#module-magmeas">magmeas</a>
 </li>
       </ul></li>
-      <li><a href="api_ref.html#magmeas.base.MT">MT (class in magmeas.base)</a>
+      <li><a href="api_ref.html#magmeas.MT">MT (class in magmeas)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -482,61 +477,51 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.FORC.path">path (magmeas.base.FORC property)</a>
+      <li><a href="api_ref.html#magmeas.FORC.plot">plot() (magmeas.FORC method)</a>
 
       <ul>
-        <li><a href="api_ref.html#magmeas.base.MH.path">(magmeas.base.MH property)</a>
+        <li><a href="api_ref.html#magmeas.MH_major.plot">(magmeas.MH_major method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.path">(magmeas.base.MH_major property)</a>
+        <li><a href="api_ref.html#magmeas.MH_recoil.plot">(magmeas.MH_recoil method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.path">(magmeas.base.MH_recoil property)</a>
+        <li><a href="api_ref.html#magmeas.MT.plot">(magmeas.MT method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MT.path">(magmeas.base.MT property)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.VSM.path">(magmeas.base.VSM property)</a>
+        <li><a href="api_ref.html#magmeas.Sweep.plot">(magmeas.Sweep method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.FORC.plot">plot() (magmeas.base.FORC method)</a>
-
-      <ul>
-        <li><a href="api_ref.html#magmeas.base.MH.plot">(magmeas.base.MH method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.plot">(magmeas.base.MH_major method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.plot">(magmeas.base.MH_recoil method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MT.plot">(magmeas.base.MT method)</a>
-</li>
-      </ul></li>
-      <li><a href="api_ref.html#magmeas.base.plot_batch">plot_batch() (in module magmeas.base)</a>
-</li>
   </ul></td>
 </tr></table>
 
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.MH_recoil.recoil_susceptibility">recoil_susceptibility() (magmeas.base.MH_recoil method)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.FORC.reload_qd">reload_qd() (magmeas.base.FORC method)</a>
+      <li><a href="api_ref.html#magmeas.FORC.read_custom">read_custom() (magmeas.FORC method)</a>
 
       <ul>
-        <li><a href="api_ref.html#magmeas.base.MH.reload_qd">(magmeas.base.MH method)</a>
+        <li><a href="api_ref.html#magmeas.MH_major.read_custom">(magmeas.MH_major method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.reload_qd">(magmeas.base.MH_major method)</a>
+        <li><a href="api_ref.html#magmeas.MH_recoil.read_custom">(magmeas.MH_recoil method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.reload_qd">(magmeas.base.MH_recoil method)</a>
+        <li><a href="api_ref.html#magmeas.MT.read_custom">(magmeas.MT method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MT.reload_qd">(magmeas.base.MT method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.VSM.reload_qd">(magmeas.base.VSM method)</a>
+        <li><a href="api_ref.html#magmeas.Sweep.read_custom">(magmeas.Sweep method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.MH_major.remanence">remanence (magmeas.base.MH_major property)</a>
+      <li><a href="api_ref.html#magmeas.FORC.read_PPMS">read_PPMS() (magmeas.FORC method)</a>
+
+      <ul>
+        <li><a href="api_ref.html#magmeas.MH_major.read_PPMS">(magmeas.MH_major method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MH_recoil.read_PPMS">(magmeas.MH_recoil method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MT.read_PPMS">(magmeas.MT method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.Sweep.read_PPMS">(magmeas.Sweep method)</a>
+</li>
+      </ul></li>
+      <li><a href="api_ref.html#magmeas.MH_recoil.recoil_susceptibility">recoil_susceptibility() (magmeas.MH_recoil method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -544,21 +529,19 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.MH_major.saturation">saturation (magmeas.base.MH_major property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.FORC.segments">segments() (magmeas.base.FORC method)</a>
+      <li><a href="api_ref.html#magmeas.FORC.segments">segments() (magmeas.FORC method)</a>
 
       <ul>
-        <li><a href="api_ref.html#magmeas.base.MH_major.segments">(magmeas.base.MH_major method)</a>
+        <li><a href="api_ref.html#magmeas.MH_major.segments">(magmeas.MH_major method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.segments">(magmeas.base.MH_recoil method)</a>
+        <li><a href="api_ref.html#magmeas.MH_recoil.segments">(magmeas.MH_recoil method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MT.segments">(magmeas.base.MT method)</a>
+        <li><a href="api_ref.html#magmeas.MT.segments">(magmeas.MT method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.MH_major.squareness">squareness (magmeas.base.MH_major property)</a>
+      <li><a href="api_ref.html#magmeas.Sweep">Sweep (class in magmeas)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -566,104 +549,56 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.FORC.T">T (magmeas.base.FORC property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.FORC.t">t (magmeas.base.FORC property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH.T">T (magmeas.base.MH property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH.t">t (magmeas.base.MH property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH_major.T">T (magmeas.base.MH_major property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH_major.t">t (magmeas.base.MH_major property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH_recoil.T">T (magmeas.base.MH_recoil property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MH_recoil.t">t (magmeas.base.MH_recoil property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MT.T">T (magmeas.base.MT property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MT.t">t (magmeas.base.MT property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.VSM.T">T (magmeas.base.VSM property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.VSM.t">t (magmeas.base.VSM property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.MT.Tc">Tc (magmeas.base.MT property)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.to_batch">to_batch() (in module magmeas.base)</a>
-</li>
-      <li><a href="api_ref.html#magmeas.base.FORC.to_csv">to_csv() (magmeas.base.FORC method)</a>
+      <li><a href="api_ref.html#magmeas.FORC.to_csv">to_csv() (magmeas.FORC method)</a>
 
       <ul>
-        <li><a href="api_ref.html#magmeas.base.MH.to_csv">(magmeas.base.MH method)</a>
+        <li><a href="api_ref.html#magmeas.MH_major.to_csv">(magmeas.MH_major method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.to_csv">(magmeas.base.MH_major method)</a>
+        <li><a href="api_ref.html#magmeas.MH_recoil.to_csv">(magmeas.MH_recoil method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.to_csv">(magmeas.base.MH_recoil method)</a>
+        <li><a href="api_ref.html#magmeas.MT.to_csv">(magmeas.MT method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MT.to_csv">(magmeas.base.MT method)</a>
+        <li><a href="api_ref.html#magmeas.Sweep.to_csv">(magmeas.Sweep method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.VSM.to_csv">(magmeas.base.VSM method)</a>
+      </ul></li>
+      <li><a href="api_ref.html#magmeas.FORC.to_dataframe">to_dataframe() (magmeas.FORC method)</a>
+
+      <ul>
+        <li><a href="api_ref.html#magmeas.MH_major.to_dataframe">(magmeas.MH_major method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MH_recoil.to_dataframe">(magmeas.MH_recoil method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.MT.to_dataframe">(magmeas.MT method)</a>
+</li>
+        <li><a href="api_ref.html#magmeas.Sweep.to_dataframe">(magmeas.Sweep method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.FORC.to_dataframe">to_dataframe() (magmeas.base.FORC method)</a>
+      <li><a href="api_ref.html#magmeas.FORC.to_hdf5">to_hdf5() (magmeas.FORC method)</a>
 
       <ul>
-        <li><a href="api_ref.html#magmeas.base.MH.to_dataframe">(magmeas.base.MH method)</a>
+        <li><a href="api_ref.html#magmeas.MH_major.to_hdf5">(magmeas.MH_major method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.to_dataframe">(magmeas.base.MH_major method)</a>
+        <li><a href="api_ref.html#magmeas.MH_recoil.to_hdf5">(magmeas.MH_recoil method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.to_dataframe">(magmeas.base.MH_recoil method)</a>
+        <li><a href="api_ref.html#magmeas.MT.to_hdf5">(magmeas.MT method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MT.to_dataframe">(magmeas.base.MT method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.VSM.to_dataframe">(magmeas.base.VSM method)</a>
+        <li><a href="api_ref.html#magmeas.Sweep.to_hdf5">(magmeas.Sweep method)</a>
 </li>
       </ul></li>
-      <li><a href="api_ref.html#magmeas.base.to_hdf5">to_hdf5() (in module magmeas.base)</a>
+      <li><a href="api_ref.html#magmeas.FORC.to_yaml">to_yaml() (magmeas.FORC method)</a>
 
       <ul>
-        <li><a href="api_ref.html#magmeas.base.FORC.to_hdf5">(magmeas.base.FORC method)</a>
+        <li><a href="api_ref.html#magmeas.MH_major.to_yaml">(magmeas.MH_major method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH.to_hdf5">(magmeas.base.MH method)</a>
+        <li><a href="api_ref.html#magmeas.MH_recoil.to_yaml">(magmeas.MH_recoil method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.to_hdf5">(magmeas.base.MH_major method)</a>
+        <li><a href="api_ref.html#magmeas.MT.to_yaml">(magmeas.MT method)</a>
 </li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.to_hdf5">(magmeas.base.MH_recoil method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MT.to_hdf5">(magmeas.base.MT method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.VSM.to_hdf5">(magmeas.base.VSM method)</a>
+        <li><a href="api_ref.html#magmeas.Sweep.to_yaml">(magmeas.Sweep method)</a>
 </li>
       </ul></li>
-      <li><a href="api_ref.html#magmeas.base.to_yaml">to_yaml() (in module magmeas.base)</a>
-
-      <ul>
-        <li><a href="api_ref.html#magmeas.base.FORC.to_yaml">(magmeas.base.FORC method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MH.to_yaml">(magmeas.base.MH method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MH_major.to_yaml">(magmeas.base.MH_major method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MH_recoil.to_yaml">(magmeas.base.MH_recoil method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.MT.to_yaml">(magmeas.base.MT method)</a>
-</li>
-        <li><a href="api_ref.html#magmeas.base.VSM.to_yaml">(magmeas.base.VSM method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="V">V</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_ref.html#magmeas.base.VSM">VSM (class in magmeas.base)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -696,8 +631,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -717,8 +652,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -731,7 +665,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

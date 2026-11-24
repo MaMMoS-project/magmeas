@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>magmeas.sweep &#8212; magmeas 0.6.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
+
+    <script src="../../_static/documentation_options.js?v=8fa8b3e9"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/magmeas/sweep';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">magmeas 0.6.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../notebooks/getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api_ref.html">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../notebooks/getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api_ref.html">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-house"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">magmeas.sweep</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for magmeas.sweep</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Magnetometric Sweep class."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">mammos_entity</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">me</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mammos_units</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">u</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mammos_analysis.demag</span><span class="w"> </span><span class="kn">import</span> <span class="n">demag_cuboid</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">magmeas._utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_arg_processing</span>
+
+
+<div class="viewcode-block" id="Sweep">
+<a class="viewcode-back" href="../../api_ref.html#magmeas.Sweep">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Sweep</span><span class="p">(</span><span class="n">me</span><span class="o">.</span><span class="n">EntityCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Class for importing, storing and using of magnetometric data aswell as derived</span>
+<span class="sd">    parameters.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="Sweep.read_custom">
+<a class="viewcode-back" href="../../api_ref.html#magmeas.Sweep.read_custom">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_custom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reader_func</span><span class="p">,</span> <span class="o">*</span><span class="n">reader_args</span><span class="p">,</span> <span class="o">**</span><span class="n">reader_kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Use a custom reader function and assign its output to self.</span>
+<span class="sd">        This is intended to expand the file reading functionality of magmeas</span>
+<span class="sd">        with custom functions for currently unsupported file types. It could</span>
+<span class="sd">        however also be used to group several initialisation steps together,</span>
+<span class="sd">        as all outputs of the custom reader function will be assigned to self</span>
+<span class="sd">        without any checks. This doesn't only have to be measurement data like</span>
+<span class="sd">        the ExternalMagneticField but could also be sample information, already</span>
+<span class="sd">        calculated properties or anything else.</span>
+
+<span class="sd">        The custom reader function `reader_func`is expected to return a single</span>
+<span class="sd">        dictionary or mammos_entity.EntityCollection object. Its contents will</span>
+<span class="sd">        be assigned to self without checks. It is strongly encouraged to only</span>
+<span class="sd">        include mammos_entity.Entity objects in those output containers, since</span>
+<span class="sd">        only those can later be used for magmeas-internal calculations.</span>
+<span class="sd">        Please keep in mind, that some already present contents of self might be</span>
+<span class="sd">        overwritten if the same keys are used.</span>
+
+<span class="sd">        Also returns self, so the following works:</span>
+
+<span class="sd">            some_data = magmeas.Sweep().read_custom(some_func, 'path/to/file.DAT')</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reader_func: FUNCTION</span>
+<span class="sd">            The custom reader function which will return a dictionary or a</span>
+<span class="sd">            mammos_entity.EntityCollection object with Entities that will be</span>
+<span class="sd">            assigned to self.</span>
+<span class="sd">        reader_args: optional</span>
+<span class="sd">            Arguments which will be passed to reader_func. This could for</span>
+<span class="sd">            example be the path to a file which is supposed to be read.</span>
+<span class="sd">        reader_kwargs: optional</span>
+<span class="sd">            Keyword arguments which will be passed to reader_func.</span>
+<span class="sd">        """</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">reader_func</span><span class="p">(</span><span class="o">*</span><span class="n">reader_args</span><span class="p">,</span> <span class="o">**</span><span class="n">reader_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">EntityCollection</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"The reader_func returned an object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">output</span><span class="p">)</span><span class="si">}</span><span class="s2">. "</span>
+                <span class="o">+</span> <span class="s2">"This is currently not supported. Please only use reader "</span>
+                <span class="o">+</span> <span class="s2">"functions which return objects of type dictionary or "</span>
+                <span class="o">+</span> <span class="s2">"mammos_entity.EntityCollection."</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="Sweep.read_PPMS">
+<a class="viewcode-back" href="../../api_ref.html#magmeas.Sweep.read_PPMS">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_PPMS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Read VSM-data from a Quantum Design .DAT file generated with Quantum</span>
+<span class="sd">        Designs PPMS, DynaCool or VersaLab devices and assign it to self.</span>
+<span class="sd">        Also returns self, so the following works:</span>
+
+<span class="sd">            some_data = magmeas.Sweep().read_PPMS('path/to/file.DAT')</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filepath: STR | PATH</span>
+<span class="sd">            Path to Quantum Design .DAT file that data is supposed to be</span>
+<span class="sd">            imported from</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        SWEEP-like</span>
+<span class="sd">            Returns self, see above.</span>
+<span class="sd">        """</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">magmeas.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_PPMS</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_custom</span><span class="p">(</span><span class="n">read_PPMS</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="Sweep.get_entity_key">
+<a class="viewcode-back" href="../../api_ref.html#magmeas.Sweep.get_entity_key">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_entity_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ontology_label</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Check, whether collection contains entities of the given label and</span>
+<span class="sd">        return their respective keys. If no entities of this label can be found,</span>
+<span class="sd">        then None is returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ontology_label: STR</span>
+<span class="sd">            Ontology label of the entities for which the keys are supposed to</span>
+<span class="sd">            be returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        STR | LIST[STR] | NONE</span>
+<span class="sd">            None if entities with the given ontology label could not be found,</span>
+<span class="sd">            the key of the entity that had the specified label if only one was</span>
+<span class="sd">            found or a list of all keys for which the respective entity has the</span>
+<span class="sd">            specified ontology label.</span>
+<span class="sd">        """</span>
+        <span class="n">entities</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="o">.</span><span class="n">ontology_label</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">entities</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">ontology_label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">entities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">ontology_label</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="n">ontology_label</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="n">ontology_label</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Sweep.calc_M">
+<a class="viewcode-back" href="../../api_ref.html#magmeas.Sweep.calc_M">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_M</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Calculate Magnetization and MagneticPolarization and assign them to self</span>
+<span class="sd">        with the respective keys 'M' and 'J'.</span>
+<span class="sd">        For this, self must contain one (and only one) Entity which has the</span>
+<span class="sd">        ontology_label 'MagneticMoment' and one of the following:</span>
+
+<span class="sd">        - an Entity with the ontology_label 'Volume'</span>
+<span class="sd">        - an Entity with the ontology_label 'Mass' AND one with 'Density'</span>
+<span class="sd">        - an Entity with the ontology_label 'Length', containing three values</span>
+<span class="sd">          (and only three!) which are assumed to be the side lenghts of a</span>
+<span class="sd">          rectangular cuboid</span>
+
+<span class="sd">        If more than one variant would be possible, only one will be chosen. The</span>
+<span class="sd">        choice will fall on the option higher in the list above. If the thus</span>
+<span class="sd">        chosen option is satisfied by more than one Entity contained in self,</span>
+<span class="sd">        the calculation will be canceled as the ambiguity cannot be fixed</span>
+<span class="sd">        automatically (e.g. two Entities have the ontology_label 'Volume').</span>
+<span class="sd">        Optionally, the needed Entities from the list above can be given as</span>
+<span class="sd">        keyword arguments of this function to provide them for this calculation.</span>
+<span class="sd">        They will then be assigned to self and the same logic as before is</span>
+<span class="sd">        followed. Assignments to self will happen whether the given Entities</span>
+<span class="sd">        are used in the calculation or not. Already assigned Entities will be</span>
+<span class="sd">        overwritten if the same key is used, which also applies to entities with</span>
+<span class="sd">        the keys 'M' and 'J'.</span>
+
+<span class="sd">        The following equations are used:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            M &amp;= \frac{\mu}{V}\\</span>
+<span class="sd">            J &amp;= \mu _0 \cdot M\\</span>
+<span class="sd">            V &amp;= m \cdot \rho\\</span>
+<span class="sd">            V &amp;= l_1 \cdot l_2 \cdot l_3</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs: ENTITY, optional</span>
+<span class="sd">            Keyword arguments that will be assigned to self and possibly</span>
+<span class="sd">            contribute to the calculation of M and J if they are relevant.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
+        <span class="n">moment_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"MagneticMoment"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">moment_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">"No entity with the ontology_label 'MagneticMoment' could be "</span>
+                <span class="o">+</span> <span class="s2">"found in self. Please provide a MagneticMoment first and try "</span>
+                <span class="o">+</span> <span class="s2">"again."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">moment_key</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">"More than one entity with the ontology_label 'MagneticMoment' "</span>
+                <span class="o">+</span> <span class="s2">"could be found in self. Please provide only one. The entities "</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">"found were </span><span class="si">{</span><span class="n">moment_key</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">):</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"The type of the kwarg ´</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">´ was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">, which is not "</span>
+                    <span class="o">+</span> <span class="s2">"allowed for this method. Please only pass kwargs of type "</span>
+                    <span class="o">+</span> <span class="s2">"mammos_entity.Entity to this method."</span>
+                <span class="p">)</span>
+
+        <span class="n">volume_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"Volume"</span><span class="p">)</span>
+        <span class="n">mass_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"Mass"</span><span class="p">)</span>
+        <span class="n">density_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"Density"</span><span class="p">)</span>
+        <span class="n">length_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"Length"</span><span class="p">)</span>
+        <span class="c1"># self.get_entity_key only returns a str if the ontology_label was found</span>
+        <span class="c1"># exactly once. Therefore, isinstance(key, str) is a sufficient check.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">volume_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">volume_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mass_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">density_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">mass_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span> <span class="o">/</span> <span class="bp">self</span><span class="p">[</span><span class="n">density_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">length_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">length_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"The entity ´</span><span class="si">{</span><span class="n">length_key</span><span class="si">}</span><span class="s2">´ in self does have the ontology_label "</span>
+                    <span class="o">+</span> <span class="s2">"'Length', but not the right shape of (3,). The detected "</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">"shape was </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="n">length_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">."</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">volume</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">length_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="o">*</span> <span class="bp">self</span><span class="p">[</span><span class="n">length_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="o">*</span> <span class="bp">self</span><span class="p">[</span><span class="n">length_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">"No suitable sample information "</span>
+                <span class="o">+</span> <span class="s2">"(volume | (mass &amp; density) | length) "</span>
+                <span class="o">+</span> <span class="s2">"could be found within self. Please provide sufficient information "</span>
+                <span class="o">+</span> <span class="s2">"for the calculation of M, see the docstring and try again."</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"M"</span><span class="p">]</span> <span class="o">=</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">(</span>
+            <span class="s2">"Magnetization"</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">moment_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span> <span class="o">/</span> <span class="n">volume</span><span class="p">,</span>
+            <span class="s2">"A / m"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"J"</span><span class="p">]</span> <span class="o">=</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">(</span>
+            <span class="s2">"MagneticPolarisation"</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">moment_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span> <span class="o">/</span> <span class="n">volume</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">mu0</span><span class="p">,</span>
+            <span class="s2">"T"</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sweep.corr_demag">
+<a class="viewcode-back" href="../../api_ref.html#magmeas.Sweep.corr_demag">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">corr_demag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Correct the ExternalMagneticField for the demagnetising field created by</span>
+<span class="sd">        the samples own Magnetization. This yields the InternalMagneticField,</span>
+<span class="sd">        which will be assigned to self with the key 'H'.</span>
+<span class="sd">        For this, self must contain one (and only one) Entity which has the</span>
+<span class="sd">        ontology_label 'ExternalMagneticField', another one with 'Magnetization'</span>
+<span class="sd">        and one of the following:</span>
+
+<span class="sd">        - an Entity with the ontology_label 'DemagnetizingFactor'</span>
+<span class="sd">        - an Entity with the ontology_label 'Length', containing three values</span>
+<span class="sd">          (and only three!) which are assumed to be the side lenghts of a</span>
+<span class="sd">          rectangular cuboid. The FIRST value in this Entity is assumed to be</span>
+<span class="sd">          parallel to the direction of the ExternalMagneticField.</span>
+<span class="sd">          The function mammos_analysis.demag.rectangular_cuboid will be used to</span>
+<span class="sd">          calculate the DemagnetizingFactor of this rectangular cuboid. Doing so</span>
+<span class="sd">          manually and only passing the relevant value as its own Entity with</span>
+<span class="sd">          the ontology_label 'DemagnetizingFactor' like above is recommended.</span>
+
+<span class="sd">        If more than one variant would be possible, only one will be chosen. The</span>
+<span class="sd">        choice will fall on the option higher in the list above. If the thus</span>
+<span class="sd">        chosen option is satisfied by more than one Entity contained in self,</span>
+<span class="sd">        the calculation will be canceled as the ambiguity cannot be fixed</span>
+<span class="sd">        automatically (e.g. two Entities have the ontology_label 'Length').</span>
+<span class="sd">        Optionally, the needed Entities from the list above can be given as</span>
+<span class="sd">        keyword arguments of this function to provide them for this calculation.</span>
+<span class="sd">        They will then be assigned to self and the same logic as before is</span>
+<span class="sd">        followed. Assignments to self will happen whether the given Entities</span>
+<span class="sd">        are used in the calculation or not. Already assigned Entities will be</span>
+<span class="sd">        overwritten if the same key is used, which also applies to entities with</span>
+<span class="sd">        the key 'H'.</span>
+
+<span class="sd">        The following equations are used:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            H_{int} = H_{ext} - D \cdot M</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs: ENTITY, optional</span>
+<span class="sd">            Keyword arguments that will be assigned to self and possibly</span>
+<span class="sd">            contribute to the calculation of H if they are relevant.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
+        <span class="n">magnetisation_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"Magnetization"</span><span class="p">)</span>
+        <span class="n">ext_field_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"ExternalMagneticField"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">magnetisation_key</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ext_field_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">"Either an Entity with the ontology_label 'Magnetization' or "</span>
+                <span class="o">+</span> <span class="s2">" 'ExternalMagneticField' could not be found in self. "</span>
+                <span class="o">+</span> <span class="s2">"Please provide both first and try again."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">magnetisation_key</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ext_field_key</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">"More than one entity with the ontology_label 'Magnetization' "</span>
+                <span class="o">+</span> <span class="s2">"or 'ExternalMagneticField' could be found in self. "</span>
+                <span class="o">+</span> <span class="s2">"Please provide only one. The entities found were "</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">magnetisation_key</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">ext_field_key</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">):</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"The type of the kwarg ´</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">´ was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">, which is not "</span>
+                    <span class="o">+</span> <span class="s2">"allowed for this method. Please only pass kwargs of type "</span>
+                    <span class="o">+</span> <span class="s2">"mammos_entity.Entity to this method."</span>
+                <span class="p">)</span>
+
+        <span class="n">demag_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"DemagnetizingFactor"</span><span class="p">)</span>
+        <span class="n">length_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"Length"</span><span class="p">)</span>
+        <span class="c1"># self.get_entity_key only returns a str if the ontology_label was found</span>
+        <span class="c1"># exactly once. Therefore, isinstance(key, str) is a sufficient check.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">demag_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">demag_factor</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">demag_key</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">length_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">length_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"The entity ´</span><span class="si">{</span><span class="n">length_key</span><span class="si">}</span><span class="s2">´ in self does have the ontology_label "</span>
+                    <span class="o">+</span> <span class="s2">"'Length', but not the right shape of (3,). The detected "</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">"shape was </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="n">length_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">."</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">demag_factor</span> <span class="o">=</span> <span class="n">demag_cuboid</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="p">[</span><span class="n">length_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">"No suitable sample information (DemagnetizingFactor | Length)"</span>
+                <span class="o">+</span> <span class="s2">"could be found within self. Please provide sufficient information "</span>
+                <span class="o">+</span> <span class="s2">"for the calculation of H, see the docstring and try again."</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"H"</span><span class="p">]</span> <span class="o">=</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">(</span>
+            <span class="s2">"InternalMagneticField"</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">ext_field_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span> <span class="o">-</span> <span class="bp">self</span><span class="p">[</span><span class="n">magnetisation_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span> <span class="o">*</span> <span class="n">demag_factor</span><span class="o">.</span><span class="n">q</span><span class="p">,</span>
+            <span class="s2">"A/m"</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sweep.calc_B">
+<a class="viewcode-back" href="../../api_ref.html#magmeas.Sweep.calc_B">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_B</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Calculate MagneticFluxDensity and assign it to self with the key 'B'.</span>
+<span class="sd">        For this, self must contain one (and only one) Entity which has the</span>
+<span class="sd">        ontology_label 'InternalMagneticField' and one of the following:</span>
+
+<span class="sd">        - an Entity with the ontology_label 'Magnetization'</span>
+<span class="sd">        - an Entity with the ontology_label 'MagneticPolarisation'</span>
+
+<span class="sd">        If more than one variant would be possible, only one will be chosen. The</span>
+<span class="sd">        choice will fall on the option higher in the list above. If the thus</span>
+<span class="sd">        chosen option is satisfied by more than one Entity contained in self,</span>
+<span class="sd">        the calculation will be canceled as the ambiguity cannot be fixed</span>
+<span class="sd">        automatically (e.g. two Entities have the ontology_label 'Magnetization').</span>
+<span class="sd">        Optionally, the needed Entities from the list above can be given as</span>
+<span class="sd">        keyword arguments of this function to provide them for this calculation.</span>
+<span class="sd">        They will then be assigned to self and the same logic as before is</span>
+<span class="sd">        followed. Assignments to self will happen whether the given Entities</span>
+<span class="sd">        are used in the calculation or not. Already assigned Entities will be</span>
+<span class="sd">        overwritten if the same key is used, which also applies to entities with</span>
+<span class="sd">        the key 'B'.</span>
+<span class="sd">        The following equations will be used:</span>
+
+<span class="sd">        .. math::    </span>
+
+<span class="sd">            B &amp;= \mu _0 \cdot (H_{int} + M)\\</span>
+<span class="sd">            B &amp;= \mu _0 \cdot H_{int} + J</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kwargs: ENTITY, optional</span>
+<span class="sd">            Keyword arguments that will be assigned to self and possibly</span>
+<span class="sd">            contribute to the calculation of B if they are relevant.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        """</span>
+        <span class="n">field_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"InternalMagneticField"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">field_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">"No entity with the ontology_label 'InternalMagneticField' could be "</span>
+                <span class="o">+</span> <span class="s2">"found in self. Please provide a InternalMagneticField first and try "</span>
+                <span class="o">+</span> <span class="s2">"again."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">field_key</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">"More than one entity with the ontology_label 'InternalMagneticField' "</span>
+                <span class="o">+</span> <span class="s2">"could be found in self. Please provide only one. The entities "</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">"found were </span><span class="si">{</span><span class="n">field_key</span><span class="si">}</span><span class="s2">."</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">):</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"The type of the kwarg ´</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">´ was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">, which is not "</span>
+                    <span class="o">+</span> <span class="s2">"allowed for this method. Please only pass kwargs of type "</span>
+                    <span class="o">+</span> <span class="s2">"mammos_entity.Entity to this method."</span>
+                <span class="p">)</span>
+
+        <span class="n">magn_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"Magnetization"</span><span class="p">)</span>
+        <span class="n">pol_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"MagneticPolarisation"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">magn_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">"B"</span><span class="p">]</span> <span class="o">=</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">(</span>
+                <span class="s2">"MagneticFluxDensity"</span><span class="p">,</span>
+                <span class="n">u</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">mu0</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">field_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span> <span class="o">+</span> <span class="bp">self</span><span class="p">[</span><span class="n">magn_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="p">),</span>
+                <span class="s2">"T"</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pol_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">"B"</span><span class="p">]</span> <span class="o">=</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">(</span>
+                <span class="s2">"MagneticFluxDensity"</span><span class="p">,</span>
+                <span class="n">u</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">mu0</span> <span class="o">*</span> <span class="bp">self</span><span class="p">[</span><span class="n">field_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span> <span class="o">+</span> <span class="bp">self</span><span class="p">[</span><span class="n">pol_key</span><span class="p">]</span><span class="o">.</span><span class="n">q</span><span class="p">,</span>
+                <span class="s2">"T"</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">"No suitable sample information "</span>
+                <span class="o">+</span> <span class="s2">"(InternalMagneticField &amp; (Magnetization | MagneticPolarisation)) "</span>
+                <span class="o">+</span> <span class="s2">"could be found within self. Please provide sufficient information "</span>
+                <span class="o">+</span> <span class="s2">"for the calculation of B, see the docstring and try again."</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Sweep.plot">
+<a class="viewcode-back" href="../../api_ref.html#magmeas.Sweep.plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="n">filepath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">bounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fig_ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">segments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">segments_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Plot arguments and save figure if a filepath is given.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        args: STR | ENTITY | QUANTITY | ARRAY</span>
+<span class="sd">            This determines the values to be plotted. Can only be comprised of</span>
+<span class="sd">            one or two values. In the case of a string, it is first attempted</span>
+<span class="sd">            to use it as a key for the values in self. If the string is not a</span>
+<span class="sd">            key in self, then it is assumed to be an ontology_label and the</span>
+<span class="sd">            entitity in self with the fitting ontology_label will be used. If</span>
+<span class="sd">            more than one entities have a fitting ontology_label, this method</span>
+<span class="sd">            fails.</span>
+<span class="sd">            In the case of an Entity, a Quantity or an array, they are attempted</span>
+<span class="sd">            to be plotted directly.</span>
+<span class="sd">        filepath: STR | PATH, optional</span>
+<span class="sd">            Filepath for saving the figure. Default is None, in that case no</span>
+<span class="sd">            file is saved and the generated figure as well as all axes objects</span>
+<span class="sd">            are returned.</span>
+<span class="sd">        bounds: NONE | TUPLE(NONE | INT), optional</span>
+<span class="sd">            Indices (start, end) at which the data to be plotted will be cut</span>
+<span class="sd">            off. Use None to plot until the respective start or end.</span>
+<span class="sd">            Default is None.</span>
+<span class="sd">        fig_ax: TUPLE(matplotlib.figure.Figure, matplotlib.axes.Axes), optional</span>
+<span class="sd">            Tuple of figure and axes the data should be plotted to. If None is</span>
+<span class="sd">            given they will be generated dynamically. Default is None.</span>
+<span class="sd">        segments: NONE | TUPLE(NONE | INT), optional</span>
+<span class="sd">            Segmentation points (start, end) at which the data to be plotted</span>
+<span class="sd">            will be cut off. See the method self.segments for more information.</span>
+<span class="sd">            Note that valid input here are only the indices FOR the output from</span>
+<span class="sd">            the segments method and NOT the indices of the actual measurement</span>
+<span class="sd">            points. Use None to plot until the respective start or end.</span>
+<span class="sd">            Will be overwritten by bounds.</span>
+<span class="sd">            If only None and no tuple is given, this will be ignored.</span>
+<span class="sd">            Default is None.</span>
+<span class="sd">        segments_kwargs: NONE | DICT, optional</span>
+<span class="sd">            Dictionary of keyword arguments that will be unpacked in the</span>
+<span class="sd">            segments method of self, if self has one. See the respective method</span>
+<span class="sd">            for more details.</span>
+<span class="sd">            Defailt is None.</span>
+<span class="sd">        kwargs:</span>
+<span class="sd">            Keyword arguments to change the appearance of plots.</span>
+<span class="sd">            See documentation of matplotlib.pyplot.plot for more information.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None | (matplotlib.Figure, matplotlib.Axes)</span>
+<span class="sd">            Return figure and axes object if filepath is not specified.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">bounds</span>
+        <span class="k">elif</span> <span class="n">segments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">segments_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">segments</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">(</span><span class="o">**</span><span class="n">segments_kwargs</span><span class="p">)[</span><span class="n">start</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">(</span><span class="o">**</span><span class="n">segments_kwargs</span><span class="p">)[</span><span class="n">end</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">segments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">segments_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">segments</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">()[</span><span class="n">start</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">()[</span><span class="n">end</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fig_ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fig_ax</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"No values to plot were given, nothing to do."</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">_arg_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">q</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">axis_label</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"("</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="o">+</span> <span class="s2">")"</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">_arg_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">axis_label</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">q</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"("</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="o">+</span> <span class="s2">")"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">axis_label</span><span class="p">)</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">q</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"("</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span> <span class="o">+</span> <span class="s2">")"</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"A number of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="si">}</span><span class="s2"> args was given. Please use at most two."</span>
+            <span class="p">)</span>
+
+        <span class="c1"># save figure if filepath is given</span>
+        <span class="k">if</span> <span class="n">filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filepath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Jonas Winkler.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

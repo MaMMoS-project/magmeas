@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -8,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Getting started &#8212; magmeas 0.5.1 documentation</title>
+    <title>Getting started &#8212; magmeas 0.6.0 documentation</title>
   
   
   
@@ -27,24 +26,24 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
-    <script src="../_static/documentation_options.js?v=b9afe91b"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/documentation_options.js?v=8fa8b3e9"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/getting_started';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -52,6 +51,7 @@
     <link rel="next" title="API Reference" href="../api_ref.html" />
     <link rel="prev" title="magmeas documentation" href="../index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
   
@@ -71,7 +71,9 @@
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -99,7 +101,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -119,7 +121,7 @@
   
   
   
-    <p class="title logo__title">magmeas 0.5.1 documentation</p>
+    <p class="title logo__title">magmeas 0.6.0 documentation</p>
   
 </a></div>
     
@@ -134,7 +136,7 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="#" aria-current="page">
     Getting started
   </a>
 </li>
@@ -157,7 +159,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -167,11 +169,18 @@
       
         <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
       
     </div>
     
@@ -180,7 +189,7 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -189,7 +198,7 @@
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -203,7 +212,7 @@
       
       
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
@@ -220,7 +229,7 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="#" aria-current="page">
     Getting started
   </a>
 </li>
@@ -244,18 +253,26 @@
         
           <div class="navbar-item">
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
         
       </div>
     
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
   </svg>
   <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
@@ -302,7 +319,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Getting started</span></li>
@@ -326,112 +343,146 @@
 <h1>Getting started<a class="headerlink" href="#Getting-started" title="Link to this heading">#</a></h1>
 <section id="Introduction">
 <h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">#</a></h2>
-<p>This page gives a short overview over the basic usage and functionality of magmeas. For this, we are going to use VSM-data from a publically available <a class="reference external" href="https://nomad-lab.eu/prod/v1/gui/user/uploads/upload/id/dyT-vLgKTkqK5JeSy_HWwA/files/IFW_VSM_RawData">example dataset uploaded to Nomad</a>.</p>
-<p>When you are using your own measurement files, make sure that the .DAT files contain the necessary sample information. Refer to the <a class="reference external" href="https://github.com/MaMMoS-project/magmeas">magmeas README</a> for more information. Alternatively the input of sample information is also possible manually (more information <a class="reference external" href="https://mammos-project.github.io/magmeas/magmeas.html#magmeas.base.VSM.reload_qd">here</a>).</p>
+<p>This page gives a short overview over the basic usage and functionality of <a class="reference external" href="https://github.com/MaMMoS-project/magmeas">magmeas</a>. For this, we are going to use VSM-data from a publically available <a class="reference external" href="https://nomad-lab.eu/prod/v1/gui/user/uploads/upload/id/dyT-vLgKTkqK5JeSy_HWwA/files/IFW_VSM_RawData">example dataset uploaded to Nomad</a>.</p>
 </section>
-<section id="Data-analysis">
-<h2>Data analysis<a class="headerlink" href="#Data-analysis" title="Link to this heading">#</a></h2>
-<div class="nbinput nblast docutils container">
+<section id="General-concepts">
+<h2>General concepts<a class="headerlink" href="#General-concepts" title="Link to this heading">#</a></h2>
+<p>The classes defined in <code class="docutils literal notranslate"><span class="pre">magmeas</span></code> should be understood as <code class="docutils literal notranslate"><span class="pre">mammos_entity.EntityCollection</span></code> with extra functionality suited for handling magnetometry data. It is worth the time to familiarise yourself with the <a class="reference external" href="https://mammos-project.github.io/mammos/api/mammos_entity.html#mammos_entity.EntityCollection">EntityCollection</a> first.</p>
+<p>The main class of magmeas is <code class="docutils literal notranslate"><span class="pre">Sweep</span></code> and handles the initialisation, some general calculations, IO-functionality and some basic plotting. All other classes inherit this behaviour and just add some additional functionality for specific use-cases.</p>
+</section>
+<section id="Initialisation">
+<h2>Initialisation<a class="headerlink" href="#Initialisation" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Sweep</span></code> objects can be initialised as empty containers. New entities can always be added later. Alternatively, it is possible to pass entities as keyword arguments during the initialisation. As always, <code class="docutils literal notranslate"><span class="pre">mammos_entity.Entity</span></code> objects should be used wherever possible to not just incorporate numerical, but also dimensional and ontological information.</p>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import magmeas
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mammos_entity</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">me</span>
 
-dataDir = &quot;IFW_VSM_RawData/&quot;
-</pre></div>
-</div>
-</div>
-<p>Let’s start with an M(H) hysteresis loop. The magmeas package can automatically read the example dataset and calculates some extrinsic properties.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mh = magmeas.MH_major(dataDir + &quot;VSM_MH.DAT&quot;)
+<span class="kn">import</span><span class="w"> </span><span class="nn">magmeas</span>
 
-print(mh.remanence)
-print(mh.coercivity)
+<span class="n">data</span> <span class="o">=</span> <span class="n">magmeas</span><span class="o">.</span><span class="n">Sweep</span><span class="p">(</span>
+    <span class="n">H_ext</span><span class="o">=</span><span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">(</span>
+        <span class="s2">"ExternalMagneticField"</span><span class="p">,</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">1e6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.8e6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.6e6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5e6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2e6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">],</span>
+        <span class="s2">"A/m"</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="s2">"M"</span><span class="p">]</span> <span class="o">=</span> <span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">(</span>
+    <span class="s2">"Magnetization"</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mf">1e6</span><span class="p">,</span> <span class="o">-</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e6</span><span class="p">],</span> <span class="s2">"A/m"</span>
+<span class="p">)</span>
+<span class="n">data</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Remanence(value=0.39461314771557665, unit=MA / m)
-CoercivityHc(value=0.2453529830215174, unit=MA / m)
-</pre></div></div>
-</div>
-<p>Since the extrinsic properties are stored as mammos_entity. Entity objects, we can also get information about their ontology.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mh.BHmax.ontology.get_annotations()
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
-<div class="highlight"><pre>
-{&#39;wikipediaReference&#39;: [locstr(&#39;https://en.wikipedia.org/wiki/Maximum_energy_product&#39;, &#39;&#39;)],
- &#39;altLabel&#39;: [locstr(&#39;(BH)max&#39;, &#39;&#39;)],
- &#39;prefLabel&#39;: [locstr(&#39;MaximumEnergyProduct&#39;, &#39;en&#39;)],
- &#39;elucidation&#39;: [locstr(&#39;The value of the maximum energy product (BH)max is deduced from a\nplot of BH(B) for all points of the second quadrant of the B-H\nhysteresis loop. BH varies with B going through a maximum value (BH)max\nfor a particular value of B.\n\n(BH)max equals the area of the largest second-quadrant rectangle which\nfits under the B-H loop.\n\nThe maximum energy product is considered to be the best single index\nof quality of a permanent magnet material.\nIt is twice the energy stored in the stray field of the magnet of\noptimal shape.&#39;, &#39;en&#39;)]}
-</pre></div></div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "76bd26fb4e994cc287bf01e197b1ca85", "version_major": 2, "version_minor": 1}</script></div>
 </div>
 </section>
-<section id="Plotting">
-<h2>Plotting<a class="headerlink" href="#Plotting" title="Link to this heading">#</a></h2>
-<p>There is also plotting functionality compatible with common matplolib keyword arguments and the ability to either pass existing matplotlib objects to the method or returning dynamically generated figures and axes for additional formatting, enabling the integration of magmeas features in common plotting workflows. In the example below we’re doing the latter option.</p>
+<section id="Importing-measurement-data">
+<h2>Importing measurement data<a class="headerlink" href="#Importing-measurement-data" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">magmeas</span></code> was written with the analysis of <strong>experimental</strong> magnetometry data in mind. In order to do this, we’ll have to get the experimental data into the classes of <code class="docutils literal notranslate"><span class="pre">magmeas</span></code> somehow. As you have just seen, this can always be done manually. Do your own reading and processing of data first and then assign it to the <code class="docutils literal notranslate"><span class="pre">magmeas</span></code> object.</p>
+<p>However, some import functionality for common data files one might get from magnetometry equipment is already included in <code class="docutils literal notranslate"><span class="pre">magmeas</span></code>. Here is an example for an <span class="math notranslate nohighlight">\(M(H)\)</span> measurement acquired on a 14 T PPMS from Quantum Design. The import methods are written so that they assign all of the data to the object they were called from and also return this object so that it can be quickly defined in just one line.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fig, ax1, ax2 = mh.plot(unit=(&quot;MA/m&quot;, &quot;T&quot;), linestyle=&quot;-.&quot;, label=&quot;Example File 1&quot;)
-ax1.set_title(&quot;Major Hysteresis Plot&quot;)
-ax1.legend()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mh</span> <span class="o">=</span> <span class="n">magmeas</span><span class="o">.</span><span class="n">Sweep</span><span class="p">()</span><span class="o">.</span><span class="n">read_PPMS</span><span class="p">(</span><span class="s2">"IFW_VSM_RawData/VSM_MH.DAT"</span><span class="p">)</span>
+<span class="n">mh</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
+<div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
-<div class="highlight"><pre>
-&lt;matplotlib.legend.Legend at 0x124713f2ba0&gt;
-</pre></div></div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "d9f37e0c690741b682eeafad3c9d973e", "version_major": 2, "version_minor": 1}</script></div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/notebooks_getting_started_7_1.png" src="../_images/notebooks_getting_started_7_1.png" />
-</div>
-</div>
-<p>In case the plotting functionality of magmeas is not sufficient we can also access the measurement values such as magnetic field H, magnetization M, time t and temperature T from the VSM object as they are saved as <code class="docutils literal notranslate"><span class="pre">mammos_units.Entity</span></code> objects. For plotting we’ll have to use convert them to a <code class="docutils literal notranslate"><span class="pre">mammos_units.Quantity</span></code> first.</p>
+<p>More advanced import functionality which can be used to bundle together several steps and execute them at once is presented in more detail in a separate tutorial.</p>
+</section>
+<section id="Calculate-Magnetisation">
+<h2>Calculate Magnetisation<a class="headerlink" href="#Calculate-Magnetisation" title="Link to this heading">#</a></h2>
+<p>Since many data files only contain the <code class="docutils literal notranslate"><span class="pre">MagneticMoment</span></code> <span class="math notranslate nohighlight">\(\mu\)</span>, it is a common task to calculate the <code class="docutils literal notranslate"><span class="pre">Magnetization</span></code>. This can easily be done with the <code class="docutils literal notranslate"><span class="pre">calc_M</span></code> method all <code class="docutils literal notranslate"><span class="pre">magmeas</span></code> classes contain. Since the <code class="docutils literal notranslate"><span class="pre">Magnetization</span></code> is the <code class="docutils literal notranslate"><span class="pre">MagneticMoment</span></code> per unit volume, some additional information about the sample is needed. This can be assigned to the object before the calculation, but also while calling the <code class="docutils literal notranslate"><span class="pre">calc_M</span></code> method. The <code class="docutils literal notranslate"><span class="pre">MagneticPolarisation</span></code> is always calculated
+together with the <code class="docutils literal notranslate"><span class="pre">Magnetization</span></code>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import matplotlib.pyplot as plt
-
-fig, ax1 = plt.subplots()
-ax2 = ax1.twinx()
-color1, color2 = &quot;tab:blue&quot;, &quot;tab:orange&quot;
-
-ax1.plot(mh.t.q, mh.H.q, color=color1)
-ax1.set_xlabel(f&quot;Time in {mh.t.unit}&quot;)
-ax1.set_ylabel(f&quot;Magnetic field in {mh.M.unit}&quot;, color=color1)
-ax1.tick_params(axis=&quot;y&quot;, labelcolor=color1)
-
-ax2.plot(mh.t.q, mh.M.q, color=color2)
-ax2.set_ylabel(f&quot;Magnetization in {mh.M.unit}&quot;, color=color2)
-ax2.tick_params(axis=&quot;y&quot;, labelcolor=color2)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mh</span><span class="o">.</span><span class="n">calc_M</span><span class="p">(</span><span class="n">V</span><span class="o">=</span><span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">(</span><span class="s2">"Volume"</span><span class="p">,</span> <span class="mf">10.64</span><span class="p">,</span> <span class="s2">"mm3"</span><span class="p">))</span>
+<span class="n">mh</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "482bba3a3f4945c6a9aee8b78c91c33c", "version_major": 2, "version_minor": 1}</script></div>
+</div>
+</section>
+<section id="Correct-for-demagnetisation">
+<h2>Correct for demagnetisation<a class="headerlink" href="#Correct-for-demagnetisation" title="Link to this heading">#</a></h2>
+<p>Another common task in the analysis of magnetometric data is the correction of the <code class="docutils literal notranslate"><span class="pre">ExternalMagneticField</span></code> for demagnetisation, yielding the <code class="docutils literal notranslate"><span class="pre">InternalMagneticField</span></code>. This can also be done with <code class="docutils literal notranslate"><span class="pre">magmeas</span></code>, using the <code class="docutils literal notranslate"><span class="pre">corr_demag</span></code> method. As before, the needed additional information, i.e. the <code class="docutils literal notranslate"><span class="pre">DemagnetizingFactor</span></code> can be assigned to the object before or while calling this method. For convenience, the sample information needed for calculating the <code class="docutils literal notranslate"><span class="pre">DemagnetizingFactor</span></code> of a rectangular
+cuboid can be used instead.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mh</span><span class="o">.</span><span class="n">corr_demag</span><span class="p">(</span>
+    <span class="n">dimensions</span><span class="o">=</span><span class="n">me</span><span class="o">.</span><span class="n">Entity</span><span class="p">(</span>
+        <span class="s2">"Length"</span><span class="p">,</span>
+        <span class="p">[</span><span class="mf">2.70</span><span class="p">,</span> <span class="mf">1.99</span><span class="p">,</span> <span class="mf">1.98</span><span class="p">],</span>
+        <span class="s2">"mm"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Direction of external magnetic field along first dimension."</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+<span class="n">mh</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "31f054f0a37548d69ca9d7a6095850a9", "version_major": 2, "version_minor": 1}</script></div>
+</div>
+</section>
+<section id="Calculate-magnetic-flux-density">
+<h2>Calculate magnetic flux density<a class="headerlink" href="#Calculate-magnetic-flux-density" title="Link to this heading">#</a></h2>
+<p>Since we now have all the information we need, let’s also calculate the <code class="docutils literal notranslate"><span class="pre">MagneticFluxDensity</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mh</span><span class="o">.</span><span class="n">calc_B</span><span class="p">()</span>
+<span class="n">mh</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "7dea6ece7ecc4b43b3c7e0e4e8332e2f", "version_major": 2, "version_minor": 1}</script></div>
+</div>
+</section>
+<section id="Finding-entities">
+<h2>Finding entities<a class="headerlink" href="#Finding-entities" title="Link to this heading">#</a></h2>
+<p>Like for a regular dictionary, you will always need the key of an entity to access and do something with it. If you want to know the key(s) of entities with a specific ontology label, you can use the method <code class="docutils literal notranslate"><span class="pre">get_entity_key</span></code> instead of searching through everything manually. This will return <code class="docutils literal notranslate"><span class="pre">None</span></code> if the ontology label could not be found, the key as a string if it could be found once and a list of strings if several entities in the object carry the specified ontology label.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">mh</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"ExternalMagneticField"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mh</span><span class="o">.</span><span class="n">get_entity_key</span><span class="p">(</span><span class="s2">"Mass"</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -439,28 +490,10 @@ ax2.tick_params(axis=&quot;y&quot;, labelcolor=color2)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_getting_started_9_0.png" src="../_images/notebooks_getting_started_9_0.png" />
-</div>
-</div>
-</section>
-<section id="File-Export">
-<h2>File Export<a class="headerlink" href="#File-Export" title="Link to this heading">#</a></h2>
-<p>Since all magmeas classes inherit from the <code class="docutils literal notranslate"><span class="pre">mammos_entity.EntityCollection</span></code> class, they can also access its advanced export functionality.</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import h5py
-
-mh.to_csv(&quot;VSM_export.csv&quot;)
-
-with h5py.File(&quot;Some_file.hdf5&quot;, &quot;w&quot;) as f:
-    grp = f.create_group(&quot;Some group label&quot;)
-    mh.to_hdf5(grp)
-
-mh.to_yaml(&quot;VSM_export.yml&quot;)
-</pre></div>
-</div>
+<div class="highlight"><pre>
+H_ext
+None
+</pre></div></div>
 </div>
 </section>
 </section>
@@ -500,7 +533,7 @@ mh.to_yaml(&quot;VSM_export.yml&quot;)
             
             
               
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
@@ -513,9 +546,13 @@ mh.to_yaml(&quot;VSM_export.yml&quot;)
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Data-analysis">Data analysis</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Plotting">Plotting</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#File-Export">File Export</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#General-concepts">General concepts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Initialisation">Initialisation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Importing-measurement-data">Importing measurement data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Calculate-Magnetisation">Calculate Magnetisation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Correct-for-demagnetisation">Correct for demagnetisation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Calculate-magnetic-flux-density">Calculate magnetic flux density</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Finding-entities">Finding entities</a></li>
 </ul>
   </nav></div>
 
@@ -541,8 +578,8 @@ mh.to_yaml(&quot;VSM_export.yml&quot;)
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -562,8 +599,7 @@ mh.to_yaml(&quot;VSM_export.yml&quot;)
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-    <br/>
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.2.0.
   </p>
 </div>
       
@@ -576,7 +612,7 @@ mh.to_yaml(&quot;VSM_export.yml&quot;)
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

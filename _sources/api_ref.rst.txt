@@ -1,7 +1,7 @@
 API Reference
 ==============
 
-.. automodule:: magmeas.base
+.. automodule:: magmeas
     :members:
     :show-inheritance:
     :undoc-members:
